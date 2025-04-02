@@ -9,6 +9,7 @@ import SearchModal from "../components/SearchModal";
 import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
 import Checkbox from "../components/ui/checkbox";
 import Textarea from "../components/ui/textarea";
+import ProjectSelector from "../components/ProjectSelector";
 
 const searchFilters = [
   { label: "Projects", value: "projects" },
@@ -21,6 +22,8 @@ const searchFilters = [
 
 export default function AppFrame() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [currentProject, setCurrentProject] = useState({ id: "woodside", name: "Woodside" });
+  
   return (
     <TooltipProvider>
       <div className="flex h-screen w-screen bg-[#F7F5F2]">
@@ -33,7 +36,6 @@ export default function AppFrame() {
                 <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Dashboard</span>
               </div>
             </TooltipTrigger>
-            <TooltipContent>Dashboard</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -43,7 +45,6 @@ export default function AppFrame() {
                 <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Data</span>
               </div>
             </TooltipTrigger>
-            <TooltipContent>Data</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -53,7 +54,6 @@ export default function AppFrame() {
                 <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Agents</span>
               </div>
             </TooltipTrigger>
-            <TooltipContent>Agents</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -63,7 +63,6 @@ export default function AppFrame() {
                 <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Settings</span>
               </div>
             </TooltipTrigger>
-            <TooltipContent>Settings</TooltipContent>
           </Tooltip>
         </div>
 
@@ -74,9 +73,10 @@ export default function AppFrame() {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <img src="/logo.svg" alt="Logo" className="h-11 w-11" />
-                <div className="text-[#3A366E] font-medium text-lg flex items-center">
-                  Woodside <ChevronDown className="ml-1 w-4 h-4 text-[#4C5760]" />
-                </div>
+                <ProjectSelector 
+                  initialProject={currentProject} 
+                  onProjectChange={(project) => setCurrentProject(project)} 
+                />
               </div>
             </div>
 

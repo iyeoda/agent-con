@@ -16,7 +16,34 @@
    - The modal is styled to match the overall app, with no background dimming.
    - Results are grouped into categories: Documents, Tasks, and Projects, each with links for more details.
 
-4. **Styling**
-   - The color scheme includes shades of indigo, orange, and mint.
+4. **Modals & Popovers**
+   - Modals use the Radix UI Dialog component for accessibility and consistent behavior.
+   - Modals have clean white backgrounds with rounded corners and subtle borders (border-[#A7CEBC]).
+   - No heavy background dimming to maintain a light, airy feel of the application.
+   - Popovers for contextual actions use Radix UI Popover component.
+   - Popover content has consistent styling: white background, subtle shadow, border-[#A7CEBC], and rounded corners.
+
+5. **Selectors & Dropdown Menus**
+   - Dropdown menus and selectors use the Popover component for consistent appearance.
+   - Selected items are highlighted with the accent color (text-[#D15F36]).
+   - Hover states use a light background (bg-[#F7F5F2]) to indicate interactivity.
+   - Menu items have consistent padding (py-2 px-3) and spacing.
+   - Selection controls are extracted into reusable components to ensure consistency throughout the app.
+   - Component design supports future backend integration via props for dynamic data and change handlers.
+
+6. **Styling**
+   - The color scheme includes shades of indigo (#3A366E), orange (#D15F36), and mint (#A7CEBC).
+   - Text uses dark gray (#4C5760) for regular content and indigo for emphasis.
    - Elements are spaced neatly and are responsive.
    - The overall aesthetic is modern, clean, and professional with a touch of creativity (e.g., the use of orange for key buttons and accents).
+
+7. **Component Architecture**
+   - **Separation of concerns**: UI components are isolated in dedicated files with specific functionality.
+   - **Reusability**: Components like ProjectSelector are designed to be reused across the application with consistent behavior.
+   - **Future-proofing**: Components are built with backend integration in mind:
+     - API calls can be added inside components
+     - Parent components can fetch data and pass as props
+     - Loading states and error handling are implemented within components
+   - **Maintainability**: Changes to specific functionality (like project selection) are contained to a single file.
+   - **Type Safety**: Components use TypeScript interfaces to ensure proper prop usage and data handling.
+   - **Accessibility**: Components leverage Radix UI primitives for keyboard navigation, focus management, and proper ARIA attributes.
