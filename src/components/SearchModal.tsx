@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import Textarea from './ui/textarea';
 import { Popover, PopoverTrigger, PopoverContent } from '@radix-ui/react-popover';
@@ -20,11 +20,28 @@ const searchFilters = [
 
 const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState("");
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="w-[500px] fixed top-0 right-[96px] border border-[#A7CEBC] shadow-lg bg-white z-50 p-4 rounded-b-lg mt-0">
+    <div ref={modalRef} className="w-[500px] fixed top-0 right-[96px] border border-[#A7CEBC] shadow-lg bg-white z-50 p-4 rounded-b-lg mt-0">
       <div className="space-y-4">
         <div className="relative">
           <Textarea
