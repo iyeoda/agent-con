@@ -4,7 +4,8 @@ import Input from "../components/ui/input";
 import Avatar from "../components/ui/avatar";
 import { ChevronDown, HelpCircle, Settings, Folder, LayoutDashboard, Bot, ChevronDownIcon, Sparkles } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
+import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
+import SearchModal from "../components/SearchModal";
 import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
 import Checkbox from "../components/ui/checkbox";
 import Textarea from "../components/ui/textarea";
@@ -19,7 +20,7 @@ const searchFilters = [
 ];
 
 export default function AppFrame() {
-  const [query, setQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   return (
     <TooltipProvider>
       <div className="flex h-screen w-screen bg-[#F7F5F2]">
@@ -72,7 +73,7 @@ export default function AppFrame() {
           <div className="h-16 border-b border-[#A7CEBC] bg-[#F7F5F2] flex items-center px-6 justify-between">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                <img src="/logo.png" alt="Logo" className="h-8 w-8" />
+                <img src="/logo.svg" alt="Logo" className="h-11 w-11" />
                 <div className="text-[#3A366E] font-medium text-lg flex items-center">
                   Woodside <ChevronDown className="ml-1 w-4 h-4 text-[#4C5760]" />
                 </div>
@@ -80,46 +81,20 @@ export default function AppFrame() {
             </div>
 
             <div className="flex items-center gap-4">
-              <Dialog>
+              <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <DialogTrigger asChild>
                   <div className="relative w-[300px]">
                     <Input
                       placeholder="Search..."
-                      className="border border-[#4C5760] text-[#4C5760] pr-10"
+                      className="border border-[#4C5760] text-[#4C5760] w-full pr-10"
                       readOnly
                     />
-                    <Sparkles className="absolute right-2 top-2 w-5 h-5 text-[#D15F36] pointer-events-none" />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <Sparkles className="w-4 h-4 text-[#D15F36]" />
+                    </div>
                   </div>
                 </DialogTrigger>
-                <DialogContent className="w-full max-w-2xl">
-                  <DialogTitle className="sr-only">Semantic AI Search</DialogTitle>
-                  <div className="space-y-4">
-                    <Textarea
-                      autoFocus
-                      placeholder="Ask about documents, tasks, agents..."
-                      value={query}
-                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setQuery(e.target.value)}
-                      className="resize-none min-h-[60px] max-h-[200px] border border-[#4C5760] text-[#4C5760]"
-                    />
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="text-[#4C5760] border-[#4C5760] px-2 py-1 h-auto">
-                          Filter <ChevronDownIcon className="w-4 h-4 ml-1" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-48 bg-white shadow border border-[#A7CEBC]">
-                        {searchFilters.map((filter) => (
-                          <div key={filter.value} className="flex items-center space-x-2 py-1">
-                            <Checkbox id={filter.value} />
-                            <label htmlFor={filter.value} className="text-sm text-[#4C5760]">
-                              {filter.label}
-                            </label>
-                          </div>
-                        ))}
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </DialogContent>
+                <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
               </Dialog>
               <HelpCircle className="text-[#4C5760] w-5 h-5 hover:text-[#D15F36] cursor-pointer" />
               <Avatar className="h-8 w-8 bg-[#3A366E] text-white text-sm font-bold">U</Avatar>
