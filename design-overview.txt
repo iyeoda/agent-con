@@ -1,0 +1,22 @@
+### App Framework UI Design Overview
+
+1. **Sidebar**
+   - A vertical sidebar with icons for "Dashboard," "Data," "AI Agents," and "Settings."
+   - Icons are displayed with tooltips that reveal the name of each section when hovered.
+   - Sidebar expands on hover to reveal text labels next to the icons.
+
+2. **Top Bar**
+   - Contains the app logo and the active project name ("Woodside").
+   - A search button (with an orange icon) opens a modal to handle complex queries.
+   - The modal provides a text area for multi-line input and filter options for the search.
+
+3. **Search Modal**
+   - Triggered when the search button is clicked.
+   - Includes an input field for the search query and options to filter by categories such as Projects, Documents, AI Agents, etc.
+   - The modal is styled to match the overall app, with no background dimming.
+   - Results are grouped into categories: Documents, Tasks, and Projects, each with links for more details.
+
+4. **Styling**
+   - The color scheme includes shades of indigo, orange, and mint.
+   - Elements are spaced neatly and are responsive.
+   - The overall aesthetic is modern, clean, and professional with a touch of creativity (e.g., the use of orange for key buttons and accents).
