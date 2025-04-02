@@ -10,6 +10,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover
 import Checkbox from "../components/ui/checkbox";
 import Textarea from "../components/ui/textarea";
 import ProjectSelector from "../components/ProjectSelector";
+import ProjectDashboard from "../components/ProjectDashboard";
 
 const searchFilters = [
   { label: "Projects", value: "projects" },
@@ -23,6 +24,7 @@ const searchFilters = [
 export default function AppFrame() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentProject, setCurrentProject] = useState({ id: "woodside", name: "Woodside" });
+  const [activeView, setActiveView] = useState("dashboard"); // Track the active view
   
   return (
     <TooltipProvider>
@@ -31,8 +33,11 @@ export default function AppFrame() {
         <div className="w-16 hover:w-40 bg-white border-r border-[#A7CEBC] flex flex-col items-start py-4 space-y-6 group relative transition-all duration-300 overflow-hidden">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-2 w-full px-4 cursor-pointer">
-                <LayoutDashboard className="min-w-[24px] text-[#3A366E] w-6 h-6 hover:text-[#D15F36]" />
+              <div 
+                className={`flex items-center gap-2 w-full px-4 cursor-pointer ${activeView === 'dashboard' ? 'text-[#D15F36]' : ''}`}
+                onClick={() => setActiveView('dashboard')}
+              >
+                <LayoutDashboard className={`min-w-[24px] w-6 h-6 ${activeView === 'dashboard' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
                 <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Dashboard</span>
               </div>
             </TooltipTrigger>
@@ -40,8 +45,11 @@ export default function AppFrame() {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-2 w-full px-4 cursor-pointer">
-                <Folder className="min-w-[24px] text-[#3A366E] w-6 h-6 hover:text-[#D15F36]" />
+              <div 
+                className={`flex items-center gap-2 w-full px-4 cursor-pointer ${activeView === 'data' ? 'text-[#D15F36]' : ''}`}
+                onClick={() => setActiveView('data')}
+              >
+                <Folder className={`min-w-[24px] w-6 h-6 ${activeView === 'data' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
                 <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Data</span>
               </div>
             </TooltipTrigger>
@@ -49,8 +57,11 @@ export default function AppFrame() {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-2 w-full px-4 cursor-pointer">
-                <Bot className="min-w-[24px] text-[#D15F36] w-6 h-6 hover:scale-105 transition-transform" />
+              <div 
+                className={`flex items-center gap-2 w-full px-4 cursor-pointer ${activeView === 'agents' ? 'text-[#D15F36]' : ''}`}
+                onClick={() => setActiveView('agents')}
+              >
+                <Bot className={`min-w-[24px] w-6 h-6 ${activeView === 'agents' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
                 <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Agents</span>
               </div>
             </TooltipTrigger>
@@ -58,8 +69,11 @@ export default function AppFrame() {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-2 w-full px-4 cursor-pointer">
-                <Settings className="min-w-[24px] text-[#4C5760] w-6 h-6 hover:text-[#D15F36]" />
+              <div 
+                className={`flex items-center gap-2 w-full px-4 cursor-pointer ${activeView === 'settings' ? 'text-[#D15F36]' : ''}`}
+                onClick={() => setActiveView('settings')}
+              >
+                <Settings className={`min-w-[24px] w-6 h-6 ${activeView === 'settings' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
                 <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Settings</span>
               </div>
             </TooltipTrigger>
@@ -101,8 +115,13 @@ export default function AppFrame() {
             </div>
           </div>
 
-          {/* Main Content Area (Empty) */}
-          <div className="flex-1 bg-gradient-to-b from-[#F7F5F2] to-[#F7F5F2]/80"></div>
+          {/* Main Content Area */}
+          <div className="flex-1 overflow-auto">
+            {activeView === 'dashboard' && <ProjectDashboard />}
+            {activeView === 'data' && <div className="p-6"><h1 className="text-2xl">Data View</h1></div>}
+            {activeView === 'agents' && <div className="p-6"><h1 className="text-2xl">AI Agents</h1></div>}
+            {activeView === 'settings' && <div className="p-6"><h1 className="text-2xl">Settings</h1></div>}
+          </div>
         </div>
       </div>
     </TooltipProvider>
