@@ -8,6 +8,7 @@ import SearchModal from "../components/SearchModal";
 import ProjectSelector from "../components/ProjectSelector";
 import ProjectDashboard from "../components/ProjectDashboard";
 import ProjectDataSection from "../components/ProjectDataSection";
+import AgentsSection from "../components/AgentsSection";
 
 export default function AppFrame() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -107,7 +108,7 @@ export default function AppFrame() {
           <div className="flex-1 overflow-auto">
             {activeView === 'dashboard' && <ProjectDashboard />}
             {activeView === 'data' && <ProjectDataSection />}
-            {activeView === 'agents' && <div className="p-6"><h1 className="text-2xl">AI Agents</h1></div>}
+            {activeView === 'agents' && <AgentsSection />}
             {activeView === 'settings' && <div className="p-6"><h1 className="text-2xl">Settings</h1></div>}
           </div>
         </div>
