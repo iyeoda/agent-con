@@ -16,12 +16,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       if (value !== undefined && value !== activeTab) {
         setActiveTab(value);
       }
-    }, [value]);
-    
-    const handleValueChange = (newValue: string) => {
-      setActiveTab(newValue);
-      onValueChange?.(newValue);
-    };
+    }, [value, activeTab]);
     
     return (
       <div

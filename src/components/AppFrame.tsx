@@ -1,26 +1,13 @@
 import React, { useState } from "react";
-import Button from "../components/ui/button";
 import Input from "../components/ui/input";
 import Avatar from "../components/ui/avatar";
-import { ChevronDown, HelpCircle, Settings, Folder, LayoutDashboard, Bot, ChevronDownIcon, Sparkles } from "lucide-react";
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip";
+import { HelpCircle, Settings, Folder, LayoutDashboard, Bot, Sparkles } from "lucide-react";
+import { TooltipProvider, Tooltip, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import SearchModal from "../components/SearchModal";
-import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
-import Checkbox from "../components/ui/checkbox";
-import Textarea from "../components/ui/textarea";
 import ProjectSelector from "../components/ProjectSelector";
 import ProjectDashboard from "../components/ProjectDashboard";
 import ProjectDataSection from "../components/ProjectDataSection";
-
-const searchFilters = [
-  { label: "Projects", value: "projects" },
-  { label: "Documents", value: "documents" },
-  { label: "Schedules", value: "schedules" },
-  { label: "AI Agents", value: "agents" },
-  { label: "Tasks / Issues", value: "issues" },
-  { label: "Data Tables", value: "data" },
-];
 
 export default function AppFrame() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
