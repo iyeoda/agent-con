@@ -2,29 +2,38 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { 
-  UserCircle, Building, CreditCard, BellRing, Database, Shield
+  UserCircle, Building, CreditCard, BellRing, Database, Shield, Users
 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 
 import { GeneralSettings } from './settings/GeneralSettings';
 import { CDEConnectionSettings } from './settings/CDEConnectionSettings';
-import { ProjectSettings } from './settings/ProjectSettings';
-import { TeamSettings } from './settings/TeamSettings';
+import ProjectSettings from './settings/ProjectSettings';
+import TeamSettings from './settings/TeamSettings';
 import { NotificationSettings } from './settings/NotificationSettings';
 import { SecuritySettings } from './settings/SecuritySettings';
 import { BillingSettings } from './settings/BillingSettings';
 
 const SettingsSection = () => {
-  const [activeTab, setActiveTab] = useState('projects');
+  const [activeTab, setActiveTab] = useState('general');
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
   // Navigation items for the settings sidebar
   const navItems = [
     { id: 'general', label: 'General', icon: UserCircle },
     { id: 'cde', label: 'CDE Connections', icon: Database },
     { id: 'projects', label: 'Projects', icon: Building },
-    { id: 'team', label: 'Team Members', icon: UserCircle },
+    { id: 'team', label: 'Team', icon: Users },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'notifications', label: 'Notifications', icon: BellRing },
     { id: 'billing', label: 'Billing & Plans', icon: CreditCard },
+  ];
+
+  // Mock projects data - replace with actual data from your backend
+  const projects = [
+    { id: '1', name: 'Woodside Tower Project' },
+    { id: '2', name: 'City Center Mall' },
+    { id: '3', name: 'Riverfront Apartments' },
   ];
 
   return (
@@ -71,6 +80,24 @@ const SettingsSection = () => {
         <div className="flex-grow">
           <Card className="border-[#A7CEBC]">
             <CardContent className="p-6">
+              {/* Project Selection Dropdown - Only show when in project-specific settings */}
+              {(activeTab === 'projects' || activeTab === 'team') && (
+                <div className="mb-6">
+                  <Select value={selectedProject || ''} onValueChange={setSelectedProject}>
+                    <SelectTrigger className="w-[300px] border-[#A7CEBC]">
+                      <SelectValue placeholder="Select a project" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projects.map((project) => (
+                        <SelectItem key={project.id} value={project.id}>
+                          {project.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="hidden">
                   {navItems.map(item => (
@@ -90,11 +117,23 @@ const SettingsSection = () => {
                   </TabsContent>
                   
                   <TabsContent value="projects" className="m-0">
-                    <ProjectSettings />
+                    {selectedProject ? (
+                      <ProjectSettings projectId={selectedProject} />
+                    ) : (
+                      <div className="text-center py-8 text-[#4C5760]">
+                        Please select a project to view its settings
+                      </div>
+                    )}
                   </TabsContent>
                   
                   <TabsContent value="team" className="m-0">
-                    <TeamSettings />
+                    {selectedProject ? (
+                      <TeamSettings projectId={selectedProject} />
+                    ) : (
+                      <div className="text-center py-8 text-[#4C5760]">
+                        Please select a project to manage its team members
+                      </div>
+                    )}
                   </TabsContent>
                   
                   <TabsContent value="security" className="m-0">

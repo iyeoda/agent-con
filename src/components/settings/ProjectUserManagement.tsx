@@ -1,32 +1,32 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Label } from '../../components/ui/label';
+import Button from '../../components/ui/button';
 import Input from '../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
-import Button from '../../components/ui/button';
-import { Users, UserPlus, Trash2, MoreVertical } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
+import { UserPlus, Mail, Shield, MoreVertical, Trash2 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../../components/ui/dropdown-menu';
 
-interface TeamSettingsProps {
-  projectId: string;
-}
-
-interface TeamMember {
+interface ProjectUser {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'member' | 'viewer';
+  role: 'admin' | 'editor' | 'viewer';
   status: 'active' | 'pending';
   joinedAt: string;
 }
 
-const TeamSettings: React.FC<TeamSettingsProps> = ({ projectId }) => {
+const ProjectUserManagement: React.FC = () => {
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState<'admin' | 'member' | 'viewer'>('member');
-
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'editor' | 'viewer'>('viewer');
+  
   // Mock data - replace with actual data from your backend
-  const teamMembers: TeamMember[] = [
+  const users: ProjectUser[] = [
     {
       id: '1',
       name: 'John Doe',
@@ -39,14 +39,14 @@ const TeamSettings: React.FC<TeamSettingsProps> = ({ projectId }) => {
       id: '2',
       name: 'Jane Smith',
       email: 'jane@example.com',
-      role: 'member',
+      role: 'editor',
       status: 'active',
       joinedAt: '2024-02-01'
     },
     {
       id: '3',
-      name: 'Mike Johnson',
-      email: 'mike@example.com',
+      name: 'Bob Wilson',
+      email: 'bob@example.com',
       role: 'viewer',
       status: 'pending',
       joinedAt: '2024-02-15'
@@ -54,76 +54,66 @@ const TeamSettings: React.FC<TeamSettingsProps> = ({ projectId }) => {
   ];
 
   const handleInvite = () => {
-    // TODO: Implement invite functionality
-    console.log('Inviting user:', { email: inviteEmail, role: inviteRole, projectId });
+    // TODO: Implement invite logic
+    console.log('Inviting user:', inviteEmail, 'with role:', selectedRole);
     setInviteEmail('');
   };
 
-  const handleRemoveMember = (memberId: string) => {
-    // TODO: Implement remove member functionality
-    console.log('Removing member:', { memberId, projectId });
+  const handleRemoveUser = (userId: string) => {
+    // TODO: Implement remove user logic
+    console.log('Removing user:', userId);
   };
 
-  const handleUpdateRole = (memberId: string, newRole: 'admin' | 'member' | 'viewer') => {
-    // TODO: Implement role update functionality
-    console.log('Updating role:', { memberId, newRole, projectId });
+  const handleUpdateRole = (userId: string, newRole: 'admin' | 'editor' | 'viewer') => {
+    // TODO: Implement role update logic
+    console.log('Updating role for user:', userId, 'to:', newRole);
   };
 
   return (
     <div className="space-y-6">
-      {/* Invite New Member */}
       <Card className="border-[#A7CEBC]">
         <CardHeader>
           <CardTitle className="text-[#3A366E] flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-[#D15F36]" />
-            Invite Team Member
+            Invite New User
           </CardTitle>
-          <CardDescription>Add a new member to this project</CardDescription>
+          <CardDescription>Add new team members to your project</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <div className="flex-grow">
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter email address"
-                value={inviteEmail}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInviteEmail(e.target.value)}
-                className="border-[#A7CEBC]"
-              />
-            </div>
-            <div className="w-48">
-              <Label htmlFor="role">Role</Label>
-              <Select value={inviteRole} onValueChange={(value: 'admin' | 'member' | 'viewer') => setInviteRole(value)}>
-                <SelectTrigger className="border-[#A7CEBC]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="member">Member</SelectItem>
-                  <SelectItem value="viewer">Viewer</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-end">
-              <Button 
-                onClick={handleInvite}
-                className="bg-[#D15F36] text-white hover:bg-opacity-90"
-              >
-                Invite
-              </Button>
-            </div>
+            <Input
+              type="email"
+              placeholder="Enter email address"
+              value={inviteEmail}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInviteEmail(e.target.value)}
+              className="flex-1"
+            />
+            <Select value={selectedRole} onValueChange={(value: 'admin' | 'editor' | 'viewer') => setSelectedRole(value)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="editor">Editor</SelectItem>
+                <SelectItem value="viewer">Viewer</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button 
+              onClick={handleInvite}
+              className="bg-[#D15F36] text-white hover:bg-opacity-90"
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Send Invite
+            </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Team Members List */}
       <Card className="border-[#A7CEBC]">
         <CardHeader>
           <CardTitle className="text-[#3A366E] flex items-center gap-2">
-            <Users className="h-5 w-5 text-[#D15F36]" />
-            Team Members
+            <Shield className="h-5 w-5 text-[#D15F36]" />
+            User Management
           </CardTitle>
           <CardDescription>Manage team member roles and permissions</CardDescription>
         </CardHeader>
@@ -140,35 +130,35 @@ const TeamSettings: React.FC<TeamSettingsProps> = ({ projectId }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {teamMembers.map((member) => (
-                <TableRow key={member.id}>
-                  <TableCell className="font-medium">{member.name}</TableCell>
-                  <TableCell>{member.email}</TableCell>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
                   <TableCell>
                     <Select 
-                      value={member.role} 
-                      onValueChange={(value: 'admin' | 'member' | 'viewer') => handleUpdateRole(member.id, value)}
+                      value={user.role} 
+                      onValueChange={(value: 'admin' | 'editor' | 'viewer') => handleUpdateRole(user.id, value)}
                     >
-                      <SelectTrigger className="border-[#A7CEBC]">
+                      <SelectTrigger className="w-[120px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="member">Member</SelectItem>
+                        <SelectItem value="editor">Editor</SelectItem>
                         <SelectItem value="viewer">Viewer</SelectItem>
                       </SelectContent>
                     </Select>
                   </TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
-                      member.status === 'active' 
+                      user.status === 'active' 
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-yellow-100 text-yellow-800'
                     }`}>
-                      {member.status}
+                      {user.status}
                     </span>
                   </TableCell>
-                  <TableCell>{new Date(member.joinedAt).toLocaleDateString()}</TableCell>
+                  <TableCell>{new Date(user.joinedAt).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -179,10 +169,10 @@ const TeamSettings: React.FC<TeamSettingsProps> = ({ projectId }) => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem 
                           className="text-red-600"
-                          onClick={() => handleRemoveMember(member.id)}
+                          onClick={() => handleRemoveUser(user.id)}
                         >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Remove
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Remove User
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -197,4 +187,4 @@ const TeamSettings: React.FC<TeamSettingsProps> = ({ projectId }) => {
   );
 };
 
-export default TeamSettings;
+export default ProjectUserManagement; 

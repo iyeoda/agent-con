@@ -3,7 +3,7 @@ import { Project, Agent, Drawing, Task, ProjectMetrics, RecentActivity, Deadline
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Progress } from '../components/ui/progress';
-import { Activity, AlertTriangle, BarChart3, Calendar, CheckCircle, FileText, MessageSquare, Users, Bot } from 'lucide-react';
+import { Activity, AlertTriangle, BarChart3, Calendar, CheckCircle, FileText, MessageSquare, Users, Bot, UserPlus } from 'lucide-react';
 import AgentsSection from './AgentsSection';
 import DrawingsSection from './DrawingsSection';
 import { projectData } from '../mock-data/project-data';
@@ -45,6 +45,10 @@ const DashboardSection: React.FC<DashboardSectionProps> = ({ selectedProject }) 
           <p className="text-[#4C5760]">Phase: {selectedProject.phase} • Location: {selectedProject.location} • ID: {selectedProject.id}</p>
         </div>
         <div className="flex space-x-2">
+          <button className="px-4 py-2 bg-[#D15F36] text-white rounded-md shadow-sm hover:bg-opacity-90 flex items-center gap-2">
+            <UserPlus size={16} />
+            Invite User
+          </button>
           <button className="px-4 py-2 bg-[#D15F36] text-white rounded-md shadow-sm hover:bg-opacity-90">
             Create Report
           </button>
