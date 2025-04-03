@@ -11,7 +11,9 @@ import ProjectDataSection from "../components/ProjectDataSection";
 import AgentsSection from "../components/AgentsSection";
 import SettingsSection from "../components/SettingsSection";
 import { AvatarDropdown } from "../components/AvatarDropdown";
-import { Project } from '../types/project';
+import { Project, Agent } from '../types';
+import { projectData } from '../mock-data/project-data';
+import DashboardSection from "../components/DashboardSection";
 
 export default function AppFrame() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -22,6 +24,19 @@ export default function AppFrame() {
     status: 'active'
   });
   const [activeView, setActiveView] = useState("dashboard"); // Track the active view
+  const [currentAgents, setCurrentAgents] = useState<Agent[]>([]);
+
+  // Update agents when project changes
+  React.useEffect(() => {
+    if (currentProject) {
+      const data = projectData[currentProject.id];
+      if (data) {
+        setCurrentAgents(data.agents);
+      } else {
+        setCurrentAgents([]);
+      }
+    }
+  }, [currentProject]);
   
   return (
     <BrowserRouter>
@@ -121,9 +136,9 @@ export default function AppFrame() {
 
             {/* Main Content Area */}
             <div className="flex-1 overflow-auto">
-              {activeView === 'dashboard' && <ProjectDashboard />}
+              {activeView === 'dashboard' && <DashboardSection selectedProject={currentProject} />}
               {activeView === 'data' && <ProjectDataSection />}
-              {activeView === 'agents' && <AgentsSection />}
+              {activeView === 'agents' && <AgentsSection agents={currentAgents} />}
               {activeView === 'settings' && <SettingsSection />}
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { Project } from '../types/project';
+import { Project } from '../types';
 
 // Mock data for projects that can be used across components
 export const mockProjects: Project[] = [
@@ -12,7 +12,14 @@ export const mockProjects: Project[] = [
     cdeColor: '#D15F36',
     members: 28,
     lastActivity: '2025-03-28T14:30:00Z',
-    status: 'active'
+    status: 'active',
+    description: 'A 50-story office tower in downtown area',
+    startDate: '2024-01-15T00:00:00Z',
+    endDate: '2026-12-31T00:00:00Z',
+    budget: 150000000,
+    currency: 'USD',
+    tags: ['commercial', 'high-rise', 'office'],
+    completionPercentage: 35
   },
   { 
     id: 'PRJ-002', 
@@ -24,7 +31,14 @@ export const mockProjects: Project[] = [
     cdeColor: '#3A366E',
     members: 15,
     lastActivity: '2025-03-27T10:15:00Z',
-    status: 'active'
+    status: 'active',
+    description: 'Mixed-use development with residential and retail spaces',
+    startDate: '2025-06-01T00:00:00Z',
+    endDate: '2027-12-31T00:00:00Z',
+    budget: 85000000,
+    currency: 'USD',
+    tags: ['mixed-use', 'residential', 'retail'],
+    completionPercentage: 5
   },
   { 
     id: 'PRJ-003', 
@@ -36,7 +50,14 @@ export const mockProjects: Project[] = [
     cdeColor: '#D15F36',
     members: 22,
     lastActivity: '2025-03-25T16:45:00Z',
-    status: 'active'
+    status: 'active',
+    description: 'Expansion of existing metro station with new platforms',
+    startDate: '2025-09-01T00:00:00Z',
+    endDate: '2026-12-31T00:00:00Z',
+    budget: 45000000,
+    currency: 'USD',
+    tags: ['infrastructure', 'transportation', 'public'],
+    completionPercentage: 15
   },
   { 
     id: 'PRJ-004', 
@@ -49,7 +70,14 @@ export const mockProjects: Project[] = [
     members: 0,
     lastActivity: '2024-11-15T09:30:00Z',
     status: 'archived',
-    archived: '2024-12-01T00:00:00Z'
+    archived: '2024-12-01T00:00:00Z',
+    description: 'Historical renovation of city hall building',
+    startDate: '2023-01-01T00:00:00Z',
+    endDate: '2024-11-30T00:00:00Z',
+    budget: 75000000,
+    currency: 'USD',
+    tags: ['renovation', 'historical', 'government'],
+    completionPercentage: 100
   },
   { 
     id: 'PRJ-005', 
@@ -62,7 +90,14 @@ export const mockProjects: Project[] = [
     members: 0,
     lastActivity: '2024-10-22T11:45:00Z',
     status: 'archived',
-    archived: '2024-11-01T00:00:00Z'
+    archived: '2024-11-01T00:00:00Z',
+    description: 'Emergency repairs to south bridge structure',
+    startDate: '2024-05-01T00:00:00Z',
+    endDate: '2024-10-31T00:00:00Z',
+    budget: 25000000,
+    currency: 'USD',
+    tags: ['infrastructure', 'emergency', 'bridge'],
+    completionPercentage: 100
   }
 ];
 
@@ -75,7 +110,14 @@ export const mockAvailableProjects: Project[] = [
     cde: 'Trimble Viewpoint',
     cdeColor: '#D15F36',
     location: 'Eastside',
-    status: 'available'
+    status: 'available',
+    description: 'New office complex development',
+    startDate: '2025-07-01T00:00:00Z',
+    endDate: '2027-12-31T00:00:00Z',
+    budget: 95000000,
+    currency: 'USD',
+    tags: ['commercial', 'office', 'new-construction'],
+    completionPercentage: 0
   },
   { 
     id: 'CDE-PRJ-002', 
@@ -84,7 +126,14 @@ export const mockAvailableProjects: Project[] = [
     cde: 'Autodesk Construction Cloud',
     cdeColor: '#3A366E',
     location: 'North Campus',
-    status: 'available'
+    status: 'available',
+    description: 'New medical center construction',
+    startDate: '2025-08-01T00:00:00Z',
+    endDate: '2028-12-31T00:00:00Z',
+    budget: 250000000,
+    currency: 'USD',
+    tags: ['healthcare', 'medical', 'institutional'],
+    completionPercentage: 0
   },
   { 
     id: 'CDE-PRJ-003', 
@@ -93,6 +142,13 @@ export const mockAvailableProjects: Project[] = [
     cde: 'Trimble Viewpoint',
     cdeColor: '#D15F36',
     location: 'Riverside District',
-    status: 'available'
+    status: 'available',
+    description: 'Luxury apartment complex development',
+    startDate: '2025-09-01T00:00:00Z',
+    endDate: '2027-12-31T00:00:00Z',
+    budget: 120000000,
+    currency: 'USD',
+    tags: ['residential', 'luxury', 'apartments'],
+    completionPercentage: 0
   }
 ]; 

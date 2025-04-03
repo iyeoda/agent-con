@@ -15,7 +15,7 @@ import DialogTitle from '../ui/dialog';
 import DialogDescription from '../ui/dialog';
 import DialogTrigger from '../ui/dialog';
 import { mockProjects, mockAvailableProjects } from '../../mock-data/projects';
-import { Project } from '../../types/project';
+import { Project } from '../../types';
 
 export const ProjectSettings = () => {
   const [projectView, setProjectView] = useState<'active' | 'archived'>('active');

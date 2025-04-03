@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
-import { Project } from "../types/project";
+import { Project } from "../types";
 import { mockProjects } from "../mock-data/projects";
 
 interface ProjectSelectorProps {
