@@ -7,6 +7,7 @@ import { Activity, AlertTriangle, BarChart3, Calendar, CheckCircle, FileText, Me
 import AgentsSection from './AgentsSection';
 import DrawingsSection from './DrawingsSection';
 import { projectData } from '../mock-data/project-data';
+import { useNavigate } from 'react-router-dom';
 
 // Debug helper
 const debug = (...args: any[]) => {
@@ -20,6 +21,7 @@ interface DashboardSectionProps {
 }
 
 const DashboardSection: React.FC<DashboardSectionProps> = ({ selectedProject }) => {
+  const navigate = useNavigate();
   debug('DashboardSection rendered with project:', selectedProject);
 
   const [projectAgents, setProjectAgents] = useState<Agent[]>([]);
@@ -264,7 +266,10 @@ const DashboardSection: React.FC<DashboardSectionProps> = ({ selectedProject }) 
               </div>
             </CardContent>
             <CardFooter>
-              <button className="text-sm text-[#3A366E] flex items-center">
+              <button 
+                className="text-sm text-[#3A366E] flex items-center"
+                onClick={() => navigate(`/project/${selectedProject.id}/calendar`)}
+              >
                 View calendar
               </button>
             </CardFooter>

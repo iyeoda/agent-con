@@ -45,7 +45,38 @@
    - Focus states match hover states for keyboard navigation
    - Smooth transitions using transition-all for all interactive states
 
-7. **Styling**
+7. **Command Menu Integration**
+   - Command menus (CMDK) are implemented using a combination of Radix UI Dialog and CMDK primitives
+   - Selection states use aria-selected attributes instead of data-selected to avoid conflicts
+   - Keyboard navigation is handled through CMDK's built-in handlers
+   - Styling follows the app's design system while maintaining CMDK's functionality
+   - Event handlers use onSelect instead of onClick for better keyboard support
+   - Command menu items maintain consistent hover and focus states
+   - Dialog overlay uses z-index coordination to prevent conflicts
+   - Command menu state is managed independently from other UI components
+
+8. **Development & Debugging**
+   - Console logging is strictly development-only using environment checks
+   - Debug logs are wrapped in a helper function:
+     ```typescript
+     const debugLog = (...args: any[]) => {
+       if (process.env.NODE_ENV === 'development') {
+         console.log('[Component Name]:', ...args);
+       }
+     };
+     ```
+   - Log messages are prefixed with component name for easy filtering
+   - State changes and event handlers include detailed logging
+   - Production builds automatically exclude debug logs
+   - Debug logs focus on:
+     - Component mount/unmount
+     - State updates
+     - Event handling
+     - Data fetching
+     - Error conditions
+   - Performance monitoring logs are kept separate from debug logs
+
+9. **Styling**
    - The color scheme includes:
      - Indigo (#3A366E) for primary UI elements and emphasis
      - Orange (#D15F36) for active states and key actions
@@ -63,78 +94,78 @@
    - Consistent hover states across all interactive elements
    - Smooth transitions for all interactive states
 
-8. **Component Architecture**
-   - **Separation of concerns**: UI components are isolated in dedicated files with specific functionality.
-   - **Reusability**: Components like ProjectSelector are designed to be reused across the application with consistent behavior.
-   - **Future-proofing**: Components are built with backend integration in mind:
-     - API calls can be added inside components
-     - Parent components can fetch data and pass as props
-     - Loading states and error handling are implemented within components
-   - **Maintainability**: Changes to specific functionality (like project selection) are contained to a single file.
-   - **Type Safety**: Components use TypeScript interfaces to ensure proper prop usage and data handling.
-   - **Accessibility**: 
-     - Components leverage Radix UI primitives for keyboard navigation
-     - Focus management follows WCAG guidelines
-     - Proper ARIA attributes are maintained
-     - Interactive elements have appropriate focus indicators
-     - Color contrast meets accessibility standards
+10. **Component Architecture**
+    - **Separation of concerns**: UI components are isolated in dedicated files with specific functionality.
+    - **Reusability**: Components like ProjectSelector are designed to be reused across the application with consistent behavior.
+    - **Future-proofing**: Components are built with backend integration in mind:
+      - API calls can be added inside components
+      - Parent components can fetch data and pass as props
+      - Loading states and error handling are implemented within components
+    - **Maintainability**: Changes to specific functionality (like project selection) are contained to a single file.
+    - **Type Safety**: Components use TypeScript interfaces to ensure proper prop usage and data handling.
+    - **Accessibility**: 
+      - Components leverage Radix UI primitives for keyboard navigation
+      - Focus management follows WCAG guidelines
+      - Proper ARIA attributes are maintained
+      - Interactive elements have appropriate focus indicators
+      - Color contrast meets accessibility standards
 
-9. **Data Management & API Integration**
-   - **Type System**:
-     - Centralized type definitions in `src/types/index.ts`
-     - Comprehensive interfaces for all entities (Project, Agent, Person, Company)
-     - Strong typing for API requests and responses
-     - Type-safe data operations throughout the application
-   
-   - **Mock Data Organization**:
-     - Domain-specific mock data files in `src/mock-data/`
-     - Each mock file imports corresponding types
-     - Realistic data with proper relationships
-     - Consistent structure matching API responses
-   
-   - **Service Layer**:
-     - Base API service with common functionality
-     - Domain-specific services for each entity type
-     - Consistent error handling and authentication
-     - Type-safe API operations
-     - Centralized data fetching logic
-   
-   - **API Integration**:
-     - Axios-based API client with interceptors
-     - Token-based authentication handling
-     - Automatic error handling for unauthorized access
-     - Consistent API response structure
-     - Environment-based configuration
-     - Secure OAuth2 flow implementation for CDE connections
-     - Type-safe response handling with generics
-   
-   - **Authentication & Security**:
-     - Secure token storage using AuthService
-     - OAuth2 flow for third-party integrations
-     - Provider-specific token management
-     - Automatic token refresh handling
-     - Secure token removal on disconnection
-     - Type-safe token operations
-   
-   - **CDE Connection Management**:
-     - Comprehensive CRUD operations for connections
-     - Secure OAuth2 flow initiation and callback handling
-     - Connection testing and validation
-     - Automated data synchronization
-     - Provider-specific token management
-     - Type-safe connection operations
-     - Error handling for invalid connections
-   
-   - **State Management**:
-     - Local state for UI interactions
-     - Service-based data fetching
-     - Optimistic updates support
-     - Error state handling
-     - Loading state management
-     - Secure token state management
-     - Connection state synchronization
+11. **Data Management & API Integration**
+    - **Type System**:
+      - Centralized type definitions in `src/types/index.ts`
+      - Comprehensive interfaces for all entities (Project, Agent, Person, Company)
+      - Strong typing for API requests and responses
+      - Type-safe data operations throughout the application
+    
+    - **Mock Data Organization**:
+      - Domain-specific mock data files in `src/mock-data/`
+      - Each mock file imports corresponding types
+      - Realistic data with proper relationships
+      - Consistent structure matching API responses
+    
+    - **Service Layer**:
+      - Base API service with common functionality
+      - Domain-specific services for each entity type
+      - Consistent error handling and authentication
+      - Type-safe API operations
+      - Centralized data fetching logic
+    
+    - **API Integration**:
+      - Axios-based API client with interceptors
+      - Token-based authentication handling
+      - Automatic error handling for unauthorized access
+      - Consistent API response structure
+      - Environment-based configuration
+      - Secure OAuth2 flow implementation for CDE connections
+      - Type-safe response handling with generics
+    
+    - **Authentication & Security**:
+      - Secure token storage using AuthService
+      - OAuth2 flow for third-party integrations
+      - Provider-specific token management
+      - Automatic token refresh handling
+      - Secure token removal on disconnection
+      - Type-safe token operations
+    
+    - **CDE Connection Management**:
+      - Comprehensive CRUD operations for connections
+      - Secure OAuth2 flow initiation and callback handling
+      - Connection testing and validation
+      - Automated data synchronization
+      - Provider-specific token management
+      - Type-safe connection operations
+      - Error handling for invalid connections
+    
+    - **State Management**:
+      - Local state for UI interactions
+      - Service-based data fetching
+      - Optimistic updates support
+      - Error state handling
+      - Loading state management
+      - Secure token state management
+      - Connection state synchronization
 
-10. **Testing Strategy**
+12. **Testing Strategy**
     - Components include test scenarios for both mock and real data
     - Error states and loading behaviors are testable
     - Mock data provides consistent test cases

@@ -151,4 +151,26 @@ export interface UserSettings {
   };
 }
 
-export type ProjectPhase = 'Planning' | 'Design' | 'Construction' | 'Completed'; 
+export type ProjectPhase = 'Planning' | 'Design' | 'Construction' | 'Completed';
+
+export type CalendarEventType = 'deadline' | 'milestone' | 'meeting' | 'task';
+export type CalendarEventStatus = 'upcoming' | 'completed' | 'cancelled';
+export type CalendarEventPriority = 'high' | 'medium' | 'low';
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  type: CalendarEventType;
+  date: string;
+  status: CalendarEventStatus;
+  priority: CalendarEventPriority;
+  time?: string;
+  assignedTo: string[];
+  description?: string;
+  location?: string;
+  duration?: string;
+  relatedDocuments?: string[];
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+} 

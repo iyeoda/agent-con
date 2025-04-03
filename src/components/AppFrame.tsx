@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, useParams } from "react-router-dom";
 import Input from "./ui/input";
-import { HelpCircle, Settings, Folder, LayoutDashboard, Bot, Sparkles } from "lucide-react";
+import { HelpCircle, Settings, Folder, LayoutDashboard, Bot, Sparkles, Calendar } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import SearchModal from "./SearchModal";
@@ -14,6 +14,7 @@ import { Project } from '../types';
 import { projectData } from '../mock-data/project-data';
 import DashboardSection from "./DashboardSection";
 import DrawingDetail from "./DrawingDetail";
+import ProjectCalendarView from "./ProjectCalendarView";
 
 // Mock project data
 const defaultProject: Project = {
@@ -143,6 +144,18 @@ const AppContent = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div 
+                  className={`flex items-center gap-2 w-full px-4 cursor-pointer ${currentView === 'calendar' ? 'text-[#D15F36]' : ''}`}
+                  onClick={() => handleViewChange('calendar')}
+                >
+                  <Calendar className={`min-w-[24px] w-6 h-6 ${currentView === 'calendar' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
+                  <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Calendar</span>
+                </div>
+              </TooltipTrigger>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div 
                   className={`flex items-center gap-2 w-full px-4 cursor-pointer ${currentView === 'settings' ? 'text-[#D15F36]' : ''}`}
                   onClick={() => handleViewChange('settings')}
                 >
@@ -196,6 +209,7 @@ const AppContent = () => {
               <Route path="/data" element={<ProjectDataSection />} />
               <Route path="/data/drawings/:drawingId" element={<DrawingDetail />} />
               <Route path="/agents" element={<AgentsSection agents={currentProject.agents} />} />
+              <Route path="/calendar" element={<ProjectCalendarView projectId={currentProject.id} />} />
               <Route path="/settings/*" element={<SettingsSection />} />
             </Routes>
           </div>
