@@ -1,11 +1,36 @@
 // Core types for the application
 
-export type AgentIconType = 'UserCog' | 'BarChart' | 'FileSignature' | 'Building2' | 'ShieldAlert' | 'Database' | 'FileStack' | 'CheckCircle';
+export enum AgentIconType {
+  UserCog = 'UserCog',
+  Shield = 'Shield',
+  Building2 = 'Building2',
+  Leaf = 'Leaf',
+  BarChart = 'BarChart',
+  FileStack = 'FileStack',
+  FileSignature = 'FileSignature',
+  ShieldAlert = 'ShieldAlert',
+  Database = 'Database',
+  CheckCircle = 'CheckCircle'
+}
+
+export enum DrawingType {
+  Architectural = 'Architectural',
+  Structural = 'Structural',
+  Survey = 'Survey',
+  Environmental = 'Environmental',
+  MEP = 'MEP',
+  Landscape = 'Landscape'
+}
+
+export enum DrawingStatus {
+  InReview = 'In Review',
+  Approved = 'Approved',
+  InProgress = 'In Progress',
+  Draft = 'Draft'
+}
 
 export type ProjectStatus = 'active' | 'archived' | 'available';
 export type ProjectPhase = 'Planning' | 'Design' | 'Construction' | 'Completed';
-export type DrawingType = 'Architectural' | 'Structural' | 'MEP' | 'Landscape';
-export type DrawingStatus = 'Draft' | 'In Review' | 'Approved' | 'Rejected';
 export type CDEConnectionType = 'Project Management' | 'BIM' | 'Document Management';
 export type CDEConnectionStatus = 'active' | 'inactive';
 
@@ -32,29 +57,20 @@ export interface Project {
 }
 
 export interface Task {
-  id: string | number;
+  id: string;
   name: string;
-  description: string;
-  status?: 'pending' | 'in_progress' | 'completed';
-  priority?: 'low' | 'medium' | 'high';
-  dueDate?: string;
-  assignedTo?: string;
-  createdBy?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  status: string;
+  assignedTo: string;
 }
 
 export interface Agent {
   id: string;
   title: string;
   icon: AgentIconType;
-  color: string;
-  textColor?: string;
-  description: string;
   tasks: Task[];
+  color?: string;
+  description?: string;
   status?: 'active' | 'inactive';
-  lastActive?: string;
-  capabilities?: string[];
 }
 
 export interface Person {
@@ -92,17 +108,8 @@ export interface Drawing {
   name: string;
   type: DrawingType;
   version: string;
-  lastModified: string;
   status: DrawingStatus;
-  assignedTo: string;
-  fileSize?: number;
-  fileUrl?: string;
-  thumbnailUrl?: string;
-  createdBy?: string;
-  createdAt?: string;
-  tags?: string[];
-  relatedDrawings?: string[];
-  comments?: DrawingComment[];
+  assignedTo?: string;
 }
 
 export interface DrawingComment {
@@ -224,4 +231,46 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+export interface ProjectMetrics {
+  completion: number;
+  rfiCount: number;
+  openIssues: number;
+  documentsToReview: number;
+  upcomingDeadlines: number;
+  teamMembers: number;
+}
+
+export interface RecentActivity {
+  id: number;
+  type: 'document' | 'comment' | 'issue' | 'approval';
+  user: string;
+  action: string;
+  item: string;
+  time: string;
+}
+
+export interface Deadline {
+  id: number;
+  task: string;
+  due: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
+export interface Risk {
+  id: number;
+  issue: string;
+  impact: string;
+  severity: 'high' | 'medium' | 'low';
+}
+
+export interface ProjectData {
+  agents: Agent[];
+  drawings: Drawing[];
+  tasks: Task[];
+  metrics: ProjectMetrics;
+  recentActivities: RecentActivity[];
+  upcomingDeadlines: Deadline[];
+  risks: Risk[];
 } 

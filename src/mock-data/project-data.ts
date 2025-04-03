@@ -1,170 +1,164 @@
 import { Project, Agent, Drawing, Task } from '../types';
+import { ProjectData, AgentIconType, DrawingType, DrawingStatus } from '../types';
 
 // Project-specific data mapping
-export const projectData: Record<string, {
-  project: Project;
-  agents: Agent[];
-  drawings: Drawing[];
-  tasks: Task[];
-}> = {
-  'PRJ-001': {
-    project: {
-      id: 'PRJ-001',
-      name: 'Woodside Tower Project',
-      logo: '/viewpoint_logo.svg',
-      image: '/projects/woodside-tower.jpg',
-      location: 'Downtown',
-      phase: 'Construction',
-      cde: 'Trimble Viewpoint',
-      cdeColor: '#D15F36',
-      members: 28,
-      lastActivity: '2025-03-28T14:30:00Z',
-      status: 'active',
-      description: 'A 50-story office tower in downtown area',
-      startDate: '2024-01-15T00:00:00Z',
-      endDate: '2026-12-31T00:00:00Z',
-      budget: 150000000,
-      currency: 'USD',
-      tags: ['commercial', 'high-rise', 'office'],
-      completionPercentage: 35
-    },
+export const projectData: Record<string, ProjectData> = {
+  "woodside": {
     agents: [
       {
-        id: 'AGT-001',
-        title: 'Project Manager',
-        icon: 'UserCog',
-        color: '#D15F36',
-        description: 'Manages project timelines, resources, and team coordination',
-        tasks: [
-          {
-            id: 1,
-            name: 'Review Project Timeline',
-            description: 'Review and update project timeline for Woodside Tower',
-            status: 'in_progress',
-            priority: 'high',
-            dueDate: '2025-04-01T00:00:00Z',
-            assignedTo: 'James Wilson',
-            createdBy: 'System',
-            createdAt: '2025-03-28T10:00:00Z',
-            updatedAt: '2025-03-28T14:30:00Z'
-          }
-        ],
-        status: 'active',
-        lastActive: '2025-03-28T15:30:00Z',
-        capabilities: ['timeline-management', 'resource-allocation', 'team-coordination']
+        id: "agent-1",
+        title: "Project Manager",
+        icon: AgentIconType.UserCog,
+        tasks: [],
+        color: "#D15F36",
+        description: "Schedule & coordination assistance",
+        status: "active"
+      },
+      {
+        id: "agent-2",
+        title: "Health & Safety",
+        icon: AgentIconType.Shield,
+        tasks: [],
+        color: "#3A366E",
+        description: "Compliance & risk assessment",
+        status: "active"
       }
     ],
     drawings: [
       {
-        id: 'DRW-001',
-        name: 'Foundation Plan',
-        type: 'Architectural',
-        version: 'A.2',
-        lastModified: '2025-03-28T14:30:00Z',
-        status: 'In Review',
-        assignedTo: 'Maria Garcia',
-        fileSize: 5242880,
-        fileUrl: '/drawings/foundation-plan.pdf',
-        thumbnailUrl: '/drawings/thumbnails/foundation-plan.jpg',
-        createdBy: 'James Wilson',
-        createdAt: '2025-03-25T09:00:00Z',
-        tags: ['foundation', 'architectural', 'structural'],
-        relatedDrawings: ['DRW-002', 'DRW-003'],
-        comments: []
+        id: "drawing-1",
+        name: "Floor Plans",
+        type: DrawingType.Architectural,
+        version: "2.0",
+        status: DrawingStatus.InReview,
+        assignedTo: "Sarah Chen"
+      },
+      {
+        id: "drawing-2",
+        name: "Structural Details",
+        type: DrawingType.Structural,
+        version: "1.5",
+        status: DrawingStatus.Approved,
+        assignedTo: "Mike Johnson"
       }
     ],
     tasks: [
       {
-        id: 'TASK-001',
-        name: 'Foundation Work',
-        description: 'Complete foundation work for tower section',
-        status: 'in_progress',
-        priority: 'high',
-        dueDate: '2025-04-15T00:00:00Z',
-        assignedTo: 'Robert Johnson',
-        createdBy: 'James Wilson',
-        createdAt: '2025-03-28T10:00:00Z',
-        updatedAt: '2025-03-28T14:30:00Z'
+        id: "task-1",
+        name: "Review Floor Plans",
+        status: "in_progress",
+        assignedTo: "Sarah Chen"
+      },
+      {
+        id: "task-2",
+        name: "Update Safety Protocol",
+        status: "pending",
+        assignedTo: "Mike Johnson"
       }
+    ],
+    metrics: {
+      completion: 42,
+      rfiCount: 23,
+      openIssues: 7,
+      documentsToReview: 15,
+      upcomingDeadlines: 4,
+      teamMembers: 28
+    },
+    recentActivities: [
+      { id: 1, type: 'document', user: 'Sarah Chen', action: 'uploaded', item: 'Revised Floor Plans', time: '2 hours ago' },
+      { id: 2, type: 'comment', user: 'Mike Johnson', action: 'commented on', item: 'Steel Delivery Schedule', time: '3 hours ago' },
+      { id: 3, type: 'issue', user: 'Elena Rodriguez', action: 'created issue', item: 'HVAC Conflicts in Section B', time: '5 hours ago' },
+      { id: 4, type: 'approval', user: 'David Kim', action: 'approved', item: 'Change Order #42', time: 'Yesterday' }
+    ],
+    upcomingDeadlines: [
+      { id: 1, task: 'Submit Revised Building Permits', due: 'Apr 5', priority: 'high' },
+      { id: 2, task: 'Complete Foundation Inspection', due: 'Apr 8', priority: 'high' },
+      { id: 3, task: 'Finalize Material Orders', due: 'Apr 12', priority: 'medium' },
+      { id: 4, task: 'Review Subcontractor Proposals', due: 'Apr 15', priority: 'medium' }
+    ],
+    risks: [
+      { id: 1, issue: 'Material Delivery Delays', impact: 'Schedule', severity: 'high' },
+      { id: 2, issue: 'Design Conflicts in East Wing', impact: 'Quality', severity: 'medium' },
+      { id: 3, issue: 'Weather Forecast for Next Week', impact: 'Schedule', severity: 'medium' }
     ]
   },
-  'PRJ-002': {
-    project: {
-      id: 'PRJ-002',
-      name: 'Harbor Heights Development',
-      logo: '/autodesk_logo.svg',
-      image: '/projects/harbor-heights.jpg',
-      location: 'Waterfront District',
-      phase: 'Planning',
-      cde: 'Autodesk Construction Cloud',
-      cdeColor: '#3A366E',
-      members: 15,
-      lastActivity: '2025-03-27T10:15:00Z',
-      status: 'active',
-      description: 'Mixed-use development with residential and retail spaces',
-      startDate: '2025-06-01T00:00:00Z',
-      endDate: '2027-12-31T00:00:00Z',
-      budget: 85000000,
-      currency: 'USD',
-      tags: ['mixed-use', 'residential', 'retail'],
-      completionPercentage: 5
-    },
+  "harbor": {
     agents: [
       {
-        id: 'AGT-002',
-        title: 'Data Analyst',
-        icon: 'BarChart',
-        color: '#3A366E',
-        description: 'Analyzes project data and generates insights',
-        tasks: [
-          {
-            id: 2,
-            name: 'Cost Analysis',
-            description: 'Analyze construction costs for Q1 2025',
-            status: 'pending',
-            priority: 'medium',
-            dueDate: '2025-04-10T00:00:00Z',
-            assignedTo: 'Maria Garcia',
-            createdBy: 'System',
-            createdAt: '2025-03-28T10:00:00Z'
-          }
-        ],
-        status: 'active',
-        lastActive: '2025-03-28T14:45:00Z',
-        capabilities: ['data-analysis', 'cost-tracking', 'performance-metrics']
+        id: "agent-3",
+        title: "Site Manager",
+        icon: AgentIconType.Building2,
+        tasks: [],
+        color: "#3A366E",
+        description: "Site management & coordination",
+        status: "active"
+      },
+      {
+        id: "agent-4",
+        title: "Environmental Specialist",
+        icon: AgentIconType.Leaf,
+        tasks: [],
+        color: "#A7CEBC",
+        description: "Environmental compliance & assessment",
+        status: "active"
       }
     ],
     drawings: [
       {
-        id: 'DRW-002',
-        name: 'Electrical Layout',
-        type: 'MEP',
-        version: 'B.1',
-        lastModified: '2025-03-27T16:45:00Z',
-        status: 'Approved',
-        assignedTo: 'Thomas Lee',
-        fileSize: 3145728,
-        fileUrl: '/drawings/electrical-layout.pdf',
-        thumbnailUrl: '/drawings/thumbnails/electrical-layout.jpg',
-        createdBy: 'Thomas Lee',
-        createdAt: '2025-03-20T11:00:00Z',
-        tags: ['electrical', 'MEP', 'systems'],
-        relatedDrawings: ['DRW-001', 'DRW-004'],
-        comments: []
+        id: "drawing-3",
+        name: "Site Survey",
+        type: DrawingType.Survey,
+        version: "1.0",
+        status: DrawingStatus.InProgress,
+        assignedTo: "John Smith"
+      },
+      {
+        id: "drawing-4",
+        name: "Environmental Impact",
+        type: DrawingType.Environmental,
+        version: "1.0",
+        status: DrawingStatus.Draft,
+        assignedTo: "Lisa Wong"
       }
     ],
     tasks: [
       {
-        id: 'TASK-002',
-        name: 'Site Preparation',
-        description: 'Begin site preparation and clearing',
-        status: 'pending',
-        priority: 'high',
-        dueDate: '2025-06-15T00:00:00Z',
-        assignedTo: 'David Kim',
-        createdBy: 'James Wilson',
-        createdAt: '2025-03-28T10:00:00Z'
+        id: "task-3",
+        name: "Complete Site Survey",
+        status: "in_progress",
+        assignedTo: "John Smith"
+      },
+      {
+        id: "task-4",
+        name: "Environmental Assessment",
+        status: "pending",
+        assignedTo: "Lisa Wong"
       }
+    ],
+    metrics: {
+      completion: 15,
+      rfiCount: 31,
+      openIssues: 12,
+      documentsToReview: 24,
+      upcomingDeadlines: 7,
+      teamMembers: 22
+    },
+    recentActivities: [
+      { id: 1, type: 'document', user: 'John Smith', action: 'uploaded', item: 'Site Survey Report', time: '1 hour ago' },
+      { id: 2, type: 'comment', user: 'Lisa Wong', action: 'commented on', item: 'Foundation Plan', time: '4 hours ago' },
+      { id: 3, type: 'issue', user: 'Mark Davis', action: 'created issue', item: 'Soil Condition Assessment', time: '6 hours ago' },
+      { id: 4, type: 'approval', user: 'Anna Lee', action: 'approved', item: 'Permit Application', time: 'Yesterday' }
+    ],
+    upcomingDeadlines: [
+      { id: 1, task: 'Submit Environmental Impact Report', due: 'Apr 10', priority: 'high' },
+      { id: 2, task: 'Complete Site Survey', due: 'Apr 14', priority: 'high' },
+      { id: 3, task: 'Review Contractor Bids', due: 'Apr 18', priority: 'medium' },
+      { id: 4, task: 'Finalize Design Documents', due: 'Apr 22', priority: 'medium' }
+    ],
+    risks: [
+      { id: 1, issue: 'Environmental Permit Delays', impact: 'Schedule', severity: 'high' },
+      { id: 2, issue: 'Soil Stability Concerns', impact: 'Quality', severity: 'high' },
+      { id: 3, issue: 'Local Community Feedback', impact: 'Scope', severity: 'medium' }
     ]
   }
   // Add more projects as needed
