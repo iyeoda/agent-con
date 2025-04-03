@@ -6,99 +6,100 @@ import { Label } from '../ui/label';
 import Dialog from '../ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Plus, MoreHorizontal, UserPlus, Mail, Building } from 'lucide-react';
+import { UserPlus, Mail, Building, MoreHorizontal } from 'lucide-react';
 
-interface TeamMember {
+interface ProjectTeamMember {
   id: string;
   name: string;
   email: string;
-  role: string;
+  projectRole: string;
+  organizationRole: string;
   joinedAt: string;
-  status: 'active' | 'pending';
-  projects: string[];
 }
 
-const TeamSettings: React.FC = () => {
+interface ProjectTeamSettingsProps {
+  projectId: string;
+  onBack: () => void;
+}
+
+const ProjectTeamSettings: React.FC<ProjectTeamSettingsProps> = ({ projectId, onBack }) => {
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Mock team members data - replace with actual data from your backend
-  const teamMembers: TeamMember[] = [
+  // Mock project team members data - replace with actual data from your backend
+  const projectMembers: ProjectTeamMember[] = [
     {
       id: '1',
       name: 'Sarah Chen',
       email: 'sarah.chen@example.com',
-      role: 'Project Manager',
-      joinedAt: '2024-01-15',
-      status: 'active',
-      projects: ['Woodside Tower', 'City Center Mall']
+      projectRole: 'Project Lead',
+      organizationRole: 'Project Manager',
+      joinedAt: '2024-01-15'
     },
     {
       id: '2',
       name: 'Mike Johnson',
       email: 'mike.j@example.com',
-      role: 'Engineer',
-      joinedAt: '2024-02-01',
-      status: 'active',
-      projects: ['Riverfront Apartments']
-    },
-    {
-      id: '3',
-      name: 'Elena Rodriguez',
-      email: 'elena.r@example.com',
-      role: 'Architect',
-      joinedAt: '2024-02-15',
-      status: 'pending',
-      projects: []
+      projectRole: 'Engineer',
+      organizationRole: 'Member',
+      joinedAt: '2024-02-01'
     }
   ];
 
-  const filteredMembers = teamMembers.filter(member => 
+  const filteredMembers = projectMembers.filter(member => 
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.role.toLowerCase().includes(searchQuery.toLowerCase())
+    member.projectRole.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div className="space-y-6">
-      {/* Organization Team Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-[#3A366E] mb-2">Organization Team</h2>
-        <p className="text-[#4C5760]">
-          Manage your organization's team members and their roles. Team members can be assigned to specific projects.
-        </p>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <div className="relative flex-grow max-w-md">
-          <Input
-            placeholder="Search members..."
-            value={searchQuery}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-            className="pl-10 border-[#A7CEBC]"
-          />
-          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+      {/* Project Team Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-[#3A366E] mb-2">Project Team</h2>
+          <p className="text-[#4C5760]">
+            Manage team members for this project
+          </p>
         </div>
-        <Button 
-          onClick={() => setIsAddMemberOpen(true)}
-          className="bg-[#D15F36] text-white hover:bg-opacity-90"
-        >
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add Member
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={onBack}
+            className="border-[#A7CEBC]"
+          >
+            Back to Project
+          </Button>
+          <Button 
+            onClick={() => setIsAddMemberOpen(true)}
+            className="bg-[#D15F36] text-white hover:bg-opacity-90"
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            Add Member
+          </Button>
+        </div>
       </div>
 
-      {/* Team Members List */}
+      <div className="relative max-w-md">
+        <Input
+          placeholder="Search team members..."
+          value={searchQuery}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+          className="pl-10 border-[#A7CEBC]"
+        />
+        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+      </div>
+
+      {/* Project Team Members List */}
       <Card className="border-[#A7CEBC]">
         <div className="divide-y divide-[#A7CEBC]">
           {/* Table Header */}
           <div className="grid grid-cols-12 bg-[#F7F5F2] p-4 text-[#3A366E] font-medium">
             <div className="col-span-3">Member</div>
             <div className="col-span-3">Email</div>
-            <div className="col-span-2">Role</div>
-            <div className="col-span-2">Projects</div>
-            <div className="col-span-1">Status</div>
-            <div className="col-span-1">Actions</div>
+            <div className="col-span-2">Project Role</div>
+            <div className="col-span-2">Organization Role</div>
+            <div className="col-span-2">Actions</div>
           </div>
           
           {/* Team Member Rows */}
@@ -113,20 +114,9 @@ const TeamSettings: React.FC = () => {
                 </div>
               </div>
               <div className="col-span-3 text-[#4C5760]">{member.email}</div>
-              <div className="col-span-2 text-[#4C5760]">{member.role}</div>
-              <div className="col-span-2 text-[#4C5760]">
-                {member.projects.length > 0 ? `${member.projects.length} projects` : 'No projects'}
-              </div>
-              <div className="col-span-1">
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  member.status === 'active' 
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {member.status}
-                </span>
-              </div>
-              <div className="col-span-1">
+              <div className="col-span-2 text-[#4C5760]">{member.projectRole}</div>
+              <div className="col-span-2 text-[#4C5760]">{member.organizationRole}</div>
+              <div className="col-span-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -135,13 +125,10 @@ const TeamSettings: React.FC = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem>
-                      View Projects
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      Edit Role
+                      Change Project Role
                     </DropdownMenuItem>
                     <DropdownMenuItem className="text-red-600">
-                      Remove Member
+                      Remove from Project
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -153,35 +140,43 @@ const TeamSettings: React.FC = () => {
 
       {/* Add Member Modal */}
       <Dialog
-        title="Add Team Member"
+        title="Add Project Member"
         content={
           <div className="space-y-4">
             <div>
-              <Label>Email Address</Label>
-              <Input className="mt-1" type="email" placeholder="Enter team member's email" />
+              <Label>Select Organization Member</Label>
+              <Select>
+                <SelectTrigger className="w-full mt-1">
+                  <SelectValue placeholder="Select a team member" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="member1">Sarah Chen</SelectItem>
+                  <SelectItem value="member2">Mike Johnson</SelectItem>
+                  <SelectItem value="member3">Elena Rodriguez</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
-              <Label>Organization Role</Label>
+              <Label>Project Role</Label>
               <Select>
                 <SelectTrigger className="w-full mt-1">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="project-manager">Project Manager</SelectItem>
-                  <SelectItem value="member">Member</SelectItem>
+                  <SelectItem value="project-lead">Project Lead</SelectItem>
+                  <SelectItem value="engineer">Engineer</SelectItem>
+                  <SelectItem value="architect">Architect</SelectItem>
+                  <SelectItem value="contractor">Contractor</SelectItem>
+                  <SelectItem value="viewer">Viewer</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-sm text-[#4C5760] mt-1">
-                Project-specific roles can be assigned when adding members to projects.
-              </p>
             </div>
             <div className="flex justify-end gap-2 mt-6">
               <Button variant="outline" onClick={() => setIsAddMemberOpen(false)}>
                 Cancel
               </Button>
               <Button className="bg-[#D15F36] text-white hover:bg-opacity-90">
-                Send Invitation
+                Add to Project
               </Button>
             </div>
           </div>
@@ -199,4 +194,4 @@ const TeamSettings: React.FC = () => {
   );
 };
 
-export default TeamSettings;
+export default ProjectTeamSettings; 
