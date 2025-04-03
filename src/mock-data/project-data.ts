@@ -1,5 +1,5 @@
 import { Project, Agent, Drawing, Task } from '../types';
-import { ProjectData, AgentIconType, DrawingType, DrawingStatus } from '../types';
+import { ProjectData, AgentIconType, DrawingType, DrawingStatus, AgentResponseType, AgentActionType } from '../types';
 
 // Project-specific data mapping
 export const projectData: Record<string, ProjectData> = {
@@ -12,7 +12,14 @@ export const projectData: Record<string, ProjectData> = {
         tasks: [],
         color: "#D15F36",
         description: "Schedule & coordination assistance",
-        status: "active"
+        status: "active",
+        type: AgentResponseType.STRUCTURED,
+        capabilities: [
+          AgentActionType.ADD_TO_DIRECTORY,
+          AgentActionType.CREATE_REMINDER,
+          AgentActionType.GENERATE_REPORT
+        ],
+        version: "1.0"
       },
       {
         id: "agent-2",
@@ -21,7 +28,14 @@ export const projectData: Record<string, ProjectData> = {
         tasks: [],
         color: "#3A366E",
         description: "Compliance & risk assessment",
-        status: "active"
+        status: "active",
+        type: AgentResponseType.STRUCTURED,
+        capabilities: [
+          AgentActionType.GENERATE_REPORT,
+          AgentActionType.EXPORT_PDF,
+          AgentActionType.CREATE_REMINDER
+        ],
+        version: "1.0"
       }
     ],
     drawings: [
@@ -91,7 +105,14 @@ export const projectData: Record<string, ProjectData> = {
         tasks: [],
         color: "#3A366E",
         description: "Site management & coordination",
-        status: "active"
+        status: "active",
+        type: AgentResponseType.STRUCTURED,
+        capabilities: [
+          AgentActionType.ADD_TO_DIRECTORY,
+          AgentActionType.GENERATE_REPORT,
+          AgentActionType.EXPORT_EXCEL
+        ],
+        version: "1.0"
       },
       {
         id: "agent-4",
@@ -100,7 +121,14 @@ export const projectData: Record<string, ProjectData> = {
         tasks: [],
         color: "#A7CEBC",
         description: "Environmental compliance & assessment",
-        status: "active"
+        status: "active",
+        type: AgentResponseType.UNSTRUCTURED,
+        capabilities: [
+          AgentActionType.EXPORT_PDF,
+          AgentActionType.CREATE_REMINDER,
+          AgentActionType.GENERATE_REPORT
+        ],
+        version: "1.0"
       }
     ],
     drawings: [

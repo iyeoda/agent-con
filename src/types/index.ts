@@ -63,14 +63,80 @@ export interface Task {
   assignedTo: string;
 }
 
+export enum AgentResponseType {
+  STRUCTURED = 'structured',
+  UNSTRUCTURED = 'unstructured'
+}
+
+export enum AgentActionType {
+  EXPORT_EXCEL = 'export_excel',
+  EXPORT_PDF = 'export_pdf',
+  CREATE_REMINDER = 'create_reminder',
+  ADD_TO_DIRECTORY = 'add_to_directory',
+  GENERATE_REPORT = 'generate_report'
+}
+
+export interface AgentAction {
+  id: string;
+  type: AgentActionType;
+  input: Record<string, any>;
+  output?: Record<string, any>;
+  status: 'pending' | 'completed' | 'failed';
+  executedAt?: Date;
+  error?: string;
+}
+
+export interface AgentSession {
+  id: string;
+  projectId: string;
+  agentId: string;
+  startedBy: string;
+  startedAt: Date;
+  responseType: AgentResponseType;
+  interactions: ChatMessage[];
+  actions: AgentAction[];
+  status: 'active' | 'completed' | 'archived';
+  metadata?: Record<string, any>;
+}
+
+export interface Export {
+  id: string;
+  sessionId: string;
+  type: 'excel' | 'pdf';
+  filePath: string;
+  createdAt: Date;
+  metadata: {
+    triggeredBy: string;
+    context: string;
+    fileName: string;
+  };
+}
+
+export interface Reminder {
+  id: string;
+  sessionId: string;
+  projectId: string;
+  createdBy: string;
+  text: string;
+  dueAt: Date;
+  status: 'pending' | 'completed';
+  followUpEmailScheduled: boolean;
+  emailSent?: boolean;
+}
+
 export interface Agent {
   id: string;
   title: string;
   icon: AgentIconType;
-  tasks: Task[];
   color?: string;
   description?: string;
   status?: 'active' | 'inactive';
+  type: AgentResponseType;
+  capabilities: AgentActionType[];
+  inputSchema?: Record<string, any>;
+  outputSchema?: Record<string, any>;
+  version: string;
+  tasks: Task[];
 }
 
 export interface Person {
@@ -125,7 +191,7 @@ export interface DrawingComment {
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: 'user' | 'agent' | 'system';
   content: string;
   timestamp: string | number | Date;
   isTaskRequest?: boolean;
@@ -134,6 +200,8 @@ export interface ChatMessage {
     projectId?: string;
     drawingId?: string;
     agentId?: string;
+    availableActions?: AgentActionType[];
+    structuredOutput?: Record<string, any>;
   };
 }
 

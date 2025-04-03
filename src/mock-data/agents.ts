@@ -1,4 +1,4 @@
-import { Agent, AgentIconType, Task } from '../types';
+import { Agent, AgentIconType, Task, AgentResponseType, AgentActionType } from '../types';
 
 export const agents: Agent[] = [
   {
@@ -7,6 +7,32 @@ export const agents: Agent[] = [
     icon: AgentIconType.UserCog,
     color: '#D15F36',
     description: 'Manages project timelines, resources, and team coordination',
+    type: AgentResponseType.STRUCTURED,
+    capabilities: [
+      AgentActionType.ADD_TO_DIRECTORY,
+      AgentActionType.CREATE_REMINDER,
+      AgentActionType.GENERATE_REPORT
+    ],
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: {
+          type: 'string',
+          enum: ['add_user', 'create_reminder', 'generate_report']
+        },
+        parameters: {
+          type: 'object'
+        }
+      }
+    },
+    outputSchema: {
+      type: 'object',
+      properties: {
+        status: { type: 'string' },
+        result: { type: 'object' }
+      }
+    },
+    version: '1.0',
     tasks: [
       {
         id: 'task-1',
@@ -29,6 +55,13 @@ export const agents: Agent[] = [
     icon: AgentIconType.BarChart,
     color: '#3A366E',
     description: 'Analyzes project data and generates insights',
+    type: AgentResponseType.UNSTRUCTURED,
+    capabilities: [
+      AgentActionType.EXPORT_EXCEL,
+      AgentActionType.EXPORT_PDF,
+      AgentActionType.CREATE_REMINDER
+    ],
+    version: '1.0',
     tasks: [
       {
         id: 'task-3',
@@ -45,6 +78,32 @@ export const agents: Agent[] = [
     icon: AgentIconType.FileStack,
     color: '#A7CEBC',
     description: 'Manages project documentation and compliance',
+    type: AgentResponseType.STRUCTURED,
+    capabilities: [
+      AgentActionType.EXPORT_PDF,
+      AgentActionType.GENERATE_REPORT,
+      AgentActionType.ADD_TO_DIRECTORY
+    ],
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: {
+          type: 'string',
+          enum: ['export_document', 'generate_report', 'add_to_directory']
+        },
+        parameters: {
+          type: 'object'
+        }
+      }
+    },
+    outputSchema: {
+      type: 'object',
+      properties: {
+        status: { type: 'string' },
+        result: { type: 'object' }
+      }
+    },
+    version: '1.0',
     tasks: [
       {
         id: 'task-4',

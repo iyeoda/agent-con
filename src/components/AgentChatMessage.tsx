@@ -3,8 +3,7 @@ import {
   UserCog, BarChart, FileSignature, Building2, ShieldAlert, 
   Database, FileStack, CheckCircle, User 
 } from 'lucide-react';
-
-type AgentIconType = 'UserCog' | 'BarChart' | 'FileSignature' | 'Building2' | 'ShieldAlert' | 'Database' | 'FileStack' | 'CheckCircle';
+import { AgentIconType } from '../types';
 
 interface AgentChatMessageProps {
   message: {
@@ -18,15 +17,17 @@ interface AgentChatMessageProps {
 }
 
 export const AgentChatMessage = ({ message, agentColor, agentIcon }: AgentChatMessageProps) => {
-  const iconMap = {
-    'UserCog': UserCog,
-    'BarChart': BarChart,
-    'FileSignature': FileSignature,
-    'Building2': Building2,
-    'ShieldAlert': ShieldAlert,
-    'Database': Database,
-    'FileStack': FileStack,
-    'CheckCircle': CheckCircle
+  const iconMap: Record<AgentIconType, React.ComponentType<any>> = {
+    [AgentIconType.UserCog]: UserCog,
+    [AgentIconType.BarChart]: BarChart,
+    [AgentIconType.FileSignature]: FileSignature,
+    [AgentIconType.Building2]: Building2,
+    [AgentIconType.ShieldAlert]: ShieldAlert,
+    [AgentIconType.Database]: Database,
+    [AgentIconType.FileStack]: FileStack,
+    [AgentIconType.CheckCircle]: CheckCircle,
+    [AgentIconType.Shield]: ShieldAlert,
+    [AgentIconType.Leaf]: FileStack
   };
 
   const IconComponent = message.role === 'agent' 

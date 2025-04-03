@@ -4,8 +4,7 @@ import {
   UserCog, BarChart, FileSignature, Building2, 
   ShieldAlert, Database, FileStack, CheckCircle 
 } from 'lucide-react';
-
-type AgentIconType = 'UserCog' | 'BarChart' | 'FileSignature' | 'Building2' | 'ShieldAlert' | 'Database' | 'FileStack' | 'CheckCircle';
+import { AgentIconType } from '../types';
 
 interface Task {
   id: string | number;
@@ -27,15 +26,17 @@ interface AgentCardProps {
 
 export const AgentCard = ({ agent, onClick }: AgentCardProps) => {
   // Map of icon names to Lucide icon components
-  const iconMap = {
-    'UserCog': UserCog,
-    'BarChart': BarChart,
-    'FileSignature': FileSignature,
-    'Building2': Building2,
-    'ShieldAlert': ShieldAlert,
-    'Database': Database,
-    'FileStack': FileStack,
-    'CheckCircle': CheckCircle
+  const iconMap: Record<AgentIconType, React.ComponentType<any>> = {
+    [AgentIconType.UserCog]: UserCog,
+    [AgentIconType.BarChart]: BarChart,
+    [AgentIconType.FileSignature]: FileSignature,
+    [AgentIconType.Building2]: Building2,
+    [AgentIconType.ShieldAlert]: ShieldAlert,
+    [AgentIconType.Database]: Database,
+    [AgentIconType.FileStack]: FileStack,
+    [AgentIconType.CheckCircle]: CheckCircle,
+    [AgentIconType.Shield]: ShieldAlert,
+    [AgentIconType.Leaf]: FileStack
   };
 
   // Get the icon component based on the agent's icon name
