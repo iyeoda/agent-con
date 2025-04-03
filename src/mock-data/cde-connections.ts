@@ -9,6 +9,7 @@ export const mockCDEConnections: CDEConnection[] = [
     status: 'active',
     lastSync: '2025-03-28T15:00:00Z',
     color: '#D15F36',
+    projects: 3,
     credentials: {
       apiKey: '****',
       clientId: '****',
@@ -23,6 +24,7 @@ export const mockCDEConnections: CDEConnection[] = [
     status: 'active',
     lastSync: '2025-03-28T14:30:00Z',
     color: '#3A366E',
+    projects: 2,
     credentials: {
       apiKey: '****',
       clientId: '****',
@@ -37,6 +39,7 @@ export const mockCDEConnections: CDEConnection[] = [
     status: 'inactive',
     lastSync: '2025-03-25T10:00:00Z',
     color: '#A7CEBC',
+    projects: 0,
     credentials: {
       apiKey: '****',
       clientId: '****',

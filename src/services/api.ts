@@ -19,7 +19,12 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 
 // Response interceptor for handling errors
 api.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse) => {
+    if (!response.data) {
+      throw new Error('No data received from server');
+    }
+    return response as AxiosResponse<NonNullable<typeof response.data>>;
+  },
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access

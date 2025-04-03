@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../ui/button';
-import Input from '@/components/ui/input';
+import Input from '../ui/input';
 import Switch from '../ui/switch';
 import Badge from '../ui/badge';
 import ConfirmDialog from '../ui/confirm-dialog';
@@ -8,38 +8,15 @@ import {
   AlertCircle, CheckCircle, Database, PlusCircle, RefreshCw, 
   Trash, ExternalLink, ChevronDown, ChevronRight, Calendar
 } from 'lucide-react';
+import { cdeConnectionService } from '../../services/cde-connections';
+import { CDEConnection } from '../../types';
 
 export const CDEConnectionSettings = () => {
-  // Sample connected CDEs
-  const [connectedCDEs, setConnectedCDEs] = useState([
-    { 
-      id: 'trimble-1', 
-      name: 'Trimble Viewpoint', 
-      status: 'connected', 
-      lastSync: '2025-03-15T14:30:00Z',
-      icon: '/trimble-logo.png',
-      projects: 3,
-      color: '#D15F36'
-    },
-    { 
-      id: 'autodesk-1', 
-      name: 'Autodesk Construction Cloud', 
-      status: 'connected', 
-      lastSync: '2025-03-20T09:15:00Z',
-      icon: '/autodesk-logo.png',
-      projects: 2,
-      color: '#3A366E'
-    },
-    { 
-      id: 'procore-1', 
-      name: 'Procore', 
-      status: 'disconnected', 
-      lastSync: null,
-      icon: '/procore-logo.png',
-      projects: 0,
-      color: '#A7CEBC'
-    }
-  ]);
+  const [connectedCDEs, setConnectedCDEs] = useState<CDEConnection[]>([]);
+  const [expandedCDE, setExpandedCDE] = useState<string | null>(null);
+  const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false);
+  const [cdeToDisconnect, setCdeToDisconnect] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Available CDEs for connection
   const availableCDEs = [
@@ -50,21 +27,80 @@ export const CDEConnectionSettings = () => {
     { id: 'plangrid', name: 'PlanGrid', icon: '/plangrid-logo.png', color: '#9C7C9C' }
   ];
 
-  const [expandedCDE, setExpandedCDE] = useState<string | null>(null);
-  const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false);
-  const [cdeToDisconnect, setCdeToDisconnect] = useState<string | null>(null);
+  // Load connected CDEs
+  useEffect(() => {
+    loadConnectedCDEs();
+  }, []);
 
-  const handleConnect = (cdeId: string) => {
-    // In a real implementation, this would initiate the OAuth2 flow
-    alert(`Initiating OAuth2 flow for ${cdeId}`);
-    
-    // Simulate opening a popup for OAuth authentication
-    window.open('#', 'oauth-window', 'width=600,height=700');
+  const loadConnectedCDEs = async () => {
+    try {
+      setLoading(true);
+      const connections = await cdeConnectionService.getAll();
+      setConnectedCDEs(connections);
+    } catch (error) {
+      console.error('Error loading CDE connections:', error);
+      // You might want to show a toast notification here
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSyncNow = (cdeId: string) => {
-    // In a real implementation, this would trigger a sync with the CDE
-    alert(`Syncing with ${cdeId}`);
+  const handleConnect = async (cdeId: string) => {
+    try {
+      setLoading(true);
+      const { url } = await cdeConnectionService.initiateOAuth(cdeId);
+      
+      // Open OAuth popup
+      const popup = window.open(
+        url,
+        'oauth-window',
+        'width=600,height=700,menubar=no,toolbar=no,location=no,status=no'
+      );
+
+      // Listen for OAuth callback
+      window.addEventListener('message', async (event) => {
+        if (event.data.type === 'oauth_callback') {
+          try {
+            await cdeConnectionService.handleOAuthCallback(cdeId, event.data.code);
+            await loadConnectedCDEs(); // Reload connections
+          } catch (error) {
+            console.error('Error handling OAuth callback:', error);
+            // You might want to show a toast notification here
+          }
+        }
+      });
+
+      // Clean up popup when closed
+      if (popup) {
+        const checkPopup = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(checkPopup);
+            // You might want to show a toast notification here
+          }
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Error initiating OAuth flow:', error);
+      // You might want to show a toast notification here
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSyncNow = async (cdeId: string) => {
+    try {
+      setLoading(true);
+      const result = await cdeConnectionService.sync(cdeId);
+      if (result.success) {
+        await loadConnectedCDEs(); // Reload connections to get updated lastSync
+      }
+      // You might want to show a toast notification here
+    } catch (error) {
+      console.error('Error syncing CDE:', error);
+      // You might want to show a toast notification here
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDisconnect = (cdeId: string) => {
@@ -72,15 +108,20 @@ export const CDEConnectionSettings = () => {
     setDisconnectDialogOpen(true);
   };
 
-  const confirmDisconnect = () => {
+  const confirmDisconnect = async () => {
     if (cdeToDisconnect) {
-      setConnectedCDEs(
-        connectedCDEs.map(cde => 
-          cde.id === cdeToDisconnect 
-            ? { ...cde, status: 'disconnected', lastSync: null } 
-            : cde
-        )
-      );
+      try {
+        setLoading(true);
+        await cdeConnectionService.disconnect(cdeToDisconnect);
+        await loadConnectedCDEs(); // Reload connections
+      } catch (error) {
+        console.error('Error disconnecting CDE:', error);
+        // You might want to show a toast notification here
+      } finally {
+        setLoading(false);
+        setDisconnectDialogOpen(false);
+        setCdeToDisconnect(null);
+      }
     }
   };
 

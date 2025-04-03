@@ -120,6 +120,7 @@ export interface CDEConnection {
   status: string;
   lastSync?: string;
   color: string;
+  projects: number;
   credentials?: {
     apiKey: string;
     clientId: string;
