@@ -9,6 +9,7 @@ import ProjectSelector from "../components/ProjectSelector";
 import ProjectDashboard from "../components/ProjectDashboard";
 import ProjectDataSection from "../components/ProjectDataSection";
 import AgentsSection from "../components/AgentsSection";
+import SettingsSection from "../components/SettingsSection";
 
 export default function AppFrame() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -109,7 +110,7 @@ export default function AppFrame() {
             {activeView === 'dashboard' && <ProjectDashboard />}
             {activeView === 'data' && <ProjectDataSection />}
             {activeView === 'agents' && <AgentsSection />}
-            {activeView === 'settings' && <div className="p-6"><h1 className="text-2xl">Settings</h1></div>}
+            {activeView === 'settings' && <SettingsSection />}
           </div>
         </div>
       </div>

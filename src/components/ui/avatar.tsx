@@ -14,4 +14,23 @@ const Avatar = ({ className, children }: AvatarProps) => (
   </div>
 );
 
+interface AvatarFallbackProps {
+  className?: string;
+  children: ReactNode;
+}
+
+export const AvatarFallback = ({ className, children }: AvatarFallbackProps) => (
+  <div className={className}>{children}</div>
+);
+
+interface AvatarImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+}
+
+export const AvatarImage = ({ src, alt, className }: AvatarImageProps) => (
+  <img src={src} alt={alt} className={`rounded-full ${className}`} />
+);
+
 export default Avatar;
