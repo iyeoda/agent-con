@@ -173,4 +173,39 @@ export interface CalendarEvent {
   tags?: string[];
   createdAt: string;
   updatedAt: string;
+}
+
+export type WorkspaceItemCategory = 'task' | 'event' | 'query' | 'insight' | 'issue';
+export type WorkspaceItemStatus = 'open' | 'in_progress' | 'completed' | 'overdue' | 'upcoming';
+export type WorkspaceItemPriority = 'high' | 'medium' | 'low';
+export type WorkspaceItemType = 'task' | 'deadline' | 'milestone' | 'meeting';
+
+export interface WorkspaceItem {
+  id: string;
+  title: string;
+  description?: string;
+  category: WorkspaceItemCategory;
+  type?: WorkspaceItemType;
+  assignee?: string;
+  assignedTo?: string[];
+  status: WorkspaceItemStatus;
+  priority: WorkspaceItemPriority;
+  dueDate?: string;
+  date?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+  tags: string[];
+  relatedDocuments?: string[];
+  projectId: string;
+  // Calendar specific fields
+  time?: string;
+  location?: string;
+  duration?: string;
+  // Additional metadata
+  parentId?: string;
+  dependencies?: string[];
+  progress?: number;
+  estimatedHours?: number;
+  actualHours?: number;
 } 
