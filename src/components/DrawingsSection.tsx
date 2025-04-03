@@ -1,41 +1,47 @@
 import React from 'react';
-import { Card, CardContent } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Drawing } from '../types';
 
 interface DrawingsSectionProps {
-  drawings: Drawing[];
+  drawings?: Drawing[];
 }
 
-const DrawingsSection: React.FC<DrawingsSectionProps> = ({ drawings }) => {
+const DrawingsSection: React.FC<DrawingsSectionProps> = ({ drawings = [] }) => {
   return (
-    <Card className="border-[#A7CEBC]">
-      <CardContent className="p-6">
-        <h2 className="text-xl font-semibold text-[#3A366E] mb-4">Recent Drawings</h2>
-        <div className="space-y-4">
-          {drawings.map((drawing) => (
-            <div key={drawing.id} className="flex items-start gap-4 p-4 bg-white rounded-lg border border-[#A7CEBC] hover:bg-gray-50 transition-colors">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <span className="text-[#4C5760] text-lg">📄</span>
-                </div>
-              </div>
-              <div className="flex-grow">
-                <h3 className="font-medium text-[#3A366E]">{drawing.name}</h3>
-                <p className="text-sm text-[#4C5760]">{drawing.type}</p>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-xs text-[#4C5760]">v{drawing.version}</span>
-                  <span className="text-xs text-[#4C5760]">•</span>
-                  <span className="text-xs text-[#4C5760]">{drawing.status}</span>
-                </div>
-              </div>
+    <div className="p-6">
+      <Card className="shadow-sm border-[#A7CEBC]">
+        <CardHeader>
+          <CardTitle className="text-[#3A366E]">Project Drawings</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {drawings.length === 0 ? (
+            <div className="text-center text-[#4C5760] py-8">
+              No drawings available for this project.
             </div>
-          ))}
-          {drawings.length === 0 && (
-            <p className="text-[#4C5760] text-center py-4">No drawings available</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {drawings.map((drawing) => (
+                <Card key={drawing.id} className="shadow-sm border-[#A7CEBC]">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-medium text-[#3A366E] mb-1">{drawing.name}</h4>
+                        <p className="text-sm text-[#4C5760]">Type: {drawing.type}</p>
+                        <p className="text-sm text-[#4C5760]">Status: {drawing.status}</p>
+                        <p className="text-sm text-[#4C5760]">Version: {drawing.version}</p>
+                      </div>
+                      <div className="text-xs text-[#4C5760]">
+                        {new Date(drawing.uploadedAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           )}
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

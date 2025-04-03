@@ -2,43 +2,36 @@ import { Drawing, DrawingType, DrawingStatus } from '../types';
 
 export const drawings: Drawing[] = [
   {
-    id: 'DRW-001',
-    name: 'Foundation Plan',
-    type: DrawingType.Architectural,
-    version: 'A.2',
-    status: DrawingStatus.InReview,
-    assignedTo: 'Maria Garcia'
+    id: "DWG-001",
+    name: "Foundation Plan",
+    type: "structural",
+    status: "current",
+    version: "2.0",
+    uploadedBy: "James Wilson",
+    uploadedAt: "2024-03-15T10:30:00Z",
+    fileSize: 2500000,
+    preview: "/drawings/foundation-plan.png"
   },
   {
-    id: 'DRW-002',
-    name: 'Electrical Layout',
-    type: DrawingType.MEP,
-    version: 'B.1',
-    status: DrawingStatus.Approved,
-    assignedTo: 'Thomas Lee'
+    id: "DWG-002",
+    name: "Electrical Layout",
+    type: "electrical",
+    status: "current",
+    version: "1.5",
+    uploadedBy: "Sarah Chen",
+    uploadedAt: "2024-03-14T15:45:00Z",
+    fileSize: 1800000,
+    preview: "/drawings/electrical-layout.png"
   },
   {
-    id: 'DRW-003',
-    name: 'Structural Details',
-    type: DrawingType.Structural,
-    version: 'C.3',
-    status: DrawingStatus.Draft,
-    assignedTo: 'Robert Johnson'
-  },
-  {
-    id: 'DRW-004',
-    name: 'HVAC System',
-    type: DrawingType.MEP,
-    version: 'A.1',
-    status: DrawingStatus.InReview,
-    assignedTo: 'James Wilson'
-  },
-  {
-    id: 'DRW-005',
-    name: 'Landscape Design',
-    type: DrawingType.Landscape,
-    version: 'B.2',
-    status: DrawingStatus.Approved,
-    assignedTo: 'David Kim'
+    id: "DWG-003",
+    name: "HVAC System",
+    type: "mechanical",
+    status: "pending",
+    version: "1.0",
+    uploadedBy: "Maria Garcia",
+    uploadedAt: "2024-03-13T09:15:00Z",
+    fileSize: 3200000,
+    preview: "/drawings/hvac-system.png"
   }
 ]; 

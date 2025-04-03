@@ -4,6 +4,8 @@ export const mockCompanies: Company[] = [
   { 
     id: 'COM-001', 
     name: 'Acme Construction', 
+    type: 'Contractor',
+    status: 'active',
     role: 'Main Contractor', 
     contactPerson: 'John Davis', 
     email: 'john@acme.com', 
@@ -12,6 +14,8 @@ export const mockCompanies: Company[] = [
   { 
     id: 'COM-002', 
     name: 'BlueSky Architects', 
+    type: 'Consultant',
+    status: 'active',
     role: 'Architect', 
     contactPerson: 'Sarah Chen', 
     email: 'sarah@bluesky.com', 
@@ -20,6 +24,8 @@ export const mockCompanies: Company[] = [
   { 
     id: 'COM-003', 
     name: 'Foundation Experts', 
+    type: 'Contractor',
+    status: 'active',
     role: 'Subcontractor', 
     contactPerson: 'Michael Brown', 
     email: 'michael@foundation.com', 
@@ -28,6 +34,8 @@ export const mockCompanies: Company[] = [
   { 
     id: 'COM-004', 
     name: 'PowerGrid Systems', 
+    type: 'Consultant',
+    status: 'active',
     role: 'Electrical Consultant', 
     contactPerson: 'Elena Rodriguez', 
     email: 'elena@powergrid.com', 
@@ -36,6 +44,8 @@ export const mockCompanies: Company[] = [
   { 
     id: 'COM-005', 
     name: 'GreenSpace Landscaping', 
+    type: 'Contractor',
+    status: 'active',
     role: 'Landscaping', 
     contactPerson: 'David Kim', 
     email: 'david@greenspace.com', 

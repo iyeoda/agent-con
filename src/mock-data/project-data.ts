@@ -1,193 +1,155 @@
-import { Project, Agent, Drawing, Task } from '../types';
-import { ProjectData, AgentIconType, DrawingType, DrawingStatus, AgentResponseType, AgentActionType } from '../types';
+import { Project, Drawing, Task, ProjectMetrics, RecentActivity, Deadline, Risk, Agent } from '../types';
+import { agents } from './agents';
+import { drawings } from './drawings';
 
-// Project-specific data mapping
+interface ProjectData {
+  agents: Agent[];
+  drawings: Drawing[];
+  tasks: Task[];
+  metrics: ProjectMetrics;
+  recentActivities: RecentActivity[];
+  upcomingDeadlines: Deadline[];
+  risks: Risk[];
+}
+
 export const projectData: Record<string, ProjectData> = {
   "woodside": {
-    agents: [
-      {
-        id: "agent-1",
-        title: "Project Manager",
-        icon: AgentIconType.UserCog,
-        tasks: [],
-        color: "#D15F36",
-        description: "Schedule & coordination assistance",
-        status: "active",
-        type: AgentResponseType.STRUCTURED,
-        capabilities: [
-          AgentActionType.ADD_TO_DIRECTORY,
-          AgentActionType.CREATE_REMINDER,
-          AgentActionType.GENERATE_REPORT
-        ],
-        version: "1.0"
-      },
-      {
-        id: "agent-2",
-        title: "Health & Safety",
-        icon: AgentIconType.Shield,
-        tasks: [],
-        color: "#3A366E",
-        description: "Compliance & risk assessment",
-        status: "active",
-        type: AgentResponseType.STRUCTURED,
-        capabilities: [
-          AgentActionType.GENERATE_REPORT,
-          AgentActionType.EXPORT_PDF,
-          AgentActionType.CREATE_REMINDER
-        ],
-        version: "1.0"
-      }
-    ],
-    drawings: [
-      {
-        id: "drawing-1",
-        name: "Floor Plans",
-        type: DrawingType.Architectural,
-        version: "2.0",
-        status: DrawingStatus.InReview,
-        assignedTo: "Sarah Chen"
-      },
-      {
-        id: "drawing-2",
-        name: "Structural Details",
-        type: DrawingType.Structural,
-        version: "1.5",
-        status: DrawingStatus.Approved,
-        assignedTo: "Mike Johnson"
-      }
-    ],
+    agents,
+    drawings,
     tasks: [
       {
         id: "task-1",
-        name: "Review Floor Plans",
-        status: "in_progress",
-        assignedTo: "Sarah Chen"
+        name: "Review structural drawings",
+        description: "Complete review of latest structural drawings from engineering team"
       },
       {
         id: "task-2",
-        name: "Update Safety Protocol",
-        status: "pending",
-        assignedTo: "Mike Johnson"
+        name: "Update project schedule",
+        description: "Incorporate latest changes and delays into master schedule"
       }
     ],
     metrics: {
-      completion: 42,
-      rfiCount: 23,
-      openIssues: 7,
+      completion: 65,
+      rfiCount: 12,
+      openIssues: 8,
       documentsToReview: 15,
-      upcomingDeadlines: 4,
-      teamMembers: 28
+      upcomingDeadlines: 5,
+      teamMembers: 24
     },
     recentActivities: [
-      { id: 1, type: 'document', user: 'Sarah Chen', action: 'uploaded', item: 'Revised Floor Plans', time: '2 hours ago' },
-      { id: 2, type: 'comment', user: 'Mike Johnson', action: 'commented on', item: 'Steel Delivery Schedule', time: '3 hours ago' },
-      { id: 3, type: 'issue', user: 'Elena Rodriguez', action: 'created issue', item: 'HVAC Conflicts in Section B', time: '5 hours ago' },
-      { id: 4, type: 'approval', user: 'David Kim', action: 'approved', item: 'Change Order #42', time: 'Yesterday' }
+      {
+        id: "act-1",
+        type: "document",
+        user: "Sarah Chen",
+        action: "uploaded",
+        item: "Foundation Details Rev.2",
+        time: "2 hours ago"
+      },
+      {
+        id: "act-2",
+        type: "comment",
+        user: "James Wilson",
+        action: "commented on",
+        item: "RFI #123",
+        time: "3 hours ago"
+      },
+      {
+        id: "act-3",
+        type: "approval",
+        user: "Maria Garcia",
+        action: "approved",
+        item: "Change Order #45",
+        time: "5 hours ago"
+      }
     ],
     upcomingDeadlines: [
-      { id: 1, task: 'Submit Revised Building Permits', due: 'Apr 5', priority: 'high' },
-      { id: 2, task: 'Complete Foundation Inspection', due: 'Apr 8', priority: 'high' },
-      { id: 3, task: 'Finalize Material Orders', due: 'Apr 12', priority: 'medium' },
-      { id: 4, task: 'Review Subcontractor Proposals', due: 'Apr 15', priority: 'medium' }
+      {
+        id: "dead-1",
+        task: "Submit revised drawings",
+        dueDate: "2024-03-20",
+        assignedTo: "Engineering Team",
+        priority: "high"
+      },
+      {
+        id: "dead-2",
+        task: "Safety audit report",
+        dueDate: "2024-03-22",
+        assignedTo: "Safety Team",
+        priority: "medium"
+      }
     ],
     risks: [
-      { id: 1, issue: 'Material Delivery Delays', impact: 'Schedule', severity: 'high' },
-      { id: 2, issue: 'Design Conflicts in East Wing', impact: 'Quality', severity: 'medium' },
-      { id: 3, issue: 'Weather Forecast for Next Week', impact: 'Schedule', severity: 'medium' }
+      {
+        id: "risk-1",
+        issue: "Potential delay in steel delivery",
+        impact: "May affect construction schedule by 2 weeks",
+        severity: "high"
+      },
+      {
+        id: "risk-2",
+        issue: "Weather forecast shows heavy rain",
+        impact: "Could delay concrete pour",
+        severity: "medium"
+      }
     ]
   },
   "harbor": {
-    agents: [
-      {
-        id: "agent-3",
-        title: "Site Manager",
-        icon: AgentIconType.Building2,
-        tasks: [],
-        color: "#3A366E",
-        description: "Site management & coordination",
-        status: "active",
-        type: AgentResponseType.STRUCTURED,
-        capabilities: [
-          AgentActionType.ADD_TO_DIRECTORY,
-          AgentActionType.GENERATE_REPORT,
-          AgentActionType.EXPORT_EXCEL
-        ],
-        version: "1.0"
-      },
-      {
-        id: "agent-4",
-        title: "Environmental Specialist",
-        icon: AgentIconType.Leaf,
-        tasks: [],
-        color: "#A7CEBC",
-        description: "Environmental compliance & assessment",
-        status: "active",
-        type: AgentResponseType.UNSTRUCTURED,
-        capabilities: [
-          AgentActionType.EXPORT_PDF,
-          AgentActionType.CREATE_REMINDER,
-          AgentActionType.GENERATE_REPORT
-        ],
-        version: "1.0"
-      }
-    ],
-    drawings: [
-      {
-        id: "drawing-3",
-        name: "Site Survey",
-        type: DrawingType.Survey,
-        version: "1.0",
-        status: DrawingStatus.InProgress,
-        assignedTo: "John Smith"
-      },
-      {
-        id: "drawing-4",
-        name: "Environmental Impact",
-        type: DrawingType.Environmental,
-        version: "1.0",
-        status: DrawingStatus.Draft,
-        assignedTo: "Lisa Wong"
-      }
-    ],
+    agents,
+    drawings,
     tasks: [
       {
-        id: "task-3",
-        name: "Complete Site Survey",
-        status: "in_progress",
-        assignedTo: "John Smith"
+        id: "task-1",
+        name: "Review foundation plans",
+        description: "Review and approve foundation design plans"
       },
       {
-        id: "task-4",
-        name: "Environmental Assessment",
-        status: "pending",
-        assignedTo: "Lisa Wong"
+        id: "task-2",
+        name: "Environmental assessment",
+        description: "Complete environmental impact assessment"
       }
     ],
     metrics: {
-      completion: 15,
-      rfiCount: 31,
-      openIssues: 12,
-      documentsToReview: 24,
-      upcomingDeadlines: 7,
-      teamMembers: 22
+      completion: 45,
+      rfiCount: 8,
+      openIssues: 5,
+      documentsToReview: 10,
+      upcomingDeadlines: 3,
+      teamMembers: 18
     },
     recentActivities: [
-      { id: 1, type: 'document', user: 'John Smith', action: 'uploaded', item: 'Site Survey Report', time: '1 hour ago' },
-      { id: 2, type: 'comment', user: 'Lisa Wong', action: 'commented on', item: 'Foundation Plan', time: '4 hours ago' },
-      { id: 3, type: 'issue', user: 'Mark Davis', action: 'created issue', item: 'Soil Condition Assessment', time: '6 hours ago' },
-      { id: 4, type: 'approval', user: 'Anna Lee', action: 'approved', item: 'Permit Application', time: 'Yesterday' }
+      {
+        id: "act-1",
+        type: "document",
+        user: "John Smith",
+        action: "uploaded",
+        item: "Environmental Report",
+        time: "1 hour ago"
+      },
+      {
+        id: "act-2",
+        type: "comment",
+        user: "Emma Wilson",
+        action: "commented on",
+        item: "Foundation Design",
+        time: "2 hours ago"
+      }
     ],
     upcomingDeadlines: [
-      { id: 1, task: 'Submit Environmental Impact Report', due: 'Apr 10', priority: 'high' },
-      { id: 2, task: 'Complete Site Survey', due: 'Apr 14', priority: 'high' },
-      { id: 3, task: 'Review Contractor Bids', due: 'Apr 18', priority: 'medium' },
-      { id: 4, task: 'Finalize Design Documents', due: 'Apr 22', priority: 'medium' }
+      {
+        id: "dead-1",
+        task: "Submit environmental report",
+        dueDate: "2024-03-25",
+        assignedTo: "Environmental Team",
+        priority: "high"
+      }
     ],
     risks: [
-      { id: 1, issue: 'Environmental Permit Delays', impact: 'Schedule', severity: 'high' },
-      { id: 2, issue: 'Soil Stability Concerns', impact: 'Quality', severity: 'high' },
-      { id: 3, issue: 'Local Community Feedback', impact: 'Scope', severity: 'medium' }
+      {
+        id: "risk-1",
+        issue: "Soil contamination risk",
+        impact: "May require additional remediation",
+        severity: "high"
+      }
     ]
   }
-  // Add more projects as needed
 }; 

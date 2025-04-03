@@ -5,12 +5,12 @@ import Input from '../components/ui/input';
 import Button from '../components/ui/button';
 import { 
   UserCog, BarChart, FileSignature, Building2, ShieldAlert, 
-  Database, FileStack, CheckCircle, Send, PlusCircle,
-  Download, FileText, Bell, Users, FileSpreadsheet
+  Database, FileStack, CheckCircle, Send, PlusCircle 
 } from 'lucide-react';
 import { AgentTaskCard } from '../components/AgentTaskCard';
 import { AgentChatMessage } from '../components/AgentChatMessage';
-import { AgentResponseType, AgentActionType, ChatMessage, AgentAction, AgentIconType } from '../types';
+
+type AgentIconType = 'UserCog' | 'BarChart' | 'FileSignature' | 'Building2' | 'ShieldAlert' | 'Database' | 'FileStack' | 'CheckCircle';
 
 interface Task {
   id: string | number;
@@ -25,8 +25,6 @@ interface AgentChatProps {
     color: string;
     icon: AgentIconType;
     tasks: Task[];
-    type: AgentResponseType;
-    capabilities: AgentActionType[];
   };
   onBack?: () => void;
 }
@@ -34,45 +32,35 @@ interface AgentChatProps {
 export const AgentChat = ({ agent, onBack }: AgentChatProps) => {
   const [activeTab, setActiveTab] = useState('chat');
   const [messageInput, setMessageInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+  const [chatMessages, setChatMessages] = useState([
     { 
-      id: '1', 
+      id: 1, 
       role: 'agent', 
       content: `Hello, I'm your ${agent.title}. How can I help you with your project today?`,
       timestamp: new Date().toISOString()
     }
   ]);
 
-  const iconMap: Record<AgentIconType, React.ComponentType<any>> = {
-    [AgentIconType.UserCog]: UserCog,
-    [AgentIconType.BarChart]: BarChart,
-    [AgentIconType.FileSignature]: FileSignature,
-    [AgentIconType.Building2]: Building2,
-    [AgentIconType.ShieldAlert]: ShieldAlert,
-    [AgentIconType.Database]: Database,
-    [AgentIconType.FileStack]: FileStack,
-    [AgentIconType.CheckCircle]: CheckCircle,
-    [AgentIconType.Shield]: ShieldAlert,
-    [AgentIconType.Leaf]: FileStack
-  };
-
-  const actionIconMap = {
-    [AgentActionType.EXPORT_EXCEL]: FileSpreadsheet,
-    [AgentActionType.EXPORT_PDF]: FileText,
-    [AgentActionType.CREATE_REMINDER]: Bell,
-    [AgentActionType.ADD_TO_DIRECTORY]: Users,
-    [AgentActionType.GENERATE_REPORT]: FileText
+  const iconMap = {
+    'UserCog': UserCog,
+    'BarChart': BarChart,
+    'FileSignature': FileSignature,
+    'Building2': Building2,
+    'ShieldAlert': ShieldAlert,
+    'Database': Database,
+    'FileStack': FileStack,
+    'CheckCircle': CheckCircle
   };
 
   const IconComponent = iconMap[agent.icon] || UserCog;
 
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageInput.trim()) return;
 
     // Add user message
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
+    const userMessage = {
+      id: Date.now(),
       role: 'user',
       content: messageInput,
       timestamp: new Date().toISOString()
@@ -83,18 +71,11 @@ export const AgentChat = ({ agent, onBack }: AgentChatProps) => {
 
     // Simulate agent response (in a real app, this would be an API call)
     setTimeout(() => {
-      const agentResponse: ChatMessage = {
-        id: (Date.now() + 1).toString(),
+      const agentResponse = {
+        id: Date.now() + 1,
         role: 'agent',
         content: `As your ${agent.title}, I'll help address your question about "${messageInput}". In a real implementation, this would be processed by the AI.`,
-        timestamp: new Date().toISOString(),
-        metadata: {
-          availableActions: agent.capabilities,
-          structuredOutput: agent.type === AgentResponseType.STRUCTURED ? {
-            action: 'process_request',
-            result: { status: 'success' }
-          } : undefined
-        }
+        timestamp: new Date().toISOString()
       };
       setChatMessages(prev => [...prev, agentResponse]);
     }, 1000);
@@ -106,45 +87,29 @@ export const AgentChat = ({ agent, onBack }: AgentChatProps) => {
     if (!selectedTask) return;
     
     // Add task selection message
-    const taskMessage: ChatMessage = {
-      id: Date.now().toString(),
+    const taskMessage = {
+      id: Date.now(),
       role: 'user',
       content: `I'd like help with: ${selectedTask.name}`,
       timestamp: new Date().toISOString(),
-      isTaskRequest: true,
-      metadata: {
-        taskId: taskId.toString(),
-        availableActions: agent.capabilities
-      }
+      isTaskRequest: true
     };
     
     setChatMessages([...chatMessages, taskMessage]);
     
     // Simulate agent response
     setTimeout(() => {
-      const agentResponse: ChatMessage = {
-        id: (Date.now() + 1).toString(),
+      const agentResponse = {
+        id: Date.now() + 1,
         role: 'agent',
         content: `I'll help you with ${selectedTask.name}. ${selectedTask.description}. Let me gather the necessary information...`,
-        timestamp: new Date().toISOString(),
-        metadata: {
-          availableActions: agent.capabilities,
-          structuredOutput: agent.type === AgentResponseType.STRUCTURED ? {
-            action: 'process_task',
-            result: { status: 'processing' }
-          } : undefined
-        }
+        timestamp: new Date().toISOString()
       };
       setChatMessages(prev => [...prev, agentResponse]);
     }, 1000);
     
     // Switch to chat tab
     setActiveTab('chat');
-  };
-
-  const handleActionClick = (actionType: AgentActionType) => {
-    // In a real implementation, this would trigger the appropriate action
-    console.log('Action clicked:', actionType);
   };
 
   return (
@@ -180,32 +145,12 @@ export const AgentChat = ({ agent, onBack }: AgentChatProps) => {
               {/* Chat Messages */}
               <div className="flex-grow overflow-y-auto p-6 space-y-4">
                 {chatMessages.map(message => (
-                  <div key={message.id}>
-                    <AgentChatMessage 
-                      message={message} 
-                      agentColor={agent.color} 
-                      agentIcon={agent.icon} 
-                    />
-                    {message.role === 'agent' && message.metadata?.availableActions && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {message.metadata.availableActions.map(actionType => {
-                          const ActionIcon = actionIconMap[actionType];
-                          return (
-                            <Button
-                              key={actionType}
-                              variant="outline"
-                              size="sm"
-                              className="text-[#4C5760] hover:text-[#D15F36] hover:border-[#D15F36]"
-                              onClick={() => handleActionClick(actionType)}
-                            >
-                              <ActionIcon size={16} className="mr-2" />
-                              {actionType.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
+                  <AgentChatMessage 
+                    key={message.id} 
+                    message={message} 
+                    agentColor={agent.color} 
+                    agentIcon={agent.icon} 
+                  />
                 ))}
               </div>
               

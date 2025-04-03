@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Project, Agent, Drawing, Task, ProjectMetrics, RecentActivity, Deadline, Risk } from '../types';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Progress } from '../components/ui/progress';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Progress } from './ui/progress';
 import { Activity, AlertTriangle, BarChart3, Calendar, CheckCircle, FileText, MessageSquare, Users, Bot, UserPlus } from 'lucide-react';
 import AgentsSection from './AgentsSection';
 import DrawingsSection from './DrawingsSection';
 import { projectData } from '../mock-data/project-data';
+
+// Debug helper
+const debug = (...args: any[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DashboardSection]', ...args);
+  }
+};
 
 interface DashboardSectionProps {
   selectedProject: Project;
 }
 
 const DashboardSection: React.FC<DashboardSectionProps> = ({ selectedProject }) => {
+  debug('DashboardSection rendered with project:', selectedProject);
+
   const [projectAgents, setProjectAgents] = useState<Agent[]>([]);
   const [projectDrawings, setProjectDrawings] = useState<Drawing[]>([]);
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
@@ -20,10 +29,18 @@ const DashboardSection: React.FC<DashboardSectionProps> = ({ selectedProject }) 
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState<Deadline[]>([]);
   const [risks, setRisks] = useState<Risk[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (selectedProject) {
+    debug('DashboardSection mounted');
+    debug('Selected Project:', selectedProject);
+    debug('Project Data:', projectData);
+    
+    if (selectedProject && selectedProject.id) {
       const data = projectData[selectedProject.id];
+      debug('Project Data for ID:', data);
+      
       if (data) {
         setProjectAgents(data.agents);
         setProjectDrawings(data.drawings);
@@ -32,9 +49,45 @@ const DashboardSection: React.FC<DashboardSectionProps> = ({ selectedProject }) 
         setRecentActivities(data.recentActivities);
         setUpcomingDeadlines(data.upcomingDeadlines);
         setRisks(data.risks);
+        setIsLoading(false);
+      } else {
+        debug('ERROR: No data found for project ID:', selectedProject.id);
+        setError(`No data found for project ${selectedProject.name}`);
+        setIsLoading(false);
       }
     }
   }, [selectedProject]);
+
+  if (isLoading) {
+    debug('Rendering loading state');
+    return (
+      <div className="p-6">
+        <div className="text-center text-[#4C5760]">Loading project data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    debug('Rendering error state:', error);
+    return (
+      <div className="p-6">
+        <div className="text-center text-red-500">{error}</div>
+      </div>
+    );
+  }
+
+  debug('Rendering dashboard content with:', {
+    tasksCount: projectTasks.length,
+    metrics,
+    activitiesCount: recentActivities.length,
+    deadlinesCount: upcomingDeadlines.length,
+    risksCount: risks.length,
+    drawingsCount: projectDrawings.length
+  });
+
+  if (!selectedProject) {
+    return <div>No project selected</div>;
+  }
 
   return (
     <div className="p-6 space-y-6 bg-[#F7F5F2]">
@@ -198,10 +251,10 @@ const DashboardSection: React.FC<DashboardSectionProps> = ({ selectedProject }) 
                   <div key={deadline.id} className="flex items-start gap-3 py-2 border-b border-gray-100">
                     <div className={`px-2 py-1 rounded text-xs ${
                       deadline.priority === 'high' 
-                        ? 'bg-[#D15F36] bg-opacity-10 text-[#D15F36]' 
+                        ? 'bg-[#D15F36] bg-opacity-10 text-[#D15F36]'
                         : 'bg-[#F8C630] bg-opacity-10 text-[#F8C630]'
                     }`}>
-                      {deadline.due}
+                      {deadline.dueDate}
                     </div>
                     <div className="flex-grow">
                       <div className="text-sm font-medium text-[#3A366E]">{deadline.task}</div>
@@ -225,33 +278,19 @@ const DashboardSection: React.FC<DashboardSectionProps> = ({ selectedProject }) 
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <button className="w-full flex items-center gap-3 p-3 rounded-md border border-[#A7CEBC] hover:bg-[#A7CEBC] hover:bg-opacity-10 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-[#3A366E] flex items-center justify-center text-white">
-                    <Users size={16} />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-medium text-[#3A366E]">Project Manager</div>
-                    <div className="text-xs text-[#4C5760]">Schedule & coordination assistance</div>
-                  </div>
-                </button>
-                <button className="w-full flex items-center gap-3 p-3 rounded-md border border-[#A7CEBC] hover:bg-[#A7CEBC] hover:bg-opacity-10 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-[#3A366E] flex items-center justify-center text-white">
-                    <AlertTriangle size={16} />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-medium text-[#3A366E]">Health & Safety</div>
-                    <div className="text-xs text-[#4C5760]">Compliance & risk assessment</div>
-                  </div>
-                </button>
-                <button className="w-full flex items-center gap-3 p-3 rounded-md border border-[#A7CEBC] hover:bg-[#A7CEBC] hover:bg-opacity-10 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-[#3A366E] flex items-center justify-center text-white">
-                    <BarChart3 size={16} />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-medium text-[#3A366E]">Commercial Manager</div>
-                    <div className="text-xs text-[#4C5760]">Budget & cost tracking</div>
-                  </div>
-                </button>
+                {projectAgents.slice(0, 3).map(agent => (
+                  <button key={agent.id} className="w-full flex items-center gap-3 p-3 rounded-md border border-[#A7CEBC] hover:bg-[#A7CEBC] hover:bg-opacity-10 transition-colors">
+                    <div className="w-8 h-8 rounded-full" style={{ backgroundColor: agent.color }}>
+                      {agent.icon === 'UserCog' && <Users size={16} className="text-white" />}
+                      {agent.icon === 'ShieldAlert' && <AlertTriangle size={16} className="text-white" />}
+                      {agent.icon === 'BarChart' && <BarChart3 size={16} className="text-white" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-[#3A366E]">{agent.title}</div>
+                      <div className="text-xs text-[#4C5760]">{agent.description}</div>
+                    </div>
+                  </button>
+                ))}
               </div>
             </CardContent>
             <CardFooter>

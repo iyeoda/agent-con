@@ -1,4 +1,5 @@
 import { Project } from '../types';
+import { agents } from './agents';
 
 // Mock data for projects that can be used across components
 export const mockProjects: Project[] = [
@@ -19,7 +20,8 @@ export const mockProjects: Project[] = [
     budget: 150000000,
     currency: 'USD',
     tags: ['commercial', 'high-rise', 'office'],
-    completionPercentage: 35
+    completionPercentage: 35,
+    agents: agents
   },
   { 
     id: 'PRJ-002', 
@@ -38,7 +40,8 @@ export const mockProjects: Project[] = [
     budget: 85000000,
     currency: 'USD',
     tags: ['mixed-use', 'residential', 'retail'],
-    completionPercentage: 5
+    completionPercentage: 5,
+    agents: agents
   },
   { 
     id: 'PRJ-003', 
@@ -57,7 +60,8 @@ export const mockProjects: Project[] = [
     budget: 45000000,
     currency: 'USD',
     tags: ['infrastructure', 'transportation', 'public'],
-    completionPercentage: 15
+    completionPercentage: 15,
+    agents: agents
   },
   { 
     id: 'PRJ-004', 
@@ -77,7 +81,8 @@ export const mockProjects: Project[] = [
     budget: 75000000,
     currency: 'USD',
     tags: ['renovation', 'historical', 'government'],
-    completionPercentage: 100
+    completionPercentage: 100,
+    agents: agents
   },
   { 
     id: 'PRJ-005', 
@@ -97,7 +102,8 @@ export const mockProjects: Project[] = [
     budget: 25000000,
     currency: 'USD',
     tags: ['infrastructure', 'emergency', 'bridge'],
-    completionPercentage: 100
+    completionPercentage: 100,
+    agents: agents
   }
 ];
 
@@ -117,7 +123,8 @@ export const mockAvailableProjects: Project[] = [
     budget: 95000000,
     currency: 'USD',
     tags: ['commercial', 'office', 'new-construction'],
-    completionPercentage: 0
+    completionPercentage: 0,
+    agents: []
   },
   { 
     id: 'CDE-PRJ-002', 
@@ -133,7 +140,8 @@ export const mockAvailableProjects: Project[] = [
     budget: 250000000,
     currency: 'USD',
     tags: ['healthcare', 'medical', 'institutional'],
-    completionPercentage: 0
+    completionPercentage: 0,
+    agents: []
   },
   { 
     id: 'CDE-PRJ-003', 
@@ -149,6 +157,7 @@ export const mockAvailableProjects: Project[] = [
     budget: 120000000,
     currency: 'USD',
     tags: ['residential', 'luxury', 'apartments'],
-    completionPercentage: 0
+    completionPercentage: 0,
+    agents: []
   }
 ]; 

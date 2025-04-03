@@ -1,304 +1,38 @@
-// Core types for the application
-
-export enum AgentIconType {
-  UserCog = 'UserCog',
-  Shield = 'Shield',
-  Building2 = 'Building2',
-  Leaf = 'Leaf',
-  BarChart = 'BarChart',
-  FileStack = 'FileStack',
-  FileSignature = 'FileSignature',
-  ShieldAlert = 'ShieldAlert',
-  Database = 'Database',
-  CheckCircle = 'CheckCircle'
-}
-
-export enum DrawingType {
-  Architectural = 'Architectural',
-  Structural = 'Structural',
-  Survey = 'Survey',
-  Environmental = 'Environmental',
-  MEP = 'MEP',
-  Landscape = 'Landscape'
-}
-
-export enum DrawingStatus {
-  InReview = 'In Review',
-  Approved = 'Approved',
-  InProgress = 'In Progress',
-  Draft = 'Draft'
-}
-
-export type ProjectStatus = 'active' | 'archived' | 'available';
-export type ProjectPhase = 'Planning' | 'Design' | 'Construction' | 'Completed';
-export type CDEConnectionType = 'Project Management' | 'BIM' | 'Document Management';
-export type CDEConnectionStatus = 'active' | 'inactive';
-
-export interface Project {
-  id: string;
-  name: string;
-  logo?: string;
-  image?: string;  // URL to project image/photo
-  location?: string;
-  phase?: ProjectPhase;
-  cde?: string;
-  cdeColor?: string;
-  members?: number;
-  lastActivity?: string;
-  status: ProjectStatus;
-  archived?: string;
-  description?: string;
-  startDate?: string;
-  endDate?: string;
-  budget?: number;
-  currency?: string;
-  tags?: string[];
-  completionPercentage?: number;  // Project completion percentage (0-100)
-}
+export type AgentIconType = 'UserCog' | 'BarChart' | 'FileSignature' | 'Building2' | 'ShieldAlert' | 'Database' | 'FileStack' | 'CheckCircle';
 
 export interface Task {
-  id: string;
+  id: string | number;
   name: string;
-  status: string;
-  assignedTo: string;
-}
-
-export enum AgentResponseType {
-  STRUCTURED = 'structured',
-  UNSTRUCTURED = 'unstructured'
-}
-
-export enum AgentActionType {
-  EXPORT_EXCEL = 'export_excel',
-  EXPORT_PDF = 'export_pdf',
-  CREATE_REMINDER = 'create_reminder',
-  ADD_TO_DIRECTORY = 'add_to_directory',
-  GENERATE_REPORT = 'generate_report'
-}
-
-export interface AgentAction {
-  id: string;
-  type: AgentActionType;
-  input: Record<string, any>;
-  output?: Record<string, any>;
-  status: 'pending' | 'completed' | 'failed';
-  executedAt?: Date;
-  error?: string;
-}
-
-export interface AgentSession {
-  id: string;
-  projectId: string;
-  agentId: string;
-  startedBy: string;
-  startedAt: Date;
-  responseType: AgentResponseType;
-  interactions: ChatMessage[];
-  actions: AgentAction[];
-  status: 'active' | 'completed' | 'archived';
-  metadata?: Record<string, any>;
-}
-
-export interface Export {
-  id: string;
-  sessionId: string;
-  type: 'excel' | 'pdf';
-  filePath: string;
-  createdAt: Date;
-  metadata: {
-    triggeredBy: string;
-    context: string;
-    fileName: string;
-  };
-}
-
-export interface Reminder {
-  id: string;
-  sessionId: string;
-  projectId: string;
-  createdBy: string;
-  text: string;
-  dueAt: Date;
-  status: 'pending' | 'completed';
-  followUpEmailScheduled: boolean;
-  emailSent?: boolean;
+  description: string;
 }
 
 export interface Agent {
   id: string;
   title: string;
+  description: string;
+  color: string;
   icon: AgentIconType;
-  color?: string;
-  description?: string;
-  status?: 'active' | 'inactive';
-  type: AgentResponseType;
-  capabilities: AgentActionType[];
-  inputSchema?: Record<string, any>;
-  outputSchema?: Record<string, any>;
-  version: string;
+  textColor?: string;
   tasks: Task[];
+  status?: string;
+  type: 'STRUCTURED' | 'UNSTRUCTURED';
+  capabilities: string[];
+  version: string;
 }
 
-export interface Person {
-  id: string;
-  name: string;
-  company: string;
-  role: string;
-  email: string;
-  phone: string;
-  avatar?: string;
-  status?: 'active' | 'inactive';
-  department?: string;
-  joinDate?: string;
-  skills?: string[];
-  projects?: string[];
-}
-
-export interface Company {
-  id: string;
-  name: string;
-  role: string;
-  contactPerson: string;
-  email: string;
-  phone: string;
-  website?: string;
-  address?: string;
-  type?: 'Contractor' | 'Architect' | 'Consultant' | 'Client';
-  status?: 'active' | 'inactive';
-  joinDate?: string;
-  projects?: string[];
-}
+export type DrawingType = 'architectural' | 'structural' | 'mechanical' | 'electrical' | 'plumbing';
+export type DrawingStatus = 'current' | 'superseded' | 'pending' | 'draft';
 
 export interface Drawing {
   id: string;
   name: string;
   type: DrawingType;
-  version: string;
   status: DrawingStatus;
-  assignedTo?: string;
-}
-
-export interface DrawingComment {
-  id: string;
-  content: string;
-  createdBy: string;
-  createdAt: string;
-  updatedAt?: string;
-  resolved?: boolean;
-  resolvedBy?: string;
-  resolvedAt?: string;
-}
-
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'agent' | 'system';
-  content: string;
-  timestamp: string | number | Date;
-  isTaskRequest?: boolean;
-  metadata?: {
-    taskId?: string;
-    projectId?: string;
-    drawingId?: string;
-    agentId?: string;
-    availableActions?: AgentActionType[];
-    structuredOutput?: Record<string, any>;
-  };
-}
-
-export interface CDEConnection {
-  id: string;
-  name: string;
-  type: CDEConnectionType;
-  status: CDEConnectionStatus;
-  lastSync?: string;
-  credentials?: {
-    apiKey?: string;
-    clientId?: string;
-    clientSecret?: string;
-    refreshToken?: string;
-    expiresAt?: string;
-  };
-  settings?: {
-    autoSync?: boolean;
-    syncInterval?: number;
-    syncTypes?: string[];
-  };
-  projects?: string[];
-}
-
-export interface UserSettings {
-  id: string;
-  userId: string;
-  notifications: {
-    email: boolean;
-    push: boolean;
-    projectUpdates: boolean;
-    taskAssignments: boolean;
-    drawingUpdates: boolean;
-    mentions: boolean;
-    comments: boolean;
-  };
-  preferences: {
-    theme: 'light' | 'dark';
-    language: string;
-    timezone: string;
-    dateFormat: string;
-    timeFormat: string;
-    defaultView: 'list' | 'grid' | 'calendar';
-    compactMode: boolean;
-  };
-  security: {
-    twoFactorEnabled: boolean;
-    lastPasswordChange: string;
-    loginHistory: LoginHistory[];
-    activeSessions: ActiveSession[];
-  };
-}
-
-export interface LoginHistory {
-  id: string;
-  timestamp: string;
-  ipAddress: string;
-  location?: string;
-  device?: string;
-  status: 'success' | 'failed';
-}
-
-export interface ActiveSession {
-  id: string;
-  device: string;
-  location?: string;
-  lastActive: string;
-  ipAddress: string;
-}
-
-export interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message?: string;
-  errors?: ApiError[];
-}
-
-export interface ApiError {
-  code: string;
-  message: string;
-  field?: string;
-  details?: unknown;
-}
-
-export interface PaginationParams {
-  page: number;
-  limit: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+  version: string;
+  uploadedBy: string;
+  uploadedAt: string;
+  fileSize: number;
+  preview?: string;
 }
 
 export interface ProjectMetrics {
@@ -311,7 +45,7 @@ export interface ProjectMetrics {
 }
 
 export interface RecentActivity {
-  id: number;
+  id: string;
   type: 'document' | 'comment' | 'issue' | 'approval';
   user: string;
   action: string;
@@ -320,25 +54,100 @@ export interface RecentActivity {
 }
 
 export interface Deadline {
-  id: number;
+  id: string;
   task: string;
-  due: string;
+  dueDate: string;
+  assignedTo: string;
   priority: 'high' | 'medium' | 'low';
 }
 
 export interface Risk {
-  id: number;
+  id: string;
   issue: string;
   impact: string;
   severity: 'high' | 'medium' | 'low';
 }
 
-export interface ProjectData {
+export interface Project {
+  id: string;
+  name: string;
+  logo: string;
   agents: Agent[];
-  drawings: Drawing[];
-  tasks: Task[];
-  metrics: ProjectMetrics;
-  recentActivities: RecentActivity[];
-  upcomingDeadlines: Deadline[];
-  risks: Risk[];
-} 
+  location?: string;
+  phase?: string;
+  cde?: string;
+  cdeColor?: string;
+  members?: number;
+  lastActivity?: string;
+  status?: string;
+  archived?: string;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
+  budget?: number;
+  currency?: string;
+  tags?: string[];
+  completionPercentage?: number;
+}
+
+export interface Person {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  company: string;
+  avatar?: string;
+  phone?: string;
+}
+
+export interface Company {
+  id: string;
+  name: string;
+  logo?: string;
+  type: string;
+  status: string;
+  role: string;
+  contactPerson?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface CDEConnection {
+  id: string;
+  name: string;
+  provider: string;
+  type: string;
+  status: string;
+  lastSync?: string;
+  color: string;
+  credentials?: {
+    apiKey: string;
+    clientId: string;
+    clientSecret: string;
+  };
+}
+
+export interface UserSettings {
+  id: string;
+  theme: 'light' | 'dark' | 'system';
+  notifications: {
+    email: boolean;
+    push: boolean;
+    desktop: boolean;
+    projectUpdates?: boolean;
+    taskAssignments?: boolean;
+    drawingUpdates?: boolean;
+    mentions?: boolean;
+    comments?: boolean;
+  };
+  language: string;
+  timezone: string;
+  preferences?: Record<string, any>;
+  security?: {
+    twoFactorEnabled: boolean;
+    lastPasswordChange: string;
+    sessionTimeout: number;
+  };
+}
+
+export type ProjectPhase = 'Planning' | 'Design' | 'Construction' | 'Completed'; 
