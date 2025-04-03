@@ -5,10 +5,12 @@ import Input from '../components/ui/input';
 import Button from '../components/ui/button';
 import { 
   UserCog, BarChart, FileSignature, Building2, ShieldAlert, 
-  Database, FileStack, CheckCircle, Send, PlusCircle 
+  Database, FileStack, CheckCircle, Send, PlusCircle,
+  MessageSquare, ListChecks
 } from 'lucide-react';
 import { AgentTaskCard } from '../components/AgentTaskCard';
 import { AgentChatMessage } from '../components/AgentChatMessage';
+import { SmartActions } from '../components/SmartActions';
 
 type AgentIconType = 'UserCog' | 'BarChart' | 'FileSignature' | 'Building2' | 'ShieldAlert' | 'Database' | 'FileStack' | 'CheckCircle';
 
@@ -29,10 +31,20 @@ interface AgentChatProps {
   onBack?: () => void;
 }
 
+interface ChatMessage {
+  id: number;
+  role: 'user' | 'agent';
+  content: string;
+  timestamp: string;
+  isTaskRequest?: boolean;
+  metadata?: Record<string, any>;
+}
+
 export const AgentChat = ({ agent, onBack }: AgentChatProps) => {
   const [activeTab, setActiveTab] = useState('chat');
   const [messageInput, setMessageInput] = useState('');
-  const [chatMessages, setChatMessages] = useState([
+  const [chatMode, setChatMode] = useState<'structured' | 'unstructured'>('unstructured');
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     { 
       id: 1, 
       role: 'agent', 
@@ -59,7 +71,7 @@ export const AgentChat = ({ agent, onBack }: AgentChatProps) => {
     if (!messageInput.trim()) return;
 
     // Add user message
-    const userMessage = {
+    const userMessage: ChatMessage = {
       id: Date.now(),
       role: 'user',
       content: messageInput,
@@ -69,13 +81,19 @@ export const AgentChat = ({ agent, onBack }: AgentChatProps) => {
     setChatMessages([...chatMessages, userMessage]);
     setMessageInput('');
 
-    // Simulate agent response (in a real app, this would be an API call)
+    // Simulate agent response with metadata
     setTimeout(() => {
-      const agentResponse = {
+      const agentResponse: ChatMessage = {
         id: Date.now() + 1,
         role: 'agent',
         content: `As your ${agent.title}, I'll help address your question about "${messageInput}". In a real implementation, this would be processed by the AI.`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        metadata: {
+          hasData: true,
+          hasContent: true,
+          hasFollowUp: true,
+          hasProjectContext: true
+        }
       };
       setChatMessages(prev => [...prev, agentResponse]);
     }, 1000);
@@ -87,7 +105,7 @@ export const AgentChat = ({ agent, onBack }: AgentChatProps) => {
     if (!selectedTask) return;
     
     // Add task selection message
-    const taskMessage = {
+    const taskMessage: ChatMessage = {
       id: Date.now(),
       role: 'user',
       content: `I'd like help with: ${selectedTask.name}`,
@@ -99,11 +117,17 @@ export const AgentChat = ({ agent, onBack }: AgentChatProps) => {
     
     // Simulate agent response
     setTimeout(() => {
-      const agentResponse = {
+      const agentResponse: ChatMessage = {
         id: Date.now() + 1,
         role: 'agent',
         content: `I'll help you with ${selectedTask.name}. ${selectedTask.description}. Let me gather the necessary information...`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        metadata: {
+          hasData: true,
+          hasContent: true,
+          hasFollowUp: true,
+          hasProjectContext: true
+        }
       };
       setChatMessages(prev => [...prev, agentResponse]);
     }, 1000);
@@ -142,15 +166,50 @@ export const AgentChat = ({ agent, onBack }: AgentChatProps) => {
         <TabsContent value="chat" className="m-0">
           <CardContent className="p-0">
             <div className="flex flex-col h-[600px]">
+              {/* Chat Mode Selection */}
+              <div className="px-6 py-3 border-b bg-[#F7F5F2]">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setChatMode('unstructured')}
+                    className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors ${
+                      chatMode === 'unstructured'
+                        ? 'bg-[#D15F36] text-white'
+                        : 'bg-white text-[#4C5760] border border-[#A7CEBC] hover:bg-gray-50'
+                    }`}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Free Chat</span>
+                  </button>
+                  <button
+                    onClick={() => setChatMode('structured')}
+                    className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors ${
+                      chatMode === 'structured'
+                        ? 'bg-[#D15F36] text-white'
+                        : 'bg-white text-[#4C5760] border border-[#A7CEBC] hover:bg-gray-50'
+                    }`}
+                  >
+                    <ListChecks className="w-4 h-4" />
+                    <span>Structured</span>
+                  </button>
+                </div>
+              </div>
+
               {/* Chat Messages */}
               <div className="flex-grow overflow-y-auto p-6 space-y-4">
                 {chatMessages.map(message => (
-                  <AgentChatMessage 
-                    key={message.id} 
-                    message={message} 
-                    agentColor={agent.color} 
-                    agentIcon={agent.icon} 
-                  />
+                  <div key={message.id}>
+                    <AgentChatMessage 
+                      message={message} 
+                      agentColor={agent.color} 
+                      agentIcon={agent.icon} 
+                    />
+                    {message.role === 'agent' && message.metadata && (
+                      <SmartActions 
+                        actions={[]} 
+                        responseMetadata={message.metadata}
+                      />
+                    )}
+                  </div>
                 ))}
               </div>
               
