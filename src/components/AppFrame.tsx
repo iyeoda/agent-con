@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, useParams } from "react-router-dom";
 import Input from "./ui/input";
 import { HelpCircle, Settings, Folder, LayoutDashboard, Bot, Sparkles } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger } from "@radix-ui/react-tooltip";
@@ -13,13 +13,14 @@ import { AvatarDropdown } from "./AvatarDropdown";
 import { Project } from '../types';
 import { projectData } from '../mock-data/project-data';
 import DashboardSection from "./DashboardSection";
+import DrawingDetail from "./DrawingDetail";
 
 // Mock project data
 const defaultProject: Project = {
-  id: "woodside",
+  id: "550e8400-e29b-41d4-a716-446655440000",
   name: "Woodside Tower Project",
   logo: "/viewpoint_logo.svg",
-  agents: [], // Initialize with empty array
+  agents: [],
   location: "San Francisco, CA",
   phase: "Construction",
   cde: "Trimble Viewpoint",
@@ -43,30 +44,36 @@ const debug = (...args: any[]) => {
   }
 };
 
-export default function AppFrame() {
+// Create a new component for the main app content
+const AppContent = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { projectId } = useParams();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentProject, setCurrentProject] = useState<Project>(defaultProject);
-  const [activeView, setActiveView] = useState('dashboard');
 
-  // Debug initial render
-  debug('Initial render with defaultProject:', defaultProject);
+  // Extract the current view from the URL path
+  const currentView = location.pathname.split('/')[2] || 'dashboard';
 
   useEffect(() => {
-    debug('AppFrame mounted');
+    debug('AppContent mounted');
     debug('Current Project:', currentProject);
     debug('Project Data:', projectData);
     
     // Initialize project with data if available
-    if (projectData["woodside"]) {
-      debug('Found woodside project data, updating currentProject');
+    if (projectId && projectData[projectId]) {
+      debug('Found project data, updating currentProject');
       setCurrentProject({
         ...defaultProject,
-        agents: projectData["woodside"].agents
+        id: projectId,
+        agents: projectData[projectId].agents
       });
     } else {
-      debug('WARNING: No woodside project data found');
+      debug('WARNING: No project data found for ID:', projectId);
+      // Redirect to default project if invalid project ID
+      navigate(`/project/550e8400-e29b-41d4-a716-446655440000/dashboard`);
     }
-  }, []);
+  }, [projectId, navigate]);
 
   const handleProjectChange = (project: Project) => {
     debug('Project change requested:', project);
@@ -79,136 +86,132 @@ export default function AppFrame() {
         ...project,
         agents: projectDataForId.agents
       });
+      // Navigate to the new project's dashboard using the project UUID
+      navigate(`/project/${project.id}/dashboard`);
     } else {
       debug('ERROR: No data found for project ID:', project.id);
       console.error('No data found for project ID:', project.id);
     }
   };
 
-  // Debug render
-  debug('Rendering AppFrame with:', {
-    currentProject,
-    activeView,
-    isSearchOpen
-  });
+  const handleViewChange = (view: string) => {
+    navigate(`/project/${currentProject.id}/${view}`);
+  };
 
   return (
-    <BrowserRouter>
-      <TooltipProvider>
-        <div className="flex h-screen bg-[#F7F5F2]">
-          {/* Sidebar */}
-          <div className="w-16 group hover:w-48 transition-all duration-300 bg-white border-r border-[#A7CEBC] flex flex-col items-center py-6">
-            <div className="space-y-6 w-full">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div 
-                    className={`flex items-center gap-2 w-full px-4 cursor-pointer ${activeView === 'dashboard' ? 'text-[#D15F36]' : ''}`}
-                    onClick={() => setActiveView('dashboard')}
-                  >
-                    <LayoutDashboard className={`min-w-[24px] w-6 h-6 ${activeView === 'dashboard' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
-                    <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Dashboard</span>
-                  </div>
-                </TooltipTrigger>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div 
-                    className={`flex items-center gap-2 w-full px-4 cursor-pointer ${activeView === 'data' ? 'text-[#D15F36]' : ''}`}
-                    onClick={() => setActiveView('data')}
-                  >
-                    <Folder className={`min-w-[24px] w-6 h-6 ${activeView === 'data' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
-                    <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Data</span>
-                  </div>
-                </TooltipTrigger>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div 
-                    className={`flex items-center gap-2 w-full px-4 cursor-pointer ${activeView === 'agents' ? 'text-[#D15F36]' : ''}`}
-                    onClick={() => setActiveView('agents')}
-                  >
-                    <Bot className={`min-w-[24px] w-6 h-6 ${activeView === 'agents' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
-                    <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Agents</span>
-                  </div>
-                </TooltipTrigger>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div 
-                    className={`flex items-center gap-2 w-full px-4 cursor-pointer ${activeView === 'settings' ? 'text-[#D15F36]' : ''}`}
-                    onClick={() => setActiveView('settings')}
-                  >
-                    <Settings className={`min-w-[24px] w-6 h-6 ${activeView === 'settings' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
-                    <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Settings</span>
-                  </div>
-                </TooltipTrigger>
-              </Tooltip>
-            </div>
-          </div>
-
-          {/* Main content wrapper */}
-          <div className="flex-1 flex flex-col">
-            {/* Top Bar */}
-            <div className="h-16 border-b border-[#A7CEBC] bg-[#F7F5F2] flex items-center px-6 justify-between">
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <img src="/logo.svg" alt="Logo" className="h-11 w-11" />
-                  <ProjectSelector 
-                    initialProject={currentProject} 
-                    onProjectChange={handleProjectChange} 
-                  />
+    <TooltipProvider>
+      <div className="flex h-screen bg-[#F7F5F2]">
+        {/* Sidebar */}
+        <div className="w-16 group hover:w-48 transition-all duration-300 bg-white border-r border-[#A7CEBC] flex flex-col items-center py-6">
+          <div className="space-y-6 w-full">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div 
+                  className={`flex items-center gap-2 w-full px-4 cursor-pointer ${currentView === 'dashboard' ? 'text-[#D15F36]' : ''}`}
+                  onClick={() => handleViewChange('dashboard')}
+                >
+                  <LayoutDashboard className={`min-w-[24px] w-6 h-6 ${currentView === 'dashboard' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
+                  <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Dashboard</span>
                 </div>
-              </div>
+              </TooltipTrigger>
+            </Tooltip>
 
-              <div className="flex items-center">
-                <div className="w-[300px] mr-4">
-                  <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-                    <DialogTrigger asChild>
-                      <div className="relative w-full">
-                        <Input
-                          placeholder="Search..."
-                          className="border border-[#4C5760] text-[#4C5760] w-full pr-10"
-                          readOnly
-                        />
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                          <Sparkles className="h-4 w-4 text-[#D15F36]" />
-                        </div>
-                      </div>
-                    </DialogTrigger>
-                  </Dialog>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div 
+                  className={`flex items-center gap-2 w-full px-4 cursor-pointer ${currentView === 'data' ? 'text-[#D15F36]' : ''}`}
+                  onClick={() => handleViewChange('data')}
+                >
+                  <Folder className={`min-w-[24px] w-6 h-6 ${currentView === 'data' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
+                  <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Data</span>
                 </div>
-                <AvatarDropdown />
-              </div>
-            </div>
+              </TooltipTrigger>
+            </Tooltip>
 
-            {/* Main content area */}
-            <div className="flex-1 overflow-y-auto">
-              {(() => {
-                debug('Rendering main content for view:', activeView);
-                switch (activeView) {
-                  case 'dashboard':
-                    debug('Rendering DashboardSection with project:', currentProject);
-                    return <DashboardSection selectedProject={currentProject} />;
-                  case 'data':
-                    debug('Rendering ProjectDataSection');
-                    return <ProjectDataSection />;
-                  case 'agents':
-                    debug('Rendering AgentsSection with agents:', currentProject.agents);
-                    return <AgentsSection agents={currentProject.agents} />;
-                  case 'settings':
-                    debug('Rendering SettingsSection');
-                    return <SettingsSection />;
-                  default:
-                    return null;
-                }
-              })()}
-            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div 
+                  className={`flex items-center gap-2 w-full px-4 cursor-pointer ${currentView === 'agents' ? 'text-[#D15F36]' : ''}`}
+                  onClick={() => handleViewChange('agents')}
+                >
+                  <Bot className={`min-w-[24px] w-6 h-6 ${currentView === 'agents' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
+                  <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Agents</span>
+                </div>
+              </TooltipTrigger>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div 
+                  className={`flex items-center gap-2 w-full px-4 cursor-pointer ${currentView === 'settings' ? 'text-[#D15F36]' : ''}`}
+                  onClick={() => handleViewChange('settings')}
+                >
+                  <Settings className={`min-w-[24px] w-6 h-6 ${currentView === 'settings' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
+                  <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Settings</span>
+                </div>
+              </TooltipTrigger>
+            </Tooltip>
           </div>
         </div>
-      </TooltipProvider>
+
+        {/* Main content wrapper */}
+        <div className="flex-1 flex flex-col">
+          {/* Top Bar */}
+          <div className="h-16 border-b border-[#A7CEBC] bg-[#F7F5F2] flex items-center px-6 justify-between">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <img src="/logo.svg" alt="Logo" className="h-11 w-11" />
+                <ProjectSelector 
+                  initialProject={currentProject} 
+                  onProjectChange={handleProjectChange} 
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <div className="w-[300px] mr-4">
+                <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+                  <DialogTrigger asChild>
+                    <div className="relative w-full">
+                      <Input
+                        placeholder="Search..."
+                        className="border border-[#4C5760] text-[#4C5760] w-full pr-10"
+                        readOnly
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <Sparkles className="h-4 w-4 text-[#D15F36]" />
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                </Dialog>
+              </div>
+              <AvatarDropdown />
+            </div>
+          </div>
+
+          {/* Main content area */}
+          <div className="flex-1 overflow-y-auto">
+            <Routes>
+              <Route path="/dashboard" element={<DashboardSection selectedProject={currentProject} />} />
+              <Route path="/data" element={<ProjectDataSection />} />
+              <Route path="/data/drawings/:drawingId" element={<DrawingDetail />} />
+              <Route path="/agents" element={<AgentsSection agents={currentProject.agents} />} />
+              <Route path="/settings/*" element={<SettingsSection />} />
+            </Routes>
+          </div>
+        </div>
+      </div>
+    </TooltipProvider>
+  );
+};
+
+export default function AppFrame() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/project/:projectId/*" element={<AppContent />} />
+        <Route path="/" element={<Navigate to="/project/550e8400-e29b-41d4-a716-446655440000/dashboard" replace />} />
+      </Routes>
     </BrowserRouter>
   );
 }

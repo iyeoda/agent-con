@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Card, CardContent, CardFooter, CardHeader,
   Tabs, TabsContent, TabsList, TabsTrigger,
@@ -13,6 +14,12 @@ import { AIDataAssistant } from './AIDataAssistant';
 
 const ProjectDataSection = () => {
   const [activeTab, setActiveTab] = useState('drawings');
+  const navigate = useNavigate();
+  const { projectId } = useParams();
+
+  const handleDrawingClick = (drawingId: string) => {
+    navigate(`/project/${projectId}/data/drawings/${drawingId}`);
+  };
 
   return (
     <div className="p-6 space-y-6 bg-[#F7F5F2]">
@@ -20,7 +27,7 @@ const ProjectDataSection = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-[#3A366E]">Project Data</h1>
-          <p className="text-[#4C5760]">Woodside Tower • ID: WS-2025-104</p>
+          <p className="text-[#4C5760]">Project ID: {projectId}</p>
         </div>
         <div className="flex space-x-2">
           <button className="px-4 py-2 bg-[#D15F36] text-white rounded-md shadow-sm hover:bg-opacity-90 flex items-center gap-2">
@@ -99,7 +106,7 @@ const ProjectDataSection = () => {
           {/* Tab Content */}
           <Tabs defaultValue="drawings" value={activeTab} className="w-full">
             <TabsContent value="drawings" className="m-0">
-              <DrawingsTable />
+              <DrawingsTable onDrawingClick={handleDrawingClick} />
             </TabsContent>
             
             <TabsContent value="companies" className="m-0">

@@ -1,81 +1,126 @@
 import React from 'react';
-import { Badge, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui';
-import { Download, Eye, MoreHorizontal } from 'lucide-react';
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui';
+import { Eye, MoreHorizontal, FileText } from 'lucide-react';
 
-export const DrawingsTable = () => {
-  // Placeholder data
+interface DrawingsTableProps {
+  onDrawingClick: (drawingId: string) => void;
+}
+
+export const DrawingsTable: React.FC<DrawingsTableProps> = ({ onDrawingClick }) => {
+  // Placeholder data with UUIDs
   const drawings = [
-    { id: 'DWG-001', title: 'Site Plan', revision: 'P03', discipline: 'Architecture', status: 'Approved', date: '2025-03-15', author: 'J. Smith' },
-    { id: 'DWG-002', title: 'Foundation Layout', revision: 'P02', discipline: 'Structural', status: 'For Review', date: '2025-03-20', author: 'T. Johnson' },
-    { id: 'DWG-003', title: 'Electrical Layout - Ground Floor', revision: 'P01', discipline: 'Electrical', status: 'Draft', date: '2025-03-22', author: 'M. Garcia' },
-    { id: 'DWG-004', title: 'Plumbing Schematic', revision: 'P02', discipline: 'MEP', status: 'Approved', date: '2025-03-10', author: 'A. Williams' },
-    { id: 'DWG-005', title: 'Elevation - North Facade', revision: 'P04', discipline: 'Architecture', status: 'For Review', date: '2025-03-25', author: 'J. Smith' },
-  ];
-  
-  const renderStatusBadge = (status: string) => {
-    switch(status) {
-      case 'Approved':
-        return <Badge className="bg-green-100 text-green-800 border-green-200">Approved</Badge>;
-      case 'For Review':
-        return <Badge className="bg-[#F8C630] bg-opacity-20 text-[#D15F36] border-[#F8C630]">For Review</Badge>;
-      case 'Draft':
-        return <Badge className="bg-slate-100 text-slate-800 border-slate-200">Draft</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
+    { 
+      id: '550e8400-e29b-41d4-a716-446655440003', // Using UUID format
+      title: 'Floor Plan A-101', 
+      version: '2.1',
+      status: 'For Review',
+      lastModified: '2024-03-28T10:30:00Z',
+      modifiedBy: 'John Smith',
+      category: 'Architectural'
+    },
+    { 
+      id: '550e8400-e29b-41d4-a716-446655440004', // Using UUID format
+      title: 'Elevation North', 
+      version: '1.0',
+      status: 'Approved',
+      lastModified: '2024-03-27T15:45:00Z',
+      modifiedBy: 'Sarah Chen',
+      category: 'Architectural'
+    },
+    { 
+      id: '550e8400-e29b-41d4-a716-446655440005', // Using UUID format
+      title: 'Structural Foundation', 
+      version: '3.2',
+      status: 'In Progress',
+      lastModified: '2024-03-26T09:15:00Z',
+      modifiedBy: 'Michael Brown',
+      category: 'Structural'
+    },
+    { 
+      id: '550e8400-e29b-41d4-a716-446655440006', // Using UUID format
+      title: 'MEP Layout', 
+      version: '1.5',
+      status: 'For Review',
+      lastModified: '2024-03-25T14:20:00Z',
+      modifiedBy: 'Elena Rodriguez',
+      category: 'MEP'
+    },
+    { 
+      id: '550e8400-e29b-41d4-a716-446655440007', // Using UUID format
+      title: 'Interior Finishes', 
+      version: '1.0',
+      status: 'Draft',
+      lastModified: '2024-03-24T11:30:00Z',
+      modifiedBy: 'David Kim',
+      category: 'Interior'
     }
-  };
+  ];
 
   return (
-    <div className="border rounded-md overflow-x-auto">
-      {/* Table Header */}
-      <div className="grid grid-cols-8 bg-[#F7F5F2] p-3 border-b text-[#3A366E] font-medium text-sm">
-        <div>Drawing ID</div>
-        <div>Title</div>
-        <div>Revision</div>
-        <div>Discipline</div>
-        <div>Status</div>
-        <div>Date</div>
-        <div>Author</div>
-        <div>Actions</div>
-      </div>
-      
-      {/* Table Body */}
-      <div className="divide-y">
-        {drawings.map((drawing) => (
-          <div key={drawing.id} className="grid grid-cols-8 p-3 items-center text-sm hover:bg-gray-50">
-            <div className="font-medium text-[#3A366E]">{drawing.id}</div>
-            <div>{drawing.title}</div>
-            <div>{drawing.revision}</div>
-            <div>{drawing.discipline}</div>
-            <div>{renderStatusBadge(drawing.status)}</div>
-            <div>{new Date(drawing.date).toLocaleDateString()}</div>
-            <div>{drawing.author}</div>
-            <div>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-[#3A366E]">
-                  <Eye size={16} />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-[#3A366E]">
-                  <Download size={16} />
-                </Button>
+    <div className="space-y-4">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-[#A7CEBC]">
+            <th className="text-left py-3 px-4 text-sm font-medium text-[#4C5760]">Title</th>
+            <th className="text-left py-3 px-4 text-sm font-medium text-[#4C5760]">Version</th>
+            <th className="text-left py-3 px-4 text-sm font-medium text-[#4C5760]">Status</th>
+            <th className="text-left py-3 px-4 text-sm font-medium text-[#4C5760]">Last Modified</th>
+            <th className="text-left py-3 px-4 text-sm font-medium text-[#4C5760]">Category</th>
+            <th className="w-10"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {drawings.map((drawing) => (
+            <tr 
+              key={drawing.id}
+              className="border-b border-[#A7CEBC] hover:bg-gray-50 cursor-pointer"
+              onClick={() => onDrawingClick(drawing.id)}
+            >
+              <td className="py-3 px-4">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-[#4C5760]" />
+                  <span className="text-[#3A366E]">{drawing.title}</span>
+                </div>
+              </td>
+              <td className="py-3 px-4 text-[#4C5760]">{drawing.version}</td>
+              <td className="py-3 px-4">
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  drawing.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                  drawing.status === 'For Review' ? 'bg-yellow-100 text-yellow-800' :
+                  drawing.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {drawing.status}
+                </span>
+              </td>
+              <td className="py-3 px-4 text-[#4C5760]">
+                {new Date(drawing.lastModified).toLocaleDateString()}
+              </td>
+              <td className="py-3 px-4 text-[#4C5760]">{drawing.category}</td>
+              <td className="py-3 px-4">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal size={16} />
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>View Details</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => {
+                      e.stopPropagation();
+                      onDrawingClick(drawing.id);
+                    }}>
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Details
+                    </DropdownMenuItem>
                     <DropdownMenuItem>Download</DropdownMenuItem>
                     <DropdownMenuItem>Share</DropdownMenuItem>
-                    <DropdownMenuItem>Add to Favorites</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

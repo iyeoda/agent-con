@@ -13,17 +13,17 @@ interface ProjectData {
 }
 
 export const projectData: Record<string, ProjectData> = {
-  "woodside": {
+  "550e8400-e29b-41d4-a716-446655440000": {
     agents,
     drawings,
     tasks: [
       {
-        id: "task-1",
+        id: "550e8400-e29b-41d4-a716-446655440008",
         name: "Review structural drawings",
         description: "Complete review of latest structural drawings from engineering team"
       },
       {
-        id: "task-2",
+        id: "550e8400-e29b-41d4-a716-446655440009",
         name: "Update project schedule",
         description: "Incorporate latest changes and delays into master schedule"
       }
@@ -38,7 +38,7 @@ export const projectData: Record<string, ProjectData> = {
     },
     recentActivities: [
       {
-        id: "act-1",
+        id: "550e8400-e29b-41d4-a716-446655440010",
         type: "document",
         user: "Sarah Chen",
         action: "uploaded",
@@ -46,7 +46,7 @@ export const projectData: Record<string, ProjectData> = {
         time: "2 hours ago"
       },
       {
-        id: "act-2",
+        id: "550e8400-e29b-41d4-a716-446655440011",
         type: "comment",
         user: "James Wilson",
         action: "commented on",
@@ -54,7 +54,7 @@ export const projectData: Record<string, ProjectData> = {
         time: "3 hours ago"
       },
       {
-        id: "act-3",
+        id: "550e8400-e29b-41d4-a716-446655440012",
         type: "approval",
         user: "Maria Garcia",
         action: "approved",
@@ -64,14 +64,14 @@ export const projectData: Record<string, ProjectData> = {
     ],
     upcomingDeadlines: [
       {
-        id: "dead-1",
+        id: "550e8400-e29b-41d4-a716-446655440013",
         task: "Submit revised drawings",
         dueDate: "2024-03-20",
         assignedTo: "Engineering Team",
         priority: "high"
       },
       {
-        id: "dead-2",
+        id: "550e8400-e29b-41d4-a716-446655440014",
         task: "Safety audit report",
         dueDate: "2024-03-22",
         assignedTo: "Safety Team",
@@ -80,30 +80,30 @@ export const projectData: Record<string, ProjectData> = {
     ],
     risks: [
       {
-        id: "risk-1",
+        id: "550e8400-e29b-41d4-a716-446655440015",
         issue: "Potential delay in steel delivery",
         impact: "May affect construction schedule by 2 weeks",
         severity: "high"
       },
       {
-        id: "risk-2",
+        id: "550e8400-e29b-41d4-a716-446655440016",
         issue: "Weather forecast shows heavy rain",
         impact: "Could delay concrete pour",
         severity: "medium"
       }
     ]
   },
-  "harbor": {
+  "550e8400-e29b-41d4-a716-446655440001": {
     agents,
     drawings,
     tasks: [
       {
-        id: "task-1",
+        id: "550e8400-e29b-41d4-a716-446655440017",
         name: "Review foundation plans",
         description: "Review and approve foundation design plans"
       },
       {
-        id: "task-2",
+        id: "550e8400-e29b-41d4-a716-446655440018",
         name: "Environmental assessment",
         description: "Complete environmental impact assessment"
       }
@@ -118,7 +118,7 @@ export const projectData: Record<string, ProjectData> = {
     },
     recentActivities: [
       {
-        id: "act-1",
+        id: "550e8400-e29b-41d4-a716-446655440019",
         type: "document",
         user: "John Smith",
         action: "uploaded",
@@ -126,7 +126,7 @@ export const projectData: Record<string, ProjectData> = {
         time: "1 hour ago"
       },
       {
-        id: "act-2",
+        id: "550e8400-e29b-41d4-a716-446655440020",
         type: "comment",
         user: "Emma Wilson",
         action: "commented on",
@@ -136,7 +136,7 @@ export const projectData: Record<string, ProjectData> = {
     ],
     upcomingDeadlines: [
       {
-        id: "dead-1",
+        id: "550e8400-e29b-41d4-a716-446655440021",
         task: "Submit environmental report",
         dueDate: "2024-03-25",
         assignedTo: "Environmental Team",
@@ -145,7 +145,7 @@ export const projectData: Record<string, ProjectData> = {
     ],
     risks: [
       {
-        id: "risk-1",
+        id: "550e8400-e29b-41d4-a716-446655440022",
         issue: "Soil contamination risk",
         impact: "May require additional remediation",
         severity: "high"
