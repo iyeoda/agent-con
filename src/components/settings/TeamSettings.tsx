@@ -325,7 +325,7 @@ export const TeamSettings = () => {
           
           <Card className="border-[#A7CEBC]">
             <CardContent className="p-0">
-              <div className="divide-y">
+              <div className="divide-y border-y rounded-lg overflow-hidden">
                 {/* Table Header */}
                 <div className="grid grid-cols-12 p-4 bg-[#F7F5F2] font-medium text-[#3A366E]">
                   <div className="col-span-3">Name</div>
@@ -593,7 +593,7 @@ export const TeamSettings = () => {
         <TabsContent value="companies" className="space-y-6">
           <Card className="border-[#A7CEBC]">
             <CardContent className="p-0">
-              <div className="divide-y">
+              <div className="divide-y border-y rounded-lg overflow-hidden">
                 {/* Table Header */}
                 <div className="grid grid-cols-12 p-4 bg-[#F7F5F2] font-medium text-[#3A366E]">
                   <div className="col-span-5">Company</div>

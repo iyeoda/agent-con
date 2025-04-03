@@ -1,43 +1,69 @@
 ### App Framework UI Design Overview
 
-1. **Sidebar**
+1. **Navigation & Active States**
+   - Active states are indicated subtly through icon color changes to orange (#D15F36)
+   - Text remains in the default slate color (#4C5760) for both active and inactive states
+   - No background colors or borders are used for active states
+   - Hover states consistently use a light gray background (bg-gray-50) with light gray border (border-gray-200)
+   - This pattern is consistent across navigation, settings, and interactive elements
+   - Transitions are smooth using transition-all for both background and border changes
+
+2. **Sidebar**
    - A vertical sidebar with icons for "Dashboard," "Data," "AI Agents," and "Settings."
    - Icons are displayed with tooltips that reveal the name of each section when hovered.
    - Sidebar expands on hover to reveal text labels next to the icons.
+   - Active state indicated by orange icon color (#D15F36)
 
-2. **Top Bar**
+3. **Top Bar**
    - Contains the app logo and the active project name ("Woodside").
    - A search button (with an orange icon) opens a modal to handle complex queries.
    - The modal provides a text area for multi-line input and filter options for the search.
 
-3. **Search Modal**
+4. **Search Modal**
    - Triggered when the search button is clicked.
    - Includes an input field for the search query and options to filter by categories such as Projects, Documents, AI Agents, etc.
    - The modal is styled to match the overall app, with no background dimming.
    - Results are grouped into categories: Documents, Tasks, and Projects, each with links for more details.
 
-4. **Modals & Popovers**
+5. **Modals & Popovers**
    - Modals use the Radix UI Dialog component for accessibility and consistent behavior.
-   - Modals have clean white backgrounds with rounded corners and subtle borders (border-[#A7CEBC]).
+   - Modals have clean white backgrounds with rounded corners (rounded-lg) and subtle borders (border-[#A7CEBC]).
    - No heavy background dimming to maintain a light, airy feel of the application.
    - Popovers for contextual actions use Radix UI Popover component.
    - Popover content has consistent styling: white background, subtle shadow, border-[#A7CEBC], and rounded corners.
+   - All interactive elements within modals and popovers follow the global hover pattern.
 
-5. **Selectors & Dropdown Menus**
-   - Dropdown menus and selectors use the Popover component for consistent appearance.
-   - Selected items are highlighted with the accent color (text-[#D15F36]).
-   - Hover states use a light background (bg-[#F7F5F2]) to indicate interactivity.
-   - Menu items have consistent padding (py-2 px-3) and spacing.
-   - Selection controls are extracted into reusable components to ensure consistency throughout the app.
-   - Component design supports future backend integration via props for dynamic data and change handlers.
+6. **Selectors & Dropdown Menus**
+   - Dropdown menus use Radix UI primitives for consistent behavior and accessibility
+   - Menu triggers and items share consistent hover state (bg-gray-50) with border highlight (border-gray-200)
+   - Menu items use rounded corners (rounded-md) and consistent padding (px-3 py-2)
+   - Items have transparent borders by default to prevent layout shift on hover
+   - Items maintain text color (text-[#4C5760]) for better readability
+   - Orange accent color reserved for active/selected states only
+   - Minimum width of 12rem ensures content fits comfortably
+   - Text wraps naturally to handle longer content using whitespace-normal and break-words
+   - Focus states match hover states for keyboard navigation
+   - Smooth transitions using transition-all for all interactive states
 
-6. **Styling**
-   - The color scheme includes shades of indigo (#3A366E), orange (#D15F36), and mint (#A7CEBC).
-   - Text uses dark gray (#4C5760) for regular content and indigo for emphasis.
-   - Elements are spaced neatly and are responsive.
-   - The overall aesthetic is modern, clean, and professional with a touch of creativity (e.g., the use of orange for key buttons and accents).
+7. **Styling**
+   - The color scheme includes:
+     - Indigo (#3A366E) for primary UI elements and emphasis
+     - Orange (#D15F36) for active states and key actions
+     - Mint (#A7CEBC) for borders and subtle accents
+     - Slate (#4C5760) for regular text content
+     - Light gray (gray-50) for hover states
+     - Light gray (gray-200) for hover borders
+   - Text hierarchy:
+     - Indigo for headings and emphasis
+     - Slate for regular content
+     - Consistent text sizes (text-sm for menu items, text-xs for subtle text)
+   - Elements are spaced neatly and are responsive
+   - Avatars maintain perfect circles using aspect-square and overflow handling
+   - Avatar text and images are properly centered and scaled
+   - Consistent hover states across all interactive elements
+   - Smooth transitions for all interactive states
 
-7. **Component Architecture**
+8. **Component Architecture**
    - **Separation of concerns**: UI components are isolated in dedicated files with specific functionality.
    - **Reusability**: Components like ProjectSelector are designed to be reused across the application with consistent behavior.
    - **Future-proofing**: Components are built with backend integration in mind:
@@ -46,4 +72,50 @@
      - Loading states and error handling are implemented within components
    - **Maintainability**: Changes to specific functionality (like project selection) are contained to a single file.
    - **Type Safety**: Components use TypeScript interfaces to ensure proper prop usage and data handling.
-   - **Accessibility**: Components leverage Radix UI primitives for keyboard navigation, focus management, and proper ARIA attributes.
+   - **Accessibility**: 
+     - Components leverage Radix UI primitives for keyboard navigation
+     - Focus management follows WCAG guidelines
+     - Proper ARIA attributes are maintained
+     - Interactive elements have appropriate focus indicators
+     - Color contrast meets accessibility standards
+
+9. **Mock Data & Backend Integration Strategy**
+   - **Centralized Mock Data**:
+     - Mock data is stored in dedicated files (e.g., `src/mock-data/projects.ts`)
+     - Data structures mirror expected API responses
+     - TypeScript interfaces in `src/types/` define shared data shapes
+     - Mock data includes realistic scenarios (active/archived states, different CDEs)
+   
+   - **Data Organization**:
+     - Each domain has its own mock data file (projects, users, settings)
+     - Data includes relationships between entities (e.g., projects linked to CDEs)
+     - Realistic timestamps, IDs, and statuses for testing date formatting and state management
+     - Edge cases and loading states are represented
+   
+   - **Backend Integration Path**:
+     - Components are designed with a clear separation between data and presentation
+     - Mock data imports can be replaced with API service calls
+     - Data fetching will be centralized in service layers
+     - Components accept data through props, agnostic of data source
+     - Loading states and error boundaries are already in place
+   
+   - **State Management**:
+     - Local state for UI interactions (e.g., active tabs, modals)
+     - Prepared for global state management (e.g., Redux, Zustand)
+     - Clear patterns for optimistic updates
+     - Consistent error handling approach
+   
+   - **API Integration Plan**:
+     1. Create API service layer matching mock data structure
+     2. Implement authentication and authorization
+     3. Replace mock imports with API calls
+     4. Add loading states and error handling
+     5. Implement caching and optimistic updates
+     6. Add real-time updates where needed
+
+10. **Testing Strategy**
+    - Components include test scenarios for both mock and real data
+    - Error states and loading behaviors are testable
+    - Mock data provides consistent test cases
+    - Integration tests can swap mock data for API calls
+    - E2E tests can use mock data for predictable scenarios

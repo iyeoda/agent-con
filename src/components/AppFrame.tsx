@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Input from "../components/ui/input";
 import Avatar from "../components/ui/avatar";
-import { HelpCircle, Settings, Folder, LayoutDashboard, Bot, Sparkles } from "lucide-react";
+import { HelpCircle, Settings, Folder, LayoutDashboard, Bot, Sparkles, Bell } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import SearchModal from "../components/SearchModal";
@@ -10,10 +10,16 @@ import ProjectDashboard from "../components/ProjectDashboard";
 import ProjectDataSection from "../components/ProjectDataSection";
 import AgentsSection from "../components/AgentsSection";
 import SettingsSection from "../components/SettingsSection";
+import { Project } from '../types/project';
 
 export default function AppFrame() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [currentProject, setCurrentProject] = useState({ id: "woodside", name: "Woodside" });
+  const [currentProject, setCurrentProject] = useState<Project>({
+    id: "woodside",
+    name: "Woodside",
+    logo: "/viewpoint_logo.svg",
+    status: 'active'
+  });
   const [activeView, setActiveView] = useState("dashboard"); // Track the active view
   
   return (

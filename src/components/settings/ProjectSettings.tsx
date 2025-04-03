@@ -14,96 +14,16 @@ import DialogHeader from '../ui/dialog';
 import DialogTitle from '../ui/dialog';
 import DialogDescription from '../ui/dialog';
 import DialogTrigger from '../ui/dialog';
+import { mockProjects, mockAvailableProjects } from '../../mock-data/projects';
+import { Project } from '../../types/project';
 
 export const ProjectSettings = () => {
-  const [activeTab, setActiveTab] = useState('active');
-  
-  // Sample projects data
-  const projects = {
-    active: [
-      { 
-        id: 'PRJ-001', 
-        name: 'Woodside Tower Project', 
-        location: 'Downtown', 
-        phase: 'Construction', 
-        cde: 'Trimble Viewpoint',
-        cdeColor: '#D15F36',
-        members: 28,
-        lastActivity: '2025-03-28T14:30:00Z' 
-      },
-      { 
-        id: 'PRJ-002', 
-        name: 'Harbor Heights Development', 
-        location: 'Waterfront District', 
-        phase: 'Planning', 
-        cde: 'Autodesk Construction Cloud',
-        cdeColor: '#3A366E',
-        members: 15,
-        lastActivity: '2025-03-27T10:15:00Z' 
-      },
-      { 
-        id: 'PRJ-003', 
-        name: 'Metro Station Expansion', 
-        location: 'Central City', 
-        phase: 'Design', 
-        cde: 'Trimble Viewpoint',
-        cdeColor: '#D15F36',
-        members: 22,
-        lastActivity: '2025-03-25T16:45:00Z' 
-      }
-    ],
-    archived: [
-      { 
-        id: 'PRJ-004', 
-        name: 'City Hall Renovation', 
-        location: 'Downtown', 
-        phase: 'Completed', 
-        cde: 'Autodesk Construction Cloud',
-        cdeColor: '#3A366E',
-        members: 0,
-        lastActivity: '2024-11-15T09:30:00Z',
-        archived: '2024-12-01T00:00:00Z'
-      },
-      { 
-        id: 'PRJ-005', 
-        name: 'South Bridge Repairs', 
-        location: 'River District', 
-        phase: 'Completed', 
-        cde: 'Procore',
-        cdeColor: '#A7CEBC',
-        members: 0,
-        lastActivity: '2024-10-22T11:45:00Z',
-        archived: '2024-11-01T00:00:00Z'
-      }
-    ]
-  };
+  const [projectView, setProjectView] = useState<'active' | 'archived'>('active');
+  const [isAddProjectModalOpen, setIsAddProjectModalOpen] = useState(false);
 
-  // Available projects from connected CDEs
-  const availableProjects = [
-    { 
-      id: 'CDE-PRJ-001', 
-      name: 'Eastside Office Complex', 
-      cde: 'Trimble Viewpoint',
-      cdeColor: '#D15F36',
-      location: 'Eastside'
-    },
-    { 
-      id: 'CDE-PRJ-002', 
-      name: 'University Medical Center', 
-      cde: 'Autodesk Construction Cloud',
-      cdeColor: '#3A366E',
-      location: 'North Campus'
-    },
-    { 
-      id: 'CDE-PRJ-003', 
-      name: 'Riverside Apartments', 
-      cde: 'Trimble Viewpoint',
-      cdeColor: '#D15F36',
-      location: 'Riverside District'
-    }
-  ];
-
-  const [showAddProjectModal, setShowAddProjectModal] = useState(false);
+  // Filter projects based on status
+  const activeProjects = mockProjects.filter(p => p.status === 'active');
+  const archivedProjects = mockProjects.filter(p => p.status === 'archived');
 
   return (
     <div className="space-y-8">
@@ -114,18 +34,30 @@ export const ProjectSettings = () => {
         </p>
       </div>
 
-      {/* Project Tabs and Controls */}
+      {/* Project View Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-        <Tabs defaultValue="active" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-[#F7F5F2]">
-            <TabsTrigger value="active" className="data-[state=active]:bg-white">
-              Active Projects
-            </TabsTrigger>
-            <TabsTrigger value="archived" className="data-[state=active]:bg-white">
-              Archived Projects
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex rounded-md overflow-hidden border border-[#A7CEBC]">
+          <button
+            className={`px-4 py-2 text-sm font-medium ${
+              projectView === 'active'
+                ? 'bg-white text-[#3A366E]'
+                : 'bg-[#F7F5F2] text-[#4C5760] hover:bg-gray-50'
+            }`}
+            onClick={() => setProjectView('active')}
+          >
+            Active Projects
+          </button>
+          <button
+            className={`px-4 py-2 text-sm font-medium border-l border-[#A7CEBC] ${
+              projectView === 'archived'
+                ? 'bg-white text-[#3A366E]'
+                : 'bg-[#F7F5F2] text-[#4C5760] hover:bg-gray-50'
+            }`}
+            onClick={() => setProjectView('archived')}
+          >
+            Archived Projects
+          </button>
+        </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative flex-grow sm:flex-grow-0 sm:w-60">
@@ -136,7 +68,7 @@ export const ProjectSettings = () => {
             />
           </div>
           <Button 
-            onClick={() => setShowAddProjectModal(true)}
+            onClick={() => setIsAddProjectModalOpen(true)}
             className="bg-[#3A366E] hover:bg-opacity-90"
           >
             <Plus size={16} className="mr-1" />
@@ -147,26 +79,44 @@ export const ProjectSettings = () => {
 
       {/* Projects List */}
       <div className="space-y-4">
-        <TabsContent value="active" className="m-0">
-          {projects.active.length > 0 ? (
-            <div className="border rounded-md overflow-hidden">
-              {/* Table Header */}
-              <div className="grid grid-cols-12 bg-[#F7F5F2] p-3 border-b text-[#3A366E] font-medium text-sm">
-                <div className="col-span-3">Project</div>
-                <div className="col-span-2">Location</div>
-                <div className="col-span-2">Phase</div>
-                <div className="col-span-2">CDE</div>
-                <div className="col-span-1">Members</div>
-                <div className="col-span-1">Last Activity</div>
-                <div className="col-span-1">Actions</div>
-              </div>
-              
-              {/* Project Rows */}
-              <div className="divide-y">
-                {projects.active.map(project => (
-                  <div key={project.id} className="grid grid-cols-12 p-3 items-center text-sm hover:bg-gray-50">
-                    <div className="col-span-3 font-medium text-[#3A366E]">{project.name}</div>
-                    <div className="col-span-2">{project.location}</div>
+        {projectView === 'active' && (
+          activeProjects.length > 0 ? (
+            <div className="border border-[#A7CEBC] rounded-lg overflow-hidden">
+              <div className="divide-y divide-[#A7CEBC] rounded-lg overflow-hidden">
+                {/* Table Header */}
+                <div className="grid grid-cols-12 bg-[#F7F5F2] p-4 text-[#3A366E] font-medium">
+                  <div className="col-span-3">Project</div>
+                  <div className="col-span-2">Location</div>
+                  <div className="col-span-2">Phase</div>
+                  <div className="col-span-2">CDE</div>
+                  <div className="col-span-1">Members</div>
+                  <div className="col-span-1">Last Activity</div>
+                  <div className="col-span-1">Actions</div>
+                </div>
+                
+                {/* Project Rows */}
+                {activeProjects.map(project => (
+                  <div key={project.id} className="grid grid-cols-12 p-4 items-center hover:bg-gray-50">
+                    <div className="col-span-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#F7F5F2] flex items-center justify-center">
+                          {project.logo ? (
+                            <img 
+                              src={project.logo} 
+                              alt={`${project.name} logo`} 
+                              className="h-4 w-auto" 
+                            />
+                          ) : (
+                            <Building className="h-4 w-4 text-[#4C5760]" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-medium text-[#3A366E]">{project.name}</div>
+                          <div className="text-xs text-[#4C5760]">{project.id}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-span-2 text-[#4C5760]">{project.location}</div>
                     <div className="col-span-2">
                       <Badge className="bg-[#A7CEBC] bg-opacity-20 text-[#3A366E]">
                         {project.phase}
@@ -178,12 +128,12 @@ export const ProjectSettings = () => {
                           className="w-3 h-3 rounded-full" 
                           style={{ backgroundColor: project.cdeColor }}
                         />
-                        <span>{project.cde}</span>
+                        <span className="text-[#4C5760]">{project.cde}</span>
                       </div>
                     </div>
-                    <div className="col-span-1">{project.members}</div>
-                    <div className="col-span-1">
-                      {new Date(project.lastActivity).toLocaleDateString()}
+                    <div className="col-span-1 text-[#4C5760]">{project.members}</div>
+                    <div className="col-span-1 text-[#4C5760]">
+                      {project.lastActivity && new Date(project.lastActivity).toLocaleDateString()}
                     </div>
                     <div className="col-span-1">
                       <DropdownMenu>
@@ -205,36 +155,54 @@ export const ProjectSettings = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center p-8 border rounded-md bg-gray-50">
+            <div className="text-center p-8 border border-[#A7CEBC] rounded-md bg-gray-50">
               <Building size={40} className="mx-auto text-gray-400 mb-3" />
               <h3 className="text-lg font-medium text-[#3A366E] mb-1">No active projects</h3>
               <p className="text-[#4C5760] mb-4">You don't have any active projects yet.</p>
-              <Button onClick={() => setShowAddProjectModal(true)}>
+              <Button onClick={() => setIsAddProjectModalOpen(true)}>
                 Add Your First Project
               </Button>
             </div>
-          )}
-        </TabsContent>
+          )
+        )}
 
-        <TabsContent value="archived" className="m-0">
-          {projects.archived.length > 0 ? (
-            <div className="border rounded-md overflow-hidden">
-              {/* Table Header */}
-              <div className="grid grid-cols-12 bg-[#F7F5F2] p-3 border-b text-[#3A366E] font-medium text-sm">
-                <div className="col-span-3">Project</div>
-                <div className="col-span-2">Location</div>
-                <div className="col-span-2">Phase</div>
-                <div className="col-span-2">CDE</div>
-                <div className="col-span-2">Archived Date</div>
-                <div className="col-span-1">Actions</div>
-              </div>
-              
-              {/* Archived Project Rows */}
-              <div className="divide-y">
-                {projects.archived.map(project => (
-                  <div key={project.id} className="grid grid-cols-12 p-3 items-center text-sm hover:bg-gray-50">
-                    <div className="col-span-3 font-medium text-[#3A366E]">{project.name}</div>
-                    <div className="col-span-2">{project.location}</div>
+        {projectView === 'archived' && (
+          archivedProjects.length > 0 ? (
+            <div className="border border-[#A7CEBC] rounded-lg overflow-hidden">
+              <div className="divide-y divide-[#A7CEBC] rounded-lg overflow-hidden">
+                {/* Table Header */}
+                <div className="grid grid-cols-12 bg-[#F7F5F2] p-4 text-[#3A366E] font-medium">
+                  <div className="col-span-3">Project</div>
+                  <div className="col-span-2">Location</div>
+                  <div className="col-span-2">Phase</div>
+                  <div className="col-span-2">CDE</div>
+                  <div className="col-span-2">Archived Date</div>
+                  <div className="col-span-1">Actions</div>
+                </div>
+                
+                {/* Archived Project Rows */}
+                {archivedProjects.map(project => (
+                  <div key={project.id} className="grid grid-cols-12 p-4 items-center hover:bg-gray-50">
+                    <div className="col-span-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#F7F5F2] flex items-center justify-center">
+                          {project.logo ? (
+                            <img 
+                              src={project.logo} 
+                              alt={`${project.name} logo`} 
+                              className="h-4 w-auto" 
+                            />
+                          ) : (
+                            <Building className="h-4 w-4 text-[#4C5760]" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-medium text-[#3A366E]">{project.name}</div>
+                          <div className="text-xs text-[#4C5760]">{project.id}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-span-2 text-[#4C5760]">{project.location}</div>
                     <div className="col-span-2">
                       <Badge className="bg-gray-100 text-gray-600">
                         {project.phase}
@@ -246,11 +214,11 @@ export const ProjectSettings = () => {
                           className="w-3 h-3 rounded-full" 
                           style={{ backgroundColor: project.cdeColor }}
                         />
-                        <span>{project.cde}</span>
+                        <span className="text-[#4C5760]">{project.cde}</span>
                       </div>
                     </div>
-                    <div className="col-span-2">
-                      {new Date(project.archived).toLocaleDateString()}
+                    <div className="col-span-2 text-[#4C5760]">
+                      {project.archived && new Date(project.archived).toLocaleDateString()}
                     </div>
                     <div className="col-span-1">
                       <DropdownMenu>
@@ -271,13 +239,13 @@ export const ProjectSettings = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center p-8 border rounded-md bg-gray-50">
+            <div className="text-center p-8 border border-[#A7CEBC] rounded-md bg-gray-50">
               <Building size={40} className="mx-auto text-gray-400 mb-3" />
               <h3 className="text-lg font-medium text-[#3A366E] mb-1">No archived projects</h3>
               <p className="text-[#4C5760]">Any projects you archive will appear here.</p>
             </div>
-          )}
-        </TabsContent>
+          )
+        )}
       </div>
 
       {/* Add Project Modal */}
@@ -299,7 +267,7 @@ export const ProjectSettings = () => {
                   <h4 className="text-sm font-medium text-[#3A366E] mb-2">Select a project from your connected CDEs:</h4>
                 </div>
                 <div className="max-h-60 overflow-y-auto space-y-2">
-                  {availableProjects.map(project => (
+                  {mockAvailableProjects.map(project => (
                     <div 
                       key={project.id}
                       className="flex items-center justify-between p-3 border rounded-md cursor-pointer hover:bg-gray-50"
@@ -359,7 +327,7 @@ export const ProjectSettings = () => {
               </TabsContent>
             </Tabs>
             <div className="flex justify-end gap-2 mt-6">
-              <Button variant="outline" onClick={() => setShowAddProjectModal(false)}>
+              <Button variant="outline" onClick={() => setIsAddProjectModalOpen(false)}>
                 Cancel
               </Button>
               <Button className="bg-[#3A366E]">
@@ -370,7 +338,7 @@ export const ProjectSettings = () => {
         }
       >
         <Button 
-          onClick={() => setShowAddProjectModal(true)}
+          onClick={() => setIsAddProjectModalOpen(true)}
           className="bg-[#3A366E] hover:bg-opacity-90"
         >
           <Plus size={16} className="mr-1" />

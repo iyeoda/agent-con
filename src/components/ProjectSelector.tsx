@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
-
-interface Project {
-  id: string;
-  name: string;
-  logo?: string; // Path to the project's logo
-}
+import { Project } from "../types/project";
+import { mockProjects } from "../mock-data/projects";
 
 interface ProjectSelectorProps {
   initialProject?: Project;
@@ -14,21 +10,18 @@ interface ProjectSelectorProps {
 }
 
 export default function ProjectSelector({ 
-  initialProject = { id: "woodside", name: "Woodside", logo: "/viewpoint_logo.svg" },
+  initialProject = mockProjects[0],
   onProjectChange
 }: ProjectSelectorProps) {
   const [selectedProject, setSelectedProject] = useState<Project>(initialProject);
   const [isOpen, setIsOpen] = useState(false);
   
-  const projects: Project[] = [
-    { id: "woodside", name: "Woodside", logo: "/viewpoint_logo.svg" },
-    { id: "oak-house", name: "Oak House", logo: "/viewpoint_logo.svg" },
-    { id: "cliff-bay", name: "Cliff Bay", logo: "/autodesk_logo.svg" },
-  ];
+  // Filter only active projects for the selector
+  const availableProjects = mockProjects.filter(p => p.status === 'active');
   
   const handleProjectSelect = (project: Project) => {
     setSelectedProject(project);
-    setIsOpen(false); // Close the popover when a project is selected
+    setIsOpen(false);
     if (onProjectChange) {
       onProjectChange(project);
     }
@@ -53,7 +46,7 @@ export default function ProjectSelector({
       </PopoverTrigger>
       <PopoverContent className="w-64 p-2 rounded-md shadow-md bg-white border border-[#A7CEBC]">
         <div className="flex flex-col">
-          {projects.map((project) => (
+          {availableProjects.map((project) => (
             <div 
               key={project.id}
               className={`py-2 px-3 rounded cursor-pointer hover:bg-[#F7F5F2] ${

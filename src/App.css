@@ -17,10 +17,6 @@ button {
   transition: all 0.3s ease;
 }
 
-button:hover {
-  background-color: #D15F36; /* Terracotta */
-}
-
 input, textarea {
   border-radius: 0.375rem; /* Tailwind's default border radius */
 }

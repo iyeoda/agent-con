@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { 
-  UserCircle, Building, CreditCard, Globe, KeyRound, 
-  BellRing, Database, Shield, Workflow, MessageSquare 
+  UserCircle, Building, CreditCard, BellRing, Database, Shield
 } from 'lucide-react';
 
 import { GeneralSettings } from './settings/GeneralSettings';
@@ -15,7 +14,7 @@ import { SecuritySettings } from './settings/SecuritySettings';
 import { BillingSettings } from './settings/BillingSettings';
 
 const SettingsSection = () => {
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState('projects');
 
   // Navigation items for the settings sidebar
   const navItems = [
@@ -40,30 +39,24 @@ const SettingsSection = () => {
         <div className="w-full md:w-64 flex-shrink-0">
           <Card className="border-[#A7CEBC]">
             <CardContent className="p-0">
-              <nav className="divide-y">
-                {navItems.map(item => {
+              <nav>
+                {navItems.map((item, index) => {
                   const IconComponent = item.icon;
                   const isActive = activeTab === item.id;
                   
                   return (
                     <button
                       key={item.id}
-                      className={`w-full flex items-center gap-3 p-4 text-left transition-colors ${
-                        isActive 
-                          ? 'bg-[#3A366E] bg-opacity-5 border-l-4 border-[#D15F36]' 
-                          : 'hover:bg-gray-100'
+                      className={`w-full flex items-center gap-3 p-4 text-left transition-colors hover:bg-gray-50 border-t border-b border-[#E5E7EB] -mb-[1px] ${
+                        isActive ? 'bg-gray-50' : ''
                       }`}
                       onClick={() => setActiveTab(item.id)}
                     >
                       <IconComponent 
                         size={20} 
-                        className={isActive ? 'text-[#D15F36]' : 'text-[#4C5760]'} 
+                        className={isActive ? 'text-[#D15F36]' : 'text-[#3A366E]'} 
                       />
-                      <span 
-                        className={`font-medium ${
-                          isActive ? 'text-[#3A366E]' : 'text-[#4C5760]'
-                        }`}
-                      >
+                      <span className="font-medium text-[#4C5760]">
                         {item.label}
                       </span>
                     </button>
@@ -78,7 +71,7 @@ const SettingsSection = () => {
         <div className="flex-grow">
           <Card className="border-[#A7CEBC]">
             <CardContent className="p-6">
-              <Tabs defaultValue="general" value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="hidden">
                   {navItems.map(item => (
                     <TabsTrigger key={item.id} value={item.id}>

@@ -1,5 +1,6 @@
 // src/components/ui/avatar.tsx
 import React, { ReactNode } from 'react';
+import { cn } from '../../lib/utils';
 
 interface AvatarProps {
   className?: string;
@@ -8,7 +9,10 @@ interface AvatarProps {
 
 const Avatar = ({ className, children }: AvatarProps) => (
   <div
-    className={`flex items-center justify-center rounded-full bg-[#3A366E] text-white text-sm font-bold ${className}`}
+    className={cn(
+      'relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#3A366E] text-white text-sm font-bold aspect-square',
+      className
+    )}
   >
     {children}
   </div>
@@ -20,7 +24,9 @@ interface AvatarFallbackProps {
 }
 
 export const AvatarFallback = ({ className, children }: AvatarFallbackProps) => (
-  <div className={className}>{children}</div>
+  <div className={cn('flex h-full w-full items-center justify-center', className)}>
+    {children}
+  </div>
 );
 
 interface AvatarImageProps {
@@ -30,7 +36,11 @@ interface AvatarImageProps {
 }
 
 export const AvatarImage = ({ src, alt, className }: AvatarImageProps) => (
-  <img src={src} alt={alt} className={`rounded-full ${className}`} />
+  <img 
+    src={src} 
+    alt={alt} 
+    className={cn('h-full w-full object-cover', className)} 
+  />
 );
 
 export default Avatar;
