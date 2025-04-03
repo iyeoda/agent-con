@@ -55,7 +55,49 @@
    - Dialog overlay uses z-index coordination to prevent conflicts
    - Command menu state is managed independently from other UI components
 
-8. **Development & Debugging**
+8. **Calendar Components**
+   - **View Types**:
+     - Month, Week, and List views with consistent styling and behavior
+     - Each view type maintains the same color scheme and interaction patterns
+     - Views are responsive and adapt to different screen sizes
+     - Current date is highlighted with a subtle background (bg-[#3A366E] bg-opacity-5)
+   
+   - **Event Display**:
+     - Events use color-coded badges based on type:
+       - Deadlines: Red (bg-red-100 text-red-800)
+       - Milestones: Orange (bg-[#D15F36] bg-opacity-20 text-[#D15F36])
+       - Meetings: Blue (bg-blue-100 text-blue-800)
+       - Tasks: Mint (bg-[#A7CEBC] bg-opacity-30 text-[#3A366E])
+     - Event badges show title and optional time
+     - Hover states use opacity changes for subtle interaction
+     - Click events open detailed event dialogs
+   
+   - **Navigation**:
+     - Previous/Next buttons for date navigation
+     - "Today" button to quickly return to current date
+     - View type switcher with active state indication
+     - Date range display adapts to current view type
+   
+   - **Filters**:
+     - Multi-select filters for event types, priorities, and assignees
+     - Filter badges show active filter count
+     - Clear filters option when any filters are active
+     - Command-based search for team member selection
+   
+   - **Event Management**:
+     - Add Event dialog with comprehensive form
+     - Event Details dialog for viewing and editing
+     - Consistent form styling across all dialogs
+     - Team member selection with avatar initials
+     - Tag management with comma-separated input
+   
+   - **Responsive Design**:
+     - Calendar adapts to different screen sizes
+     - Mobile-friendly touch targets
+     - Scrollable views for overflow content
+     - Maintains readability at all breakpoints
+
+9. **Development & Debugging**
    - Console logging is strictly development-only using environment checks
    - Debug logs are wrapped in a helper function:
      ```typescript
@@ -76,25 +118,25 @@
      - Error conditions
    - Performance monitoring logs are kept separate from debug logs
 
-9. **Styling**
-   - The color scheme includes:
-     - Indigo (#3A366E) for primary UI elements and emphasis
-     - Orange (#D15F36) for active states and key actions
-     - Mint (#A7CEBC) for borders and subtle accents
-     - Slate (#4C5760) for regular text content
-     - Light gray (gray-50) for hover states
-     - Light gray (gray-200) for hover borders
-   - Text hierarchy:
-     - Indigo for headings and emphasis
-     - Slate for regular content
-     - Consistent text sizes (text-sm for menu items, text-xs for subtle text)
-   - Elements are spaced neatly and are responsive
-   - Avatars maintain perfect circles using aspect-square and overflow handling
-   - Avatar text and images are properly centered and scaled
-   - Consistent hover states across all interactive elements
-   - Smooth transitions for all interactive states
+10. **Styling**
+    - The color scheme includes:
+      - Indigo (#3A366E) for primary UI elements and emphasis
+      - Orange (#D15F36) for active states and key actions
+      - Mint (#A7CEBC) for borders and subtle accents
+      - Slate (#4C5760) for regular text content
+      - Light gray (gray-50) for hover states
+      - Light gray (gray-200) for hover borders
+    - Text hierarchy:
+      - Indigo for headings and emphasis
+      - Slate for regular content
+      - Consistent text sizes (text-sm for menu items, text-xs for subtle text)
+    - Elements are spaced neatly and are responsive
+    - Avatars maintain perfect circles using aspect-square and overflow handling
+    - Avatar text and images are properly centered and scaled
+    - Consistent hover states across all interactive elements
+    - Smooth transitions for all interactive states
 
-10. **Component Architecture**
+11. **Component Architecture**
     - **Separation of concerns**: UI components are isolated in dedicated files with specific functionality.
     - **Reusability**: Components like ProjectSelector are designed to be reused across the application with consistent behavior.
     - **Future-proofing**: Components are built with backend integration in mind:
@@ -110,7 +152,7 @@
       - Interactive elements have appropriate focus indicators
       - Color contrast meets accessibility standards
 
-11. **Data Management & API Integration**
+12. **Data Management & API Integration**
     - **Type System**:
       - Centralized type definitions in `src/types/index.ts`
       - Comprehensive interfaces for all entities (Project, Agent, Person, Company)
@@ -165,7 +207,7 @@
       - Secure token state management
       - Connection state synchronization
 
-12. **Testing Strategy**
+13. **Testing Strategy**
     - Components include test scenarios for both mock and real data
     - Error states and loading behaviors are testable
     - Mock data provides consistent test cases

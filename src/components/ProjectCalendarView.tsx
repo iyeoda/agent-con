@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, ChangeEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { Card, CardContent } from './ui/card';
 import Button from './ui/button';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
@@ -30,15 +30,6 @@ interface FilterState {
   organization?: string;
 }
 
-interface TeamMemberFilterProps {
-  selectedTeamMember: string | null;
-  onTeamMemberSelect: (teamMember: string | null) => void;
-}
-
-const debugLog = (...args: any[]) => {
-  console.log(...args);
-};
-
 const ProjectCalendarView: React.FC<ProjectCalendarViewProps> = ({ projectId }) => {
   const [viewType, setViewType] = useState('month');
   const [currentDate, setCurrentDate] = useState(new Date('2025-04-01'));
@@ -47,13 +38,6 @@ const ProjectCalendarView: React.FC<ProjectCalendarViewProps> = ({ projectId }) 
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
-  const [newEvent, setNewEvent] = useState<Partial<CalendarEvent>>({
-    type: 'task',
-    status: 'upcoming',
-    priority: 'medium',
-    assignedTo: [],
-    tags: []
-  });
   
   // Get events for the current project, fallback to first available project if ID doesn't exist
   const availableProjectIds = Object.keys(calendarEvents);
@@ -517,52 +501,6 @@ const ProjectCalendarView: React.FC<ProjectCalendarViewProps> = ({ projectId }) 
       </Dialog.Root>
     );
   };
-
-  function getUniqueAssignees(): string[] {
-    const assignees = new Set<string>();
-    Object.values(calendarEvents).forEach(projectEvents => {
-      projectEvents.forEach(event => {
-        if (event.assignedTo) {
-          event.assignedTo.forEach(assignee => {
-            assignees.add(assignee);
-          });
-        }
-      });
-    });
-    return Array.from(assignees);
-  }
-
-  function TeamMemberFilter({ selectedTeamMember, onTeamMemberSelect }: TeamMemberFilterProps) {
-    const uniqueAssignees = getUniqueAssignees();
-
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            <Filter className="w-4 h-4" />
-            {selectedTeamMember || "Filter Team Member"}
-          </button>
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => onTeamMemberSelect(null)}>
-            All Team Members
-          </DropdownMenuItem>
-          
-          <Separator className="my-1" />
-          
-          {uniqueAssignees.map((assignee) => (
-            <DropdownMenuItem
-              key={assignee}
-              onClick={() => onTeamMemberSelect(assignee)}
-            >
-              {assignee}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  }
 
   const AddEventDialog = () => {
     const [formState, setFormState] = useState<{
