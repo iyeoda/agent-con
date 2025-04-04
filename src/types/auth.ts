@@ -5,10 +5,20 @@ export interface AuthUser {
   role: string;
   avatar: string | null;
   organizationId: string | null;
+  phone: string;
+  department: string;
+  location: string;
+  bio: string;
+  company: string;
+  socialLinks: {
+    linkedin?: string;
+    twitter?: string;
+    website?: string;
+  };
 }
 
 export interface AuthService {
-  getCurrentUser: () => AuthUser | null;
-  setClerkUser: (user: any) => void;
-  logout: () => void;
+  getCurrentUser: () => Promise<AuthUser | null>;
+  setClerkUser: (user: any) => Promise<void>;
+  logout: () => Promise<void>;
 } 
