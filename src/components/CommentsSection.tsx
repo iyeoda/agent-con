@@ -5,7 +5,7 @@ import { getOrganizationUsers, getProjectUsers } from '../mock-data/people';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import Button from './ui/button';
 import Textarea from './ui/textarea';
-import Avatar, { AvatarFallback, AvatarImage } from './ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { MessageSquare, Paperclip, Send, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 

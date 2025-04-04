@@ -8,10 +8,11 @@ import ConfirmationDialog from '../ui/confirmation-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { UserPlus, Mail, Building, MoreHorizontal, CreditCard, Users, User } from 'lucide-react';
-import { Person, isOrganizationUser, OrganizationRole, OrganizationRoles } from '../../types/users';
+import { Person, isOrganizationUser, OrganizationRole } from '../../types/users';
 import { getOrganizationUsers } from '../../mock-data/people';
 import { userManagementService } from '../../services/user-management';
 import { toast } from 'react-hot-toast';
+import { useUser } from '../../contexts/UserContext';
 
 const TeamSettings: React.FC = () => {
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
@@ -23,7 +24,7 @@ const TeamSettings: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
-  const [selectedRoles, setSelectedRoles] = useState<OrganizationRoles>(['standard']);
+  const [selectedRoles, setSelectedRoles] = useState<OrganizationRole[]>(['standard']);
   const [isLoading, setIsLoading] = useState(false);
   const [organizationMembers, setOrganizationMembers] = useState<Person[]>([]);
 
@@ -94,7 +95,7 @@ const TeamSettings: React.FC = () => {
     setIsChangeRoleOpen(true);
   };
 
-  const handleChangeRoles = async (newRoles: OrganizationRoles) => {
+  const handleChangeRoles = async (newRoles: OrganizationRole[]) => {
     if (!memberToUpdate) return;
 
     try {
@@ -243,8 +244,8 @@ const TeamSettings: React.FC = () => {
                     <div className="flex flex-wrap gap-1">
                       {member.organizationRoles.map(role => (
                         <span key={role} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-[#4C5760]">
-                          {getRoleIcon(role)}
-                          {getRoleLabel(role)}
+                          {getRoleIcon(role as OrganizationRole)}
+                          {getRoleLabel(role as OrganizationRole)}
                         </span>
                       ))}
                     </div>

@@ -1,5 +1,5 @@
 import api from './api';
-import { Person, OrganizationUser, ProjectUser, ContactPerson, OrganizationRole, OrganizationRoles } from '../types/users';
+import { Person, OrganizationUser, ProjectUser, ContactPerson, OrganizationRole } from '../types/users';
 import { getOrganizationMembers as getMockOrgMembers, getProjectUsers as getMockProjectUsers } from '../mock-data/people';
 import config from '../config';
 
@@ -18,13 +18,52 @@ const ensureMockData = (organizationId: string = 'ACME-001') => {
 };
 
 // Helper function to create a ProjectUser from a ContactPerson
-export const createProjectUser = (contact: ContactPerson, projectId: string): ProjectUser => {
+const createProjectUser = (projectId: string, userData: Partial<ProjectUser>): ProjectUser => {
   return {
-    ...contact,
+    id: `user-${Date.now()}`,
+    name: userData.name || '',
+    email: userData.email || '',
+    role: userData.role || 'Project Member',
+    company: userData.company || '',
     isSignedUp: true,
+    isOrganizationMember: false,
     projectIds: [projectId],
-    status: 'pending',
-    joinedAt: new Date().toISOString().split('T')[0]
+    projectId: projectId,
+    status: 'active',
+    joinedAt: new Date().toISOString().split('T')[0],
+    phone: userData.phone || '',
+    department: userData.department || '',
+    location: userData.location || '',
+    bio: userData.bio || '',
+    socialLinks: userData.socialLinks || {},
+    avatar: null,
+    organizationId: null,
+    organizationRoles: [],
+    projectRole: 'project_member'
+  };
+};
+
+const createOrganizationUser = (organizationId: string, userData: Partial<OrganizationUser>): OrganizationUser => {
+  return {
+    id: `user-${Date.now()}`,
+    name: userData.name || '',
+    email: userData.email || '',
+    role: userData.role || 'Organization Member',
+    company: userData.company || '',
+    isSignedUp: true,
+    isOrganizationMember: true,
+    organizationId,
+    projectIds: [],
+    status: 'active',
+    joinedAt: new Date().toISOString().split('T')[0],
+    phone: userData.phone || '',
+    department: userData.department || '',
+    location: userData.location || '',
+    bio: userData.bio || '',
+    socialLinks: userData.socialLinks || {},
+    avatar: null,
+    organizationRoles: userData.organizationRoles || ['standard'],
+    organizationRole: 'standard'
   };
 };
 
@@ -68,7 +107,7 @@ export const userManagementService = {
     name: string,
     email: string, 
     role: string,
-    organizationRoles: OrganizationRoles = ['standard']
+    organizationRoles: OrganizationRole[] = ['standard']
   ): Promise<OrganizationUser> => {
     if (config.useMockData) {
       ensureMockData(organizationId);
@@ -85,7 +124,11 @@ export const userManagementService = {
         status: 'pending',
         joinedAt: new Date().toISOString().split('T')[0],
         phone: '',
-        organizationRoles
+        organizationRoles,
+        avatar: null,
+        department: '',
+        location: '',
+        organizationRole: 'standard'
       };
 
       // Add to mock storage
@@ -106,7 +149,7 @@ export const userManagementService = {
   updateOrganizationMemberRoles: async (
     organizationId: string,
     userId: string,
-    organizationRoles: OrganizationRoles
+    organizationRoles: OrganizationRole[]
   ): Promise<OrganizationUser> => {
     if (config.useMockData) {
       ensureMockData(organizationId);
@@ -186,9 +229,18 @@ export const userManagementService = {
         isSignedUp: true,
         isOrganizationMember: false,
         projectIds: [projectId],
+        projectId: projectId,
         status: 'pending',
         joinedAt: new Date().toISOString().split('T')[0],
-        phone: ''
+        phone: '',
+        department: '',
+        location: '',
+        bio: '',
+        socialLinks: {},
+        avatar: null,
+        organizationId: null,
+        organizationRoles: [],
+        projectRole: 'project_member'
       };
 
       // Add to mock storage
@@ -238,4 +290,4 @@ export const userManagementService = {
     
     await api.delete(`/organizations/${organizationId}/members/${userId}`);
   }
-}; 
+};

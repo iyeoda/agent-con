@@ -5,17 +5,20 @@ import { Toaster } from 'react-hot-toast';
 import { UserProvider } from './contexts/UserContext';
 import UserSwitcher from './components/UserSwitcher';
 import config from './config';
+import { ClerkProvider } from '@clerk/clerk-react';
 
 function App() {
   return (
-    <UserProvider>
-      <div className="App">
-        <AppFrame />
-        <Toaster position="top-right" />
-        {/* Only show UserSwitcher in development mode */}
-        {config.environment === 'development' && <UserSwitcher />}
-      </div>
-    </UserProvider>
+    <ClerkProvider publishableKey={config.clerkPublishableKey}>
+      <UserProvider>
+        <div className="App">
+          <AppFrame />
+          <Toaster position="top-right" />
+          {/* Only show UserSwitcher in development mode */}
+          {config.environment === 'development' && <UserSwitcher />}
+        </div>
+      </UserProvider>
+    </ClerkProvider>
   );
 }
 

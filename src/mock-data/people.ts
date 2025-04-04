@@ -25,6 +25,8 @@ const mockOrganizationUsers: OrganizationUser[] = [
       twitter: 'https://twitter.com/sarahchen',
       website: 'https://sarahchen.com'
     },
+    avatar: null,
+    organizationRole: 'org_admin',
     profileSettings: {
       timezone: 'America/New_York',
       language: 'en',
@@ -71,6 +73,8 @@ const mockOrganizationUsers: OrganizationUser[] = [
     socialLinks: {
       linkedin: 'https://linkedin.com/in/mikejohnson'
     },
+    avatar: null,
+    organizationRole: 'standard',
     profileSettings: {
       timezone: 'America/Los_Angeles',
       language: 'en',
@@ -110,6 +114,7 @@ const mockProjectUsers: ProjectUser[] = [
     isSignedUp: true,
     isOrganizationMember: false,
     projectIds: ['550e8400-e29b-41d4-a716-446655440000'],
+    projectId: '550e8400-e29b-41d4-a716-446655440000',
     status: 'active',
     joinedAt: '2024-02-15',
     phone: '555-765-4321',
@@ -120,6 +125,10 @@ const mockProjectUsers: ProjectUser[] = [
       linkedin: 'https://linkedin.com/in/elenarodriguez',
       website: 'https://powergrid.com/team/elena'
     },
+    avatar: null,
+    organizationId: null,
+    organizationRoles: [],
+    projectRole: 'project_member',
     profileSettings: {
       timezone: 'America/Los_Angeles',
       language: 'es',
@@ -155,6 +164,7 @@ const mockProjectUsers: ProjectUser[] = [
     isSignedUp: true,
     isOrganizationMember: false,
     projectIds: ['550e8400-e29b-41d4-a716-446655440001'],
+    projectId: '550e8400-e29b-41d4-a716-446655440001',
     status: 'pending',
     joinedAt: '2024-03-01',
     phone: '555-654-3210',
@@ -165,6 +175,10 @@ const mockProjectUsers: ProjectUser[] = [
       linkedin: 'https://linkedin.com/in/davidkim',
       website: 'https://greenspace.com/david'
     },
+    avatar: null,
+    organizationId: null,
+    organizationRoles: [],
+    projectRole: 'project_member',
     profileSettings: {
       timezone: 'America/Los_Angeles',
       language: 'en',
@@ -209,7 +223,12 @@ const mockContacts: ContactPerson[] = [
     bio: 'Client representative overseeing multiple construction projects.',
     socialLinks: {
       linkedin: 'https://linkedin.com/in/thomaslee'
-    }
+    },
+    avatar: null,
+    organizationId: null,
+    projectIds: [],
+    status: 'active',
+    organizationRoles: []
   },
   {
     id: 'CON-002',
@@ -226,7 +245,12 @@ const mockContacts: ContactPerson[] = [
     socialLinks: {
       linkedin: 'https://linkedin.com/in/mariagarcia',
       website: 'https://bluesky.com/team/maria'
-    }
+    },
+    avatar: null,
+    organizationId: null,
+    projectIds: [],
+    status: 'active',
+    organizationRoles: []
   }
 ];
 
