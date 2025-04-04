@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Project, Agent, Drawing, Task, ProjectMetrics, RecentActivity, Deadline, Risk } from '../types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Progress } from './ui/progress';
-import { Activity, AlertTriangle, BarChart3, Calendar, CheckCircle, FileText, MessageSquare, Users, Bot, UserPlus } from 'lucide-react';
-import AgentsSection from './AgentsSection';
-import DrawingsSection from './DrawingsSection';
+import { Activity, AlertTriangle, BarChart3, Calendar, CheckCircle, FileText, MessageSquare, Users, UserPlus } from 'lucide-react';
 import { projectData } from '../mock-data/project-data';
 import { useNavigate } from 'react-router-dom';
 

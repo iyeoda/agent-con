@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
-import { Filter, List, LayoutGrid, GanttChart, Plus, Search } from 'lucide-react';
+import { Filter, List, LayoutGrid, GanttChart, Plus } from 'lucide-react';
 import Input from './ui/input';
 import Button from './ui/button';
 import Badge from './ui/badge';
-import { Dialog, DialogTrigger } from '@radix-ui/react-dialog';
 import FilterDialog from './workspace/FilterDialog';
 import AddItemDialog from './workspace/AddItemDialog';
 import BoardView from './workspace/BoardView';

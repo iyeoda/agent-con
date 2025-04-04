@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Avatar, { AvatarFallback, AvatarImage } from './ui/avatar';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -9,11 +8,9 @@ import {
 } from './ui/dropdown-menu';
 import { 
   User, 
-  Settings, 
   Shield, 
   Moon, 
   Sun, 
-  Bell, 
   LogOut,
   Folder
 } from 'lucide-react';

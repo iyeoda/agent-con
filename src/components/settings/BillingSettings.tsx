@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from '../ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import Badge from '../ui/badge';
-import { CheckCircle, CreditCard, Calendar, Clock, Download, Info, AlertTriangle, ChevronRight } from 'lucide-react';
+import { CheckCircle, CreditCard, Calendar, Clock, Download, Info } from 'lucide-react';
 
 export const BillingSettings = () => {
   const [currentPlan, setCurrentPlan] = useState('pro');

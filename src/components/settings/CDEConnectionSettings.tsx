@@ -16,7 +16,7 @@ export const CDEConnectionSettings = () => {
   const [expandedCDE, setExpandedCDE] = useState<string | null>(null);
   const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false);
   const [cdeToDisconnect, setCdeToDisconnect] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Available CDEs for connection
   const availableCDEs = [
@@ -34,20 +34,20 @@ export const CDEConnectionSettings = () => {
 
   const loadConnectedCDEs = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const connections = await cdeConnectionService.getAll();
       setConnectedCDEs(connections);
     } catch (error) {
       console.error('Error loading CDE connections:', error);
       // You might want to show a toast notification here
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleConnect = async (cdeId: string) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const { url } = await cdeConnectionService.initiateOAuth(cdeId);
       
       // Open OAuth popup
@@ -83,13 +83,13 @@ export const CDEConnectionSettings = () => {
       console.error('Error initiating OAuth flow:', error);
       // You might want to show a toast notification here
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleSyncNow = async (cdeId: string) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const result = await cdeConnectionService.sync(cdeId);
       if (result.success) {
         await loadConnectedCDEs(); // Reload connections to get updated lastSync
@@ -99,7 +99,7 @@ export const CDEConnectionSettings = () => {
       console.error('Error syncing CDE:', error);
       // You might want to show a toast notification here
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -111,14 +111,14 @@ export const CDEConnectionSettings = () => {
   const confirmDisconnect = async () => {
     if (cdeToDisconnect) {
       try {
-        setLoading(true);
+        setIsLoading(true);
         await cdeConnectionService.disconnect(cdeToDisconnect);
         await loadConnectedCDEs(); // Reload connections
       } catch (error) {
         console.error('Error disconnecting CDE:', error);
         // You might want to show a toast notification here
       } finally {
-        setLoading(false);
+        setIsLoading(false);
         setDisconnectDialogOpen(false);
         setCdeToDisconnect(null);
       }

@@ -4,11 +4,7 @@ import {
   FileSpreadsheet, 
   FileText, 
   Bell, 
-  Folders,
-  Download,
-  FileCheck,
-  CalendarClock,
-  Save
+  Folders
 } from 'lucide-react';
 
 interface SmartAction {

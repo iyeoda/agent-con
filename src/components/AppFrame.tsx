@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, useParams } from "react-router-dom";
 import Input from "./ui/input";
-import { HelpCircle, Settings, Folder, LayoutDashboard, Bot, Sparkles, Calendar, Briefcase } from "lucide-react";
+import { Settings, Folder, LayoutDashboard, Bot, Sparkles, Calendar, Briefcase, Users, LogOut, Menu, X } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import SearchModal from "./SearchModal";
@@ -58,24 +58,25 @@ const AppContent = () => {
   const currentView = location.pathname.split('/')[2] || 'dashboard';
 
   useEffect(() => {
-    debug('AppContent mounted');
-    debug('Current Project:', currentProject);
-    debug('Project Data:', projectData);
+    if (!projectId) return;
     
-    // Initialize project with data if available
-    if (projectId && projectData[projectId]) {
-      debug('Found project data, updating currentProject');
+    const projectDataForId = projectData[projectId];
+    debug('Project data for ID:', projectDataForId);
+    
+    if (projectDataForId) {
+      // Create a minimal valid Project object
       setCurrentProject({
-        ...defaultProject,
         id: projectId,
-        agents: projectData[projectId].agents
+        name: 'Default Project', // This should come from somewhere else
+        logo: '/default-logo.png', // This should come from somewhere else
+        agents: projectDataForId.agents
       });
     } else {
       debug('WARNING: No project data found for ID:', projectId);
       // Redirect to default project if invalid project ID
       navigate(`/project/550e8400-e29b-41d4-a716-446655440000/dashboard`);
     }
-  }, [projectId, navigate]);
+  }, [projectId, navigate, projectData]);
 
   const handleProjectChange = (project: Project) => {
     debug('Project change requested:', project);

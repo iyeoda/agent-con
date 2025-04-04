@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import * as Dialog from "@radix-ui/react-dialog";
 import { 
   Calendar, ChevronLeft, ChevronRight, 
-  Plus, Filter, MoreHorizontal, CheckCircle, Clock, AlertTriangle, FileText,
+  Plus, Filter, CheckCircle, AlertTriangle, FileText,
   User, Users, Search, MapPin, X, CalendarIcon, Grid, List
 } from 'lucide-react';
 import Badge from './ui/badge';

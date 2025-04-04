@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from './ui';
-import { ArrowLeft, FileText, Calendar, User, Tag, MessageSquare, Download } from 'lucide-react';
+import { ArrowLeft, FileText, Calendar, User, MessageSquare, Download } from 'lucide-react';
 
 const DrawingDetail = () => {
   const { projectId, drawingId } = useParams();
