@@ -1,5 +1,5 @@
 import api from './api';
-import { Person, OrganizationUser, ProjectUser, ContactPerson } from '../types/users';
+import { Person, OrganizationUser, ProjectUser, ContactPerson, OrganizationRole, OrganizationRoles } from '../types/users';
 import { getOrganizationMembers as getMockOrgMembers, getProjectUsers as getMockProjectUsers } from '../mock-data/people';
 import config from '../config';
 
@@ -67,7 +67,8 @@ export const userManagementService = {
     organizationId: string,
     name: string,
     email: string, 
-    role: string
+    role: string,
+    organizationRoles: OrganizationRoles = ['standard']
   ): Promise<OrganizationUser> => {
     if (config.useMockData) {
       ensureMockData(organizationId);
@@ -83,7 +84,8 @@ export const userManagementService = {
         projectIds: [],
         status: 'pending',
         joinedAt: new Date().toISOString().split('T')[0],
-        phone: ''
+        phone: '',
+        organizationRoles
       };
 
       // Add to mock storage
@@ -94,7 +96,39 @@ export const userManagementService = {
     const response = await api.post(`/organizations/${organizationId}/members`, {
       name,
       email,
-      role
+      role,
+      organizationRoles
+    });
+    return response.data;
+  },
+
+  // Update an organization member's roles
+  updateOrganizationMemberRoles: async (
+    organizationId: string,
+    userId: string,
+    organizationRoles: OrganizationRoles
+  ): Promise<OrganizationUser> => {
+    if (config.useMockData) {
+      ensureMockData(organizationId);
+      const memberIndex = mockOrgMembers.findIndex(
+        member => member.id === userId && member.organizationId === organizationId
+      );
+      
+      if (memberIndex === -1) {
+        throw new Error('Organization member not found');
+      }
+      
+      // Update the member's roles
+      mockOrgMembers[memberIndex] = {
+        ...mockOrgMembers[memberIndex],
+        organizationRoles
+      };
+      
+      return mockOrgMembers[memberIndex];
+    }
+    
+    const response = await api.patch(`/organizations/${organizationId}/members/${userId}/roles`, {
+      organizationRoles
     });
     return response.data;
   },

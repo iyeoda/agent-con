@@ -1,4 +1,4 @@
-import { Person, ContactPerson, ProjectUser, OrganizationUser } from '../types/users';
+import { Person, ContactPerson, ProjectUser, OrganizationUser, OrganizationRole } from '../types/users';
 
 // Mock data for organization users (part of the organization that owns the app)
 const mockOrganizationUsers: OrganizationUser[] = [
@@ -14,7 +14,8 @@ const mockOrganizationUsers: OrganizationUser[] = [
     projectIds: ['550e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440001'],
     status: 'active',
     joinedAt: '2024-01-15',
-    phone: '555-987-6543'
+    phone: '555-987-6543',
+    organizationRoles: ['org_admin', 'billing_admin']
   },
   {
     id: 'ORG-002',
@@ -28,7 +29,8 @@ const mockOrganizationUsers: OrganizationUser[] = [
     projectIds: ['550e8400-e29b-41d4-a716-446655440000'],
     status: 'active',
     joinedAt: '2024-02-01',
-    phone: '555-876-5432'
+    phone: '555-876-5432',
+    organizationRoles: ['standard']
   }
 ];
 

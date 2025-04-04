@@ -8,6 +8,10 @@ export interface BasePerson {
   phone?: string;
 }
 
+// Organization role types
+export type OrganizationRole = 'billing_admin' | 'org_admin' | 'standard';
+export type OrganizationRoles = OrganizationRole[];
+
 export interface ContactPerson extends BasePerson {
   // Base contact information for people in the project contact list
   // who are not signed up to the app
@@ -33,6 +37,7 @@ export interface OrganizationUser extends BasePerson {
   projectIds: string[];
   status: 'active' | 'pending' | 'inactive';
   joinedAt: string;
+  organizationRoles: OrganizationRoles; // Multiple roles within the organization
 }
 
 // Type for any kind of user in the system

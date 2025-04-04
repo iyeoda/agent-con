@@ -7,8 +7,8 @@ import Dialog from '../ui/dialog';
 import ConfirmationDialog from '../ui/confirmation-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { UserPlus, Mail, Building, MoreHorizontal } from 'lucide-react';
-import { Person, isOrganizationUser } from '../../types/users';
+import { UserPlus, Mail, Building, MoreHorizontal, CreditCard, Users, User } from 'lucide-react';
+import { Person, isOrganizationUser, OrganizationRole, OrganizationRoles } from '../../types/users';
 import { getOrganizationUsers } from '../../mock-data/people';
 import { userManagementService } from '../../services/user-management';
 import { toast } from 'react-hot-toast';
@@ -16,11 +16,14 @@ import { toast } from 'react-hot-toast';
 const TeamSettings: React.FC = () => {
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [isConfirmRemoveOpen, setIsConfirmRemoveOpen] = useState(false);
+  const [isChangeRoleOpen, setIsChangeRoleOpen] = useState(false);
+  const [memberToUpdate, setMemberToUpdate] = useState<string | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
+  const [selectedRoles, setSelectedRoles] = useState<OrganizationRoles>(['standard']);
   const [isLoading, setIsLoading] = useState(false);
   const [organizationMembers, setOrganizationMembers] = useState<Person[]>([]);
 
@@ -59,7 +62,7 @@ const TeamSettings: React.FC = () => {
 
     try {
       setIsLoading(true);
-      await userManagementService.addOrganizationMember(organizationId, name, email, role);
+      await userManagementService.addOrganizationMember(organizationId, name, email, role, selectedRoles);
       
       // Refresh the organization members list
       const updatedMembers = await userManagementService.getOrganizationMembers(organizationId);
@@ -69,6 +72,7 @@ const TeamSettings: React.FC = () => {
       setName('');
       setEmail('');
       setRole('');
+      setSelectedRoles(['standard']);
       setIsAddMemberOpen(false);
       
       toast.success('Invitation sent successfully');
@@ -83,6 +87,33 @@ const TeamSettings: React.FC = () => {
   const openRemoveConfirmation = (memberId: string) => {
     setMemberToRemove(memberId);
     setIsConfirmRemoveOpen(true);
+  };
+
+  const openChangeRoleDialog = (memberId: string) => {
+    setMemberToUpdate(memberId);
+    setIsChangeRoleOpen(true);
+  };
+
+  const handleChangeRoles = async (newRoles: OrganizationRoles) => {
+    if (!memberToUpdate) return;
+
+    try {
+      setIsLoading(true);
+      await userManagementService.updateOrganizationMemberRoles(organizationId, memberToUpdate, newRoles);
+      
+      // Refresh the organization members list
+      const updatedMembers = await userManagementService.getOrganizationMembers(organizationId);
+      setOrganizationMembers(updatedMembers);
+      
+      toast.success('Roles updated successfully');
+    } catch (error) {
+      console.error('Error updating member roles:', error);
+      toast.error('Failed to update roles');
+    } finally {
+      setIsLoading(false);
+      setMemberToUpdate(null);
+      setIsChangeRoleOpen(false);
+    }
   };
 
   const handleRemoveMember = async () => {
@@ -103,6 +134,46 @@ const TeamSettings: React.FC = () => {
     } finally {
       setIsLoading(false);
       setMemberToRemove(null);
+    }
+  };
+
+  // Helper function to get role icon
+  const getRoleIcon = (role: OrganizationRole) => {
+    switch (role) {
+      case 'billing_admin':
+        return <CreditCard className="h-4 w-4 mr-2" />;
+      case 'org_admin':
+        return <Users className="h-4 w-4 mr-2" />;
+      case 'standard':
+        return <User className="h-4 w-4 mr-2" />;
+      default:
+        return <User className="h-4 w-4 mr-2" />;
+    }
+  };
+
+  // Helper function to get role label
+  const getRoleLabel = (role: OrganizationRole) => {
+    switch (role) {
+      case 'billing_admin':
+        return 'Billing Admin';
+      case 'org_admin':
+        return 'Organization Admin';
+      case 'standard':
+        return 'Standard User';
+      default:
+        return 'Standard User';
+    }
+  };
+
+  // Helper function to toggle a role in the selected roles array
+  const toggleRole = (role: OrganizationRole) => {
+    if (selectedRoles.includes(role)) {
+      // Don't allow removing the last role
+      if (selectedRoles.length > 1) {
+        setSelectedRoles(selectedRoles.filter(r => r !== role));
+      }
+    } else {
+      setSelectedRoles([...selectedRoles, role]);
     }
   };
 
@@ -144,7 +215,7 @@ const TeamSettings: React.FC = () => {
             <div className="col-span-3">Member</div>
             <div className="col-span-3">Email</div>
             <div className="col-span-2">Role</div>
-            <div className="col-span-2">Projects</div>
+            <div className="col-span-2">Org. Roles</div>
             <div className="col-span-1">Status</div>
             <div className="col-span-1">Actions</div>
           </div>
@@ -168,12 +239,15 @@ const TeamSettings: React.FC = () => {
                 <div className="col-span-3 text-[#4C5760]">{member.email}</div>
                 <div className="col-span-2 text-[#4C5760]">{member.role}</div>
                 <div className="col-span-2">
-                  {isOrganizationUser(member) && member.projectIds.length > 0 ? (
-                    <span className="text-[#4C5760]">
-                      {member.projectIds.length} project{member.projectIds.length !== 1 ? 's' : ''}
-                    </span>
-                  ) : (
-                    <span className="text-gray-400">No projects</span>
+                  {isOrganizationUser(member) && (
+                    <div className="flex flex-wrap gap-1">
+                      {member.organizationRoles.map(role => (
+                        <span key={role} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-[#4C5760]">
+                          {getRoleIcon(role)}
+                          {getRoleLabel(role)}
+                        </span>
+                      ))}
+                    </div>
                   )}
                 </div>
                 <div className="col-span-1">
@@ -197,7 +271,9 @@ const TeamSettings: React.FC = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Change Role</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => openChangeRoleDialog(member.id)}>
+                        Change Organization Roles
+                      </DropdownMenuItem>
                       <DropdownMenuItem 
                         className="text-red-600"
                         onClick={() => openRemoveConfirmation(member.id)}
@@ -252,6 +328,50 @@ const TeamSettings: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <Label>Organization Roles</Label>
+              <div className="mt-2 space-y-2">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="billing_admin"
+                    checked={selectedRoles.includes('billing_admin')}
+                    onChange={() => toggleRole('billing_admin')}
+                    className="h-4 w-4 text-[#D15F36] border-gray-300 rounded focus:ring-[#D15F36]"
+                  />
+                  <label htmlFor="billing_admin" className="ml-2 flex items-center text-[#4C5760]">
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    <span>Billing Admin</span>
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="org_admin"
+                    checked={selectedRoles.includes('org_admin')}
+                    onChange={() => toggleRole('org_admin')}
+                    className="h-4 w-4 text-[#D15F36] border-gray-300 rounded focus:ring-[#D15F36]"
+                  />
+                  <label htmlFor="org_admin" className="ml-2 flex items-center text-[#4C5760]">
+                    <Users className="h-4 w-4 mr-2" />
+                    <span>Organization Admin</span>
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="standard"
+                    checked={selectedRoles.includes('standard')}
+                    onChange={() => toggleRole('standard')}
+                    className="h-4 w-4 text-[#D15F36] border-gray-300 rounded focus:ring-[#D15F36]"
+                  />
+                  <label htmlFor="standard" className="ml-2 flex items-center text-[#4C5760]">
+                    <User className="h-4 w-4 mr-2" />
+                    <span>Standard User</span>
+                  </label>
+                </div>
+              </div>
+            </div>
             <div className="flex justify-end gap-2 mt-6">
               <Button 
                 variant="outline" 
@@ -259,6 +379,7 @@ const TeamSettings: React.FC = () => {
                   setName('');
                   setEmail('');
                   setRole('');
+                  setSelectedRoles(['standard']);
                   setIsAddMemberOpen(false);
                 }}
                 disabled={isLoading}
@@ -277,6 +398,80 @@ const TeamSettings: React.FC = () => {
         }
         open={isAddMemberOpen}
         onOpenChange={setIsAddMemberOpen}
+      />
+
+      {/* Change Role Dialog */}
+      <Dialog
+        title="Change Organization Roles"
+        content={
+          <div className="space-y-4">
+            <div>
+              <Label>Organization Roles</Label>
+              <div className="mt-2 space-y-2">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="change_billing_admin"
+                    checked={selectedRoles.includes('billing_admin')}
+                    onChange={() => toggleRole('billing_admin')}
+                    className="h-4 w-4 text-[#D15F36] border-gray-300 rounded focus:ring-[#D15F36]"
+                  />
+                  <label htmlFor="change_billing_admin" className="ml-2 flex items-center text-[#4C5760]">
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    <span>Billing Admin</span>
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="change_org_admin"
+                    checked={selectedRoles.includes('org_admin')}
+                    onChange={() => toggleRole('org_admin')}
+                    className="h-4 w-4 text-[#D15F36] border-gray-300 rounded focus:ring-[#D15F36]"
+                  />
+                  <label htmlFor="change_org_admin" className="ml-2 flex items-center text-[#4C5760]">
+                    <Users className="h-4 w-4 mr-2" />
+                    <span>Organization Admin</span>
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="change_standard"
+                    checked={selectedRoles.includes('standard')}
+                    onChange={() => toggleRole('standard')}
+                    className="h-4 w-4 text-[#D15F36] border-gray-300 rounded focus:ring-[#D15F36]"
+                  />
+                  <label htmlFor="change_standard" className="ml-2 flex items-center text-[#4C5760]">
+                    <User className="h-4 w-4 mr-2" />
+                    <span>Standard User</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setMemberToUpdate(null);
+                  setIsChangeRoleOpen(false);
+                }}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button 
+                className="bg-[#D15F36] text-white hover:bg-opacity-90"
+                onClick={() => handleChangeRoles(selectedRoles)}
+                disabled={isLoading}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        }
+        open={isChangeRoleOpen}
+        onOpenChange={setIsChangeRoleOpen}
       />
 
       {/* Confirmation Dialog for Removing Member */}
