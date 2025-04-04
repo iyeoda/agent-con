@@ -9,48 +9,62 @@ import { ClerkProvider, SignIn, SignUp } from '@clerk/clerk-react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
+  // If in development mode and no Clerk key, bypass auth
+  if (config.environment === 'development' && !config.clerkPublishableKey) {
+    return (
+      <BrowserRouter>
+        <UserProvider>
+          <div className="App" data-testid="app-container">
+            <AppFrame />
+            <Toaster position="top-right" />
+            <UserSwitcher />
+          </div>
+        </UserProvider>
+      </BrowserRouter>
+    );
+  }
+
+  // Production mode or development with Clerk key
   return (
-    <ClerkProvider publishableKey={config.clerkPublishableKey}>
-      <UserProvider>
-        <div className="App" data-testid="app-container">
-          <BrowserRouter>
+    <ClerkProvider 
+      publishableKey={config.clerkPublishableKey}
+      appearance={{
+        layout: {
+          socialButtonsPlacement: "bottom"
+        },
+        elements: {
+          formButtonPrimary: "bg-[#D15F36] hover:bg-[#B54E2B]",
+          card: "bg-white shadow-sm border border-[#A7CEBC]",
+          headerTitle: "text-[#3A366E]",
+          headerSubtitle: "text-[#4C5760]"
+        }
+      }}
+    >
+      <BrowserRouter>
+        <UserProvider>
+          <div className="App" data-testid="app-container">
             <Routes>
-              {/* Auth routes */}
-              <Route 
-                path="/sign-in" 
-                element={
-                  <div className="min-h-screen flex items-center justify-center bg-[#F7F5F2]">
-                    <div className="w-full max-w-md">
-                      <SignIn routing="path" path="/sign-in" afterSignInUrl="/project/550e8400-e29b-41d4-a716-446655440000/dashboard" />
-                    </div>
+              <Route path="/sign-in/*" element={
+                <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                  <div className="bg-white p-8 rounded-lg shadow-sm border border-[#A7CEBC] w-full max-w-md">
+                    <SignIn routing="path" path="/sign-in" afterSignInUrl="/dashboard" />
                   </div>
-                } 
-              />
-              <Route 
-                path="/sign-up" 
-                element={
-                  <div className="min-h-screen flex items-center justify-center bg-[#F7F5F2]">
-                    <div className="w-full max-w-md">
-                      <SignUp routing="path" path="/sign-up" afterSignUpUrl="/project/550e8400-e29b-41d4-a716-446655440000/dashboard" />
-                    </div>
+                </div>
+              } />
+              <Route path="/sign-up/*" element={
+                <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                  <div className="bg-white p-8 rounded-lg shadow-sm border border-[#A7CEBC] w-full max-w-md">
+                    <SignUp routing="path" path="/sign-up" afterSignInUrl="/dashboard" />
                   </div>
-                } 
-              />
-              <Route path="/login" element={<Navigate to="/sign-in" replace />} />
-              
-              {/* Protected routes */}
-              <Route path="/project/*" element={<AppFrame />} />
-              <Route path="/" element={<Navigate to="/project/550e8400-e29b-41d4-a716-446655440000/dashboard" replace />} />
-              
-              {/* Catch all route - redirect to sign in */}
-              <Route path="*" element={<Navigate to="/sign-in" replace />} />
+                </div>
+              } />
+              <Route path="/*" element={<AppFrame />} />
             </Routes>
             <Toaster position="top-right" />
-            {/* Only show UserSwitcher in development mode */}
             {config.environment === 'development' && <UserSwitcher />}
-          </BrowserRouter>
-        </div>
-      </UserProvider>
+          </div>
+        </UserProvider>
+      </BrowserRouter>
     </ClerkProvider>
   );
 }

@@ -4,6 +4,7 @@ import { useUser } from '../contexts/UserContext';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { LogOut, Settings, User } from 'lucide-react';
+import { useClerk } from '@clerk/clerk-react';
 
 // Sample data - replace with real data from your backend
 const recentProjects = [
@@ -21,6 +22,7 @@ const notifications = [
 export const AvatarDropdown = () => {
   const navigate = useNavigate();
   const { currentUser, logout: userLogout } = useUser();
+  const { signOut } = useClerk();
 
   // Use current user data if available, otherwise use default
   const user = currentUser || {
@@ -36,15 +38,15 @@ export const AvatarDropdown = () => {
       navigate(path);
     } catch (error) {
       console.error('Navigation failed:', error);
-      // You could show a toast notification here
     }
   };
 
   const handleSignOut = () => {
-    // Call the logout function from user context
-    userLogout();
-    // After sign out, navigate to login page
-    handleNavigation('/login');
+    signOut().then(() => {
+      // Let Clerk handle the redirect
+    }).catch((error) => {
+      console.error('Sign out failed:', error);
+    });
   };
 
   return (

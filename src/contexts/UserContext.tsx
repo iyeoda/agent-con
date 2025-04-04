@@ -19,8 +19,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const initializeUser = async () => {
+      // Always use mock data in development mode without Clerk key
+      if (config.environment === 'development' && !config.clerkPublishableKey) {
+        const mockUser = await authService.getCurrentUser();
+        if (mockUser) {
+          setCurrentUser(mockUser);
+          authService.setMockUser(mockUser);
+        }
+        return;
+      }
+
+      // Use mock data if configured
       if (config.useMockData) {
-        // In development/test, use mock data from auth service
         const mockUser = await authService.getCurrentUser();
         if (mockUser) {
           setCurrentUser(mockUser);

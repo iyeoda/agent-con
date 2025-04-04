@@ -21,6 +21,7 @@ import WorkspaceSection from "./WorkspaceSection";
 import WorkspaceItemDetail from "./workspace/WorkspaceItemDetail";
 import ActivityLogPage from "./ActivityLogPage";
 import Reports from "./reports/Reports";
+import config from "../config";
 
 // Mock project data
 const defaultProject: Project = {
@@ -270,20 +271,18 @@ const AppContent = () => {
 const AppFrame = () => {
   const { isLoaded, isSignedIn } = useAuth();
 
-  // Handle the loading state
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
 
-  // If the user is not signed in, redirect them to the sign-in page
   if (!isSignedIn) {
-    return <Navigate to="/sign-in" replace />;
+    return <Navigate to="/sign-in" />;
   }
 
-  // User is signed in, show the protected content
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/project/550e8400-e29b-41d4-a716-446655440000/dashboard" replace />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={<AppContent />} />
       <Route path="/project/:projectId/*" element={<AppContent />} />
     </Routes>
   );
