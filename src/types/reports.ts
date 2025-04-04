@@ -1,4 +1,4 @@
-export type ReportCategory = 'Project Status' | 'Financial' | 'Quality' | 'Safety';
+export type ReportCategory = 'Financial' | 'Progress' | 'Risk' | 'Quality' | 'Safety' | 'Schedule';
 export type ReportFormat = 'Narrative' | 'Tabular' | 'Combined';
 
 export interface Report {

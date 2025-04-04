@@ -1,107 +1,133 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Report } from '../../types/reports';
 import { format } from 'date-fns';
+import { X, Edit2, Share2, Download, MoreVertical } from 'lucide-react';
 
 interface ReportDetailProps {
   report: Report;
   onClose: () => void;
-  onEdit: () => void;
 }
 
-const ReportDetail: React.FC<ReportDetailProps> = ({ report, onClose, onEdit }) => {
+interface Cell {
+  id: string;
+  value: string;
+  isHeader: boolean;
+}
+
+interface Row {
+  id: string;
+  cells: Cell[];
+}
+
+const ReportDetail: React.FC<ReportDetailProps> = ({ report, onClose }) => {
+  const navigate = useNavigate();
+  
+  const handleEdit = () => {
+    navigate(`/project/${report.projectId}/reports/${report.id}/edit`);
+  };
+
+  const renderContent = () => {
+    if (report.format === 'Tabular') {
+      try {
+        const rows = JSON.parse(report.content) as Row[];
+        return (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.id}>
+                    {row.cells.map((cell) => (
+                      <td
+                        key={cell.id}
+                        className={`
+                          border border-[#A7CEBC] p-2 min-w-[120px]
+                          ${cell.isHeader ? 'bg-[#F7F5F2] font-semibold' : ''}
+                        `}
+                      >
+                        {cell.value}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      } catch (e) {
+        console.error('Failed to parse tabular report content:', e);
+        return <div className="text-[#D15F36]">Error displaying tabular data</div>;
+      }
+    }
+    
+    return (
+      <div 
+        className="prose max-w-none"
+        dangerouslySetInnerHTML={{ __html: report.content }}
+      />
+    );
+  };
+
   return (
-    <div className="fixed inset-y-0 right-0 w-[480px] bg-white border-l border-[#A7CEBC] shadow-lg overflow-y-auto">
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-6">
+    <div className="fixed right-0 top-0 h-full w-[480px] bg-white border-l border-[#A7CEBC] shadow-lg flex flex-col">
+      <div className="border-b border-[#A7CEBC] p-4">
+        <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="text-2xl font-semibold text-[#3A366E] mb-2">{report.title}</h2>
-            <p className="text-sm text-[#4C5760]">{report.projectName}</p>
+            <h2 className="text-xl font-semibold mb-1">{report.title}</h2>
+            <div className="flex items-center gap-2 text-sm text-[#4C5760]">
+              <span>{report.projectName}</span>
+              <span>•</span>
+              <span>Created by {report.createdBy.name}</span>
+              <span>•</span>
+              <span>Last edited {format(new Date(report.updatedAt), 'MMM d, yyyy')}</span>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="text-[#4C5760] hover:text-[#3A366E]"
+            className="p-2 text-[#4C5760] hover:text-[#D15F36]"
           >
-            ✕
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="flex items-center space-x-4 mb-6">
-          <span className={`text-xs px-2 py-1 rounded ${
-            report.format === 'Narrative' ? 'bg-green-100 text-green-800' :
-            report.format === 'Tabular' ? 'bg-purple-100 text-purple-800' :
-            'bg-blue-100 text-blue-800'
-          }`}>
-            {report.format}
-          </span>
-          <span className="text-xs px-2 py-1 bg-gray-100 text-gray-800 rounded">
-            {report.category}
-          </span>
-        </div>
-
-        <div className="mb-6">
+        <div className="flex items-center gap-2">
           <button
-            onClick={onEdit}
-            className="w-full bg-[#D15F36] text-white py-2 rounded-md hover:bg-opacity-90"
+            onClick={handleEdit}
+            className="flex items-center gap-1 px-3 py-1 text-sm border border-[#A7CEBC] rounded-md hover:bg-[#F7F5F2]"
           >
-            Edit Report
+            <Edit2 className="w-4 h-4" />
+            Edit
+          </button>
+          <button className="flex items-center gap-1 px-3 py-1 text-sm border border-[#A7CEBC] rounded-md hover:bg-[#F7F5F2]">
+            <Share2 className="w-4 h-4" />
+            Share
+          </button>
+          <button className="flex items-center gap-1 px-3 py-1 text-sm border border-[#A7CEBC] rounded-md hover:bg-[#F7F5F2]">
+            <Download className="w-4 h-4" />
+            Export
+          </button>
+          <button className="p-1 text-[#4C5760] hover:text-[#D15F36]">
+            <MoreVertical className="w-4 h-4" />
           </button>
         </div>
+      </div>
 
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-sm font-medium text-[#3A366E] mb-2">Created by</h3>
-            <p className="text-sm text-[#4C5760]">{report.createdBy.name}</p>
-            <p className="text-xs text-[#4C5760]">
-              {format(new Date(report.createdAt), 'MMM d, yyyy')}
-            </p>
+      <div className="flex-1 overflow-auto p-4">
+        {report.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {report.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-1 bg-[#F7F5F2] rounded-md text-sm"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
+        )}
 
-          <div>
-            <h3 className="text-sm font-medium text-[#3A366E] mb-2">Last modified</h3>
-            <p className="text-xs text-[#4C5760]">
-              {format(new Date(report.updatedAt), 'MMM d, yyyy h:mm a')}
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-medium text-[#3A366E] mb-2">Tags</h3>
-            <div className="flex flex-wrap gap-2">
-              {report.tags.map(tag => (
-                <span
-                  key={tag}
-                  className="text-xs px-2 py-1 bg-[#F7F5F2] text-[#4C5760] rounded-md"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-medium text-[#3A366E] mb-2">Shared with</h3>
-            <div className="space-y-2">
-              {report.sharing.map(share => (
-                <div
-                  key={share.userId}
-                  className="flex items-center justify-between p-2 bg-[#F7F5F2] rounded-md"
-                >
-                  <span className="text-sm text-[#4C5760]">{share.userName}</span>
-                  <span className="text-xs px-2 py-1 bg-white text-[#4C5760] rounded">
-                    {share.role}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 border-t border-[#A7CEBC] pt-6">
-          <h3 className="text-sm font-medium text-[#3A366E] mb-4">Content</h3>
-          <div className="prose max-w-none">
-            <div className="whitespace-pre-wrap text-[#4C5760]">
-              {report.content}
-            </div>
-          </div>
+        <div className="bg-white rounded-lg p-4">
+          {renderContent()}
         </div>
       </div>
     </div>

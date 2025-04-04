@@ -193,7 +193,6 @@ const Reports: React.FC<ReportsProps> = ({ projectId }) => {
         <ReportDetail
           report={selectedReport}
           onClose={() => setSelectedReport(null)}
-          onEdit={() => navigate(`/project/${projectId}/reports/${selectedReport.id}/edit`)}
         />
       )}
     </div>

@@ -408,3 +408,65 @@
       - Comment threading and replies
       - Notification system for mentions
       - Comment moderation tools
+
+19. **Tabular Editor Implementation**
+    - **Component Architecture**:
+      - `TabularEditor`: Core component for table-based data entry
+      - Integrates with `ReportEditor` for metadata management
+      - Follows single responsibility principle - handles only table editing
+      - Maintains consistent styling with app design system
+    
+    - **Data Structure**:
+      - Row-based data model with unique IDs
+      - Cell interface with value and header flag
+      - JSON serialization for storage
+      - Type-safe interfaces for all data structures
+    
+    - **User Interaction**:
+      - Excel-like keyboard navigation:
+        - Arrow keys for cell navigation
+        - Tab/Enter for next cell/row
+        - No wrapping at table edges
+      - Mouse interaction for cell selection
+      - Hover states for row/column actions
+    
+    - **Table Management**:
+      - Add/remove rows and columns
+      - Minimum constraints (2 columns, header + 1 data row)
+      - Row actions on hover (add above/below, delete)
+      - Column actions on header hover (add left/right, delete)
+    
+    - **Visual Design**:
+      - Header row with distinct styling (bg-[#F7F5F2])
+      - Cell borders using border-[#A7CEBC]
+      - Selection highlight with ring-[#D15F36]
+      - Row/column hover highlight (bg-opacity-50)
+      - Action buttons with hover states
+    
+    - **Accessibility**:
+      - Keyboard navigation support
+      - ARIA labels for action buttons
+      - Focus management between cells
+      - Clear visual indicators for selection
+    
+    - **State Management**:
+      - Selected cell tracking
+      - Row/column hover states
+      - Content change handling
+      - Undo/redo support (planned)
+    
+    - **Future Enhancements**:
+      - Cell formatting options
+      - Data validation rules
+      - Formula support
+      - Cell merging
+      - Sort and filter
+      - Import/export functionality
+      - Real-time collaboration
+    
+    - **Integration Points**:
+      - Reports section integration
+      - Project context awareness
+      - Consistent navigation patterns
+      - Shared styling system
+      - Error handling approach
