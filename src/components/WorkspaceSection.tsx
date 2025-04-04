@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Filter, List, LayoutGrid, GanttChart, Plus } from 'lucide-react';
 import Input from './ui/input';
 import Button from './ui/button';
@@ -15,6 +16,7 @@ interface WorkspaceSectionProps {
 }
 
 const WorkspaceSection: React.FC<WorkspaceSectionProps> = ({ projectId }) => {
+  const navigate = useNavigate();
   // Debug logging for mock data
   console.log('Component mounted');
   console.log('Mock data import:', mockWorkspaceItems);
@@ -93,6 +95,10 @@ const WorkspaceSection: React.FC<WorkspaceSectionProps> = ({ projectId }) => {
     setItems(prev => [...prev, item]);
   };
 
+  const handleItemClick = (itemId: string) => {
+    navigate(`/project/${projectId}/workspace/item/${itemId}`);
+  };
+
   return (
     <div className="p-6 space-y-6 bg-[#F7F5F2]">
       {/* Header */}
@@ -125,76 +131,40 @@ const WorkspaceSection: React.FC<WorkspaceSectionProps> = ({ projectId }) => {
 
       {/* View Toggle and Filters */}
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          {/* View Type Toggle */}
-          <div className="bg-white rounded-md border border-[#A7CEBC] p-1 flex items-center">
-            <button
-              onClick={() => setViewType('list')}
-              className={`p-2 rounded ${
-                viewType === 'list' 
-                  ? 'bg-[#3A366E] text-white' 
-                  : 'text-[#4C5760] hover:bg-gray-50'
-              }`}
-            >
-              <List className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => setViewType('board')}
-              className={`p-2 rounded ${
-                viewType === 'board' 
-                  ? 'bg-[#3A366E] text-white' 
-                  : 'text-[#4C5760] hover:bg-gray-50'
-              }`}
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => setViewType('timeline')}
-              className={`p-2 rounded ${
-                viewType === 'timeline' 
-                  ? 'bg-[#3A366E] text-white' 
-                  : 'text-[#4C5760] hover:bg-gray-50'
-              }`}
-            >
-              <GanttChart className="h-4 w-4" />
-            </button>
-          </div>
-
-          {/* Filter Button */}
+        <div className="flex items-center gap-2">
           <Button
-            variant="outline"
-            className="border-[#A7CEBC] text-[#4C5760]"
-            onClick={() => setIsFilterOpen(true)}
+            variant={viewType === 'list' ? 'default' : 'outline'}
+            onClick={() => setViewType('list')}
+            className={viewType === 'list' ? 'bg-[#D15F36] text-white' : 'border-[#A7CEBC] text-[#4C5760]'}
           >
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
+            <List className="h-4 w-4 mr-2" />
+            List
           </Button>
-
-          {/* Active Filters */}
-          <div className="flex gap-2">
-            {Object.entries(filters).map(([key, values]) => 
-              values.map(value => (
-                <Badge
-                  key={`${key}-${value}`}
-                  className="bg-[#3A366E] bg-opacity-10 text-[#3A366E]"
-                >
-                  {key}: {value}
-                  <button
-                    onClick={() => {
-                      setFilters(prev => ({
-                        ...prev,
-                        [key]: prev[key as keyof typeof filters].filter(v => v !== value)
-                      }));
-                    }}
-                    className="ml-2 hover:text-[#D15F36]"
-                  >
-                    ×
-                  </button>
-                </Badge>
-              ))
-            )}
-          </div>
+          <Button
+            variant={viewType === 'board' ? 'default' : 'outline'}
+            onClick={() => setViewType('board')}
+            className={viewType === 'board' ? 'bg-[#D15F36] text-white' : 'border-[#A7CEBC] text-[#4C5760]'}
+          >
+            <LayoutGrid className="h-4 w-4 mr-2" />
+            Board
+          </Button>
+          <Button
+            variant={viewType === 'timeline' ? 'default' : 'outline'}
+            onClick={() => setViewType('timeline')}
+            className={viewType === 'timeline' ? 'bg-[#D15F36] text-white' : 'border-[#A7CEBC] text-[#4C5760]'}
+          >
+            <GanttChart className="h-4 w-4 mr-2" />
+            Timeline
+          </Button>
         </div>
+        <Button
+          variant="outline"
+          onClick={() => setIsFilterOpen(true)}
+          className="border-[#A7CEBC] text-[#4C5760]"
+        >
+          <Filter className="h-4 w-4 mr-2" />
+          Filters
+        </Button>
       </div>
 
       {/* Content Area */}
@@ -215,7 +185,11 @@ const WorkspaceSection: React.FC<WorkspaceSectionProps> = ({ projectId }) => {
             {/* Items */}
             {filteredItems.length > 0 ? (
               filteredItems.map(item => (
-                <div key={item.id} className="grid grid-cols-12 p-4 items-center hover:bg-gray-50">
+                <div 
+                  key={item.id} 
+                  className="grid grid-cols-12 p-4 items-center hover:bg-gray-50 cursor-pointer"
+                  onClick={() => handleItemClick(item.id)}
+                >
                   <div className="col-span-4">
                     <div className="font-medium text-[#3A366E]">{item.title}</div>
                     {item.description && (
@@ -263,10 +237,20 @@ const WorkspaceSection: React.FC<WorkspaceSectionProps> = ({ projectId }) => {
         )}
 
         {/* Board View */}
-        {viewType === 'board' && <BoardView items={filteredItems} />}
+        {viewType === 'board' && (
+          <BoardView 
+            items={filteredItems} 
+            onItemClick={handleItemClick}
+          />
+        )}
 
         {/* Timeline View */}
-        {viewType === 'timeline' && <TimelineView items={filteredItems} />}
+        {viewType === 'timeline' && (
+          <TimelineView 
+            items={filteredItems} 
+            onItemClick={handleItemClick}
+          />
+        )}
       </div>
 
       {/* Dialogs */}

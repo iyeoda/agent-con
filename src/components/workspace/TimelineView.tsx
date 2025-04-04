@@ -6,161 +6,151 @@ import Button from '../ui/button';
 
 interface TimelineViewProps {
   items: WorkspaceItem[];
+  onItemClick: (itemId: string) => void;
 }
 
-const TimelineView: React.FC<TimelineViewProps> = ({ items }) => {
-  const [startDate, setStartDate] = React.useState(() => {
-    const today = new Date();
-    today.setDate(1); // Start from the first day of the month
-    return today;
-  });
+const TimelineView: React.FC<TimelineViewProps> = ({ items, onItemClick }) => {
+  const [currentDate, setCurrentDate] = React.useState(new Date());
 
-  // Calculate the number of days to display (2 months)
-  const daysToShow = 60;
+  // Group items by date
+  const itemsByDate = useMemo(() => {
+    const grouped = items.reduce((acc, item) => {
+      const date = item.dueDate ? new Date(item.dueDate) : new Date(item.createdAt);
+      const dateKey = date.toISOString().split('T')[0];
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+      acc[dateKey].push(item);
+      return acc;
+    }, {} as Record<string, WorkspaceItem[]>);
 
-  // Generate dates for the timeline
-  const dates = useMemo(() => {
-    const result = [];
-    const currentDate = new Date(startDate);
-    
-    for (let i = 0; i < daysToShow; i++) {
-      result.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    
-    return result;
-  }, [startDate]);
-
-  // Filter and sort items with due dates
-  const timelineItems = useMemo(() => {
-    return items
-      .filter(item => item.dueDate)
-      .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
+    return grouped;
   }, [items]);
 
-  // Navigate timeline
-  const handleNavigate = (direction: 'prev' | 'next') => {
-    const newDate = new Date(startDate);
-    if (direction === 'prev') {
-      newDate.setMonth(newDate.getMonth() - 1);
-    } else {
-      newDate.setMonth(newDate.getMonth() + 1);
-    }
-    setStartDate(newDate);
+  // Get all dates that have items
+  const dates = useMemo(() => {
+    return Object.keys(itemsByDate).sort();
+  }, [itemsByDate]);
+
+  const handlePreviousMonth = () => {
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() - 1);
+      return newDate;
+    });
   };
+
+  const handleNextMonth = () => {
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() + 1);
+      return newDate;
+    });
+  };
+
+  // Get days in current month
+  const daysInMonth = useMemo(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    return new Date(year, month + 1, 0).getDate();
+  }, [currentDate]);
+
+  // Get first day of month (0-6, where 0 is Sunday)
+  const firstDayOfMonth = useMemo(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    return new Date(year, month, 1).getDay();
+  }, [currentDate]);
+
+  // Generate calendar days
+  const calendarDays = useMemo(() => {
+    const days = [];
+    const totalDays = firstDayOfMonth + daysInMonth;
+    const weeks = Math.ceil(totalDays / 7);
+
+    for (let week = 0; week < weeks; week++) {
+      for (let day = 0; day < 7; day++) {
+        const dayNumber = week * 7 + day - firstDayOfMonth + 1;
+        if (dayNumber > 0 && dayNumber <= daysInMonth) {
+          const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNumber);
+          const dateKey = date.toISOString().split('T')[0];
+          days.push({
+            day: dayNumber,
+            date: dateKey,
+            items: itemsByDate[dateKey] || []
+          });
+        } else {
+          days.push({ day: null, date: null, items: [] });
+        }
+      }
+    }
+
+    return days;
+  }, [currentDate, firstDayOfMonth, daysInMonth, itemsByDate]);
 
   return (
     <div className="p-4">
-      {/* Timeline Controls */}
+      {/* Calendar Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            className="border-[#A7CEBC]"
-            onClick={() => handleNavigate('prev')}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="font-medium text-[#3A366E]">
-            {startDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-          </span>
-          <Button
-            variant="outline"
-            className="border-[#A7CEBC]"
-            onClick={() => handleNavigate('next')}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={handlePreviousMonth}
+          className="border-[#A7CEBC] text-[#4C5760]"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <h2 className="text-lg font-medium text-[#3A366E]">
+          {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+        </h2>
+        <Button
+          variant="outline"
+          onClick={handleNextMonth}
+          className="border-[#A7CEBC] text-[#4C5760]"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
 
-      <div className="border border-[#A7CEBC] rounded-lg overflow-hidden">
-        {/* Timeline Header */}
-        <div className="grid grid-cols-[200px_1fr] border-b border-[#A7CEBC]">
-          <div className="p-3 bg-[#3A366E] bg-opacity-5 font-medium text-[#3A366E]">
-            Item
+      {/* Calendar Grid */}
+      <div className="grid grid-cols-7 gap-2">
+        {/* Weekday Headers */}
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          <div
+            key={day}
+            className="text-center text-sm font-medium text-[#4C5760] py-2"
+          >
+            {day}
           </div>
-          <div className="overflow-x-auto">
-            <div className="grid grid-cols-[repeat(60,_40px)] bg-[#3A366E] bg-opacity-5">
-              {dates.map((date, index) => (
-                <div
-                  key={index}
-                  className={`
-                    p-2 text-center text-xs font-medium text-[#4C5760] border-l border-[#A7CEBC]
-                    ${date.getDate() === 1 ? 'border-l-2' : ''}
-                  `}
-                >
-                  {date.getDate()}
+        ))}
+
+        {/* Calendar Days */}
+        {calendarDays.map(({ day, date, items }, index) => (
+          <div
+            key={index}
+            className={`min-h-[100px] p-2 border border-[#A7CEBC] rounded-lg ${
+              day ? 'bg-white' : 'bg-gray-50'
+            }`}
+          >
+            {day && (
+              <>
+                <div className="text-sm font-medium text-[#3A366E] mb-2">
+                  {day}
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Timeline Content */}
-        <div className="divide-y divide-[#A7CEBC]">
-          {timelineItems.map(item => {
-            const itemDate = new Date(item.dueDate!);
-            const startIndex = Math.floor(
-              (itemDate.getTime() - dates[0].getTime()) / (1000 * 60 * 60 * 24)
-            );
-
-            return (
-              <div key={item.id} className="grid grid-cols-[200px_1fr]">
-                {/* Item Details */}
-                <div className="p-3 bg-white">
-                  <div className="font-medium text-[#3A366E] mb-1">{item.title}</div>
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-[#A7CEBC] bg-opacity-20 text-[#3A366E]">
-                      {item.category}
-                    </Badge>
-                    <Badge className={`
-                      ${item.priority === 'high' ? 'bg-red-100 text-red-800' : ''}
-                      ${item.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : ''}
-                      ${item.priority === 'low' ? 'bg-green-100 text-green-800' : ''}
-                    `}>
-                      {item.priority}
-                    </Badge>
-                  </div>
-                </div>
-
-                {/* Timeline Bar */}
-                <div className="relative">
-                  <div className="grid grid-cols-[repeat(60,_40px)] h-full">
-                    {dates.map((_, index) => (
-                      <div
-                        key={index}
-                        className={`
-                          border-l border-[#A7CEBC] h-full
-                          ${index === 0 ? 'border-l-0' : ''}
-                        `}
-                      />
-                    ))}
-                  </div>
-                  {startIndex >= 0 && startIndex < daysToShow && (
+                <div className="space-y-1">
+                  {items.map(item => (
                     <div
-                      className={`
-                        absolute top-1/2 h-4 -mt-2 rounded
-                        ${item.status === 'completed' ? 'bg-green-500' : 'bg-[#3A366E]'}
-                        opacity-75
-                      `}
-                      style={{
-                        left: `${startIndex * 40}px`,
-                        width: '40px',
-                      }}
-                    />
-                  )}
+                      key={item.id}
+                      className="text-xs p-1 rounded bg-[#A7CEBC] bg-opacity-20 text-[#3A366E] cursor-pointer hover:bg-opacity-30"
+                      onClick={() => onItemClick(item.id)}
+                    >
+                      {item.title}
+                    </div>
+                  ))}
                 </div>
-              </div>
-            );
-          })}
-
-          {timelineItems.length === 0 && (
-            <div className="p-8 text-center text-[#4C5760]">
-              No items with due dates found
-            </div>
-          )}
-        </div>
+              </>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

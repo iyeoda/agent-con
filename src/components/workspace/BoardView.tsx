@@ -4,6 +4,7 @@ import Badge from '../ui/badge';
 
 interface BoardViewProps {
   items: WorkspaceItem[];
+  onItemClick: (itemId: string) => void;
 }
 
 const statusColumns = [
@@ -13,7 +14,7 @@ const statusColumns = [
   { id: 'overdue', label: 'Overdue' }
 ] as const;
 
-const BoardView: React.FC<BoardViewProps> = ({ items }) => {
+const BoardView: React.FC<BoardViewProps> = ({ items, onItemClick }) => {
   // Group items by status
   const itemsByStatus = statusColumns.reduce((acc, { id }) => {
     acc[id] = items.filter(item => item.status === id);
@@ -42,7 +43,8 @@ const BoardView: React.FC<BoardViewProps> = ({ items }) => {
             {itemsByStatus[id].map(item => (
               <div
                 key={item.id}
-                className="bg-white p-3 rounded border border-[#A7CEBC] shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white p-3 rounded border border-[#A7CEBC] shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => onItemClick(item.id)}
               >
                 {/* Item Header */}
                 <div className="flex items-start justify-between mb-2">

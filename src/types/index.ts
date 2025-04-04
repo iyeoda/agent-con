@@ -258,4 +258,31 @@ export interface UserActivity {
   metadata?: Record<string, any>;
   ipAddress?: string;
   userAgent?: string;
+}
+
+export type CommentableEntityType = 
+  | 'drawing' 
+  | 'task' 
+  | 'query' 
+  | 'file' 
+  | 'workspace_item';
+
+export interface Comment {
+  id: string;
+  content: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+  entityType: CommentableEntityType;
+  entityId: string;
+  projectId: string;
+  parentId?: string; // For nested comments/replies
+  mentions?: string[]; // User IDs mentioned in the comment
+  attachments?: {
+    id: string;
+    name: string;
+    url: string;
+    type: string;
+    size: number;
+  }[];
 } 

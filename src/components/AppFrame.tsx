@@ -16,6 +16,7 @@ import DashboardSection from "./DashboardSection";
 import DrawingDetail from "./DrawingDetail";
 import ProjectCalendarView from "./ProjectCalendarView";
 import WorkspaceSection from "./WorkspaceSection";
+import WorkspaceItemDetail from "./workspace/WorkspaceItemDetail";
 import ActivityLogPage from "./ActivityLogPage";
 
 // Mock project data
@@ -234,6 +235,7 @@ const AppContent = () => {
             <Routes>
               <Route path="/dashboard" element={<DashboardSection selectedProject={currentProject} />} />
               <Route path="/workspace" element={<WorkspaceSection projectId={currentProject.id} />} />
+              <Route path="/workspace/item/:itemId" element={<WorkspaceItemDetail />} />
               <Route path="/data" element={<ProjectDataSection />} />
               <Route path="/data/drawings/:drawingId" element={<DrawingDetail />} />
               <Route path="/agents" element={<AgentsSection agents={currentProject.agents} />} />
