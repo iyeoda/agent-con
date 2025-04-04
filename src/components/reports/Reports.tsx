@@ -199,30 +199,11 @@ const Reports: React.FC<ReportsProps> = ({ projectId }) => {
     </div>
   );
 
-  const ReportEditorRoute = () => {
-    const { reportId } = useParams();
-    const report = reportId === 'new' ? undefined : mockReports.find(r => r.id === reportId);
-
-    const handleSave = (updatedReport: Partial<Report>) => {
-      // In a real app, this would make an API call
-      console.log('Saving report:', updatedReport);
-      navigate(`/project/${projectId}/reports`);
-    };
-
-    return (
-      <ReportEditor
-        report={report}
-        onSave={handleSave}
-        onClose={() => navigate(`/project/${projectId}/reports`)}
-      />
-    );
-  };
-
   return (
     <Routes>
       <Route path="/" element={<ReportsList />} />
-      <Route path="/new" element={<ReportEditorRoute />} />
-      <Route path="/:reportId/edit" element={<ReportEditorRoute />} />
+      <Route path="new" element={<ReportEditor mode="create" />} />
+      <Route path=":reportId/edit" element={<ReportEditor mode="edit" />} />
     </Routes>
   );
 };
