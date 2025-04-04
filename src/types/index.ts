@@ -211,4 +211,51 @@ export interface WorkspaceItem {
   progress?: number;
   estimatedHours?: number;
   actualHours?: number;
+}
+
+// User Activity Types
+export type ActivityActionType = 
+  | 'created' 
+  | 'updated' 
+  | 'deleted' 
+  | 'viewed' 
+  | 'commented' 
+  | 'approved' 
+  | 'rejected' 
+  | 'assigned' 
+  | 'uploaded' 
+  | 'downloaded' 
+  | 'shared' 
+  | 'logged_in' 
+  | 'logged_out' 
+  | 'settings_changed' 
+  | 'role_changed';
+
+export type ActivityEntityType = 
+  | 'project' 
+  | 'document' 
+  | 'task' 
+  | 'comment' 
+  | 'issue' 
+  | 'user' 
+  | 'agent' 
+  | 'drawing' 
+  | 'calendar_event' 
+  | 'workspace_item' 
+  | 'system';
+
+export interface UserActivity {
+  id: string;
+  userId: string;
+  userName: string;
+  action: ActivityActionType;
+  entityType: ActivityEntityType;
+  entityId: string;
+  entityName: string;
+  projectId?: string;
+  projectName?: string;
+  timestamp: string;
+  metadata?: Record<string, any>;
+  ipAddress?: string;
+  userAgent?: string;
 } 
