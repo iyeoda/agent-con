@@ -129,21 +129,24 @@ export interface CDEConnection {
 }
 
 export interface UserSettings {
-  id: string;
-  theme: 'light' | 'dark' | 'system';
+  timezone: string;
+  language: string;
+  theme: 'light' | 'dark';
   notifications: {
     email: boolean;
     push: boolean;
     desktop: boolean;
-    projectUpdates?: boolean;
-    taskAssignments?: boolean;
-    drawingUpdates?: boolean;
-    mentions?: boolean;
-    comments?: boolean;
+    projectUpdates: boolean;
+    taskAssignments: boolean;
+    drawingUpdates: boolean;
+    mentions: boolean;
+    comments: boolean;
   };
-  language: string;
-  timezone: string;
-  preferences?: Record<string, any>;
+  preferences: {
+    dashboardLayout: 'grid' | 'list';
+    emailDigest: 'daily' | 'weekly' | 'never';
+    taskView: 'kanban' | 'list';
+  };
   security?: {
     twoFactorEnabled: boolean;
     lastPasswordChange: string;

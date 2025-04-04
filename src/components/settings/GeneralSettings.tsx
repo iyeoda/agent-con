@@ -1,49 +1,77 @@
 import React, { useState } from 'react';
-import Button from '../ui/button';
-import Input from '../ui/input';
+import { useUser } from '../../contexts/UserContext';
+import { ContactPerson, Person } from '../../types/users';
+import { Button, Input } from '../ui';
+import Avatar, { AvatarImage, AvatarFallback } from '../ui/avatar';
+import { Label } from '../ui/label';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
 import Switch from '../ui/switch';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import Avatar, { AvatarFallback, AvatarImage } from '../ui/avatar';
-import { 
-  Camera, Globe, Bell, Moon, Sun, Save, User, Building, Mail, Phone
-} from 'lucide-react';
 
-export const GeneralSettings = () => {
-  const [darkMode, setDarkMode] = useState(false);
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  
-  // Sample user data
-  const user = {
-    name: 'John Smith',
-    title: 'Project Manager',
-    company: 'Acme Construction',
-    email: 'john.smith@acmeconstruction.com',
-    phone: '+1 (555) 123-4567',
-    avatar: null,
-    timezone: 'America/New_York',
-    language: 'English (US)'
+const defaultUser: ContactPerson = {
+  id: 'default',
+  name: 'Guest User',
+  email: 'guest@example.com',
+  role: 'Guest',
+  company: 'Unknown',
+  isSignedUp: false,
+  isOrganizationMember: false,
+  phone: '',
+  avatar: undefined,
+  department: '',
+  location: '',
+  bio: '',
+  socialLinks: {}
+};
+
+export const GeneralSettings: React.FC = () => {
+  const { currentUser } = useUser();
+  const user = currentUser || defaultUser;
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedUser, setEditedUser] = useState(user);
+
+  const canEditProfile = user.isSignedUp;
+  const canEditCompany = user.isOrganizationMember && 
+    'organizationRoles' in user && 
+    user.organizationRoles.includes('org_admin');
+
+  const handleInputChange = (field: keyof Person, value: string) => {
+    setEditedUser(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
-  
-  const timezones = [
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'Europe/London',
-    'Europe/Paris',
-    'Asia/Tokyo',
-    'Australia/Sydney'
-  ];
-  
-  const languages = [
-    'English (US)',
-    'English (UK)',
-    'Spanish',
-    'French',
-    'German',
-    'Japanese',
-    'Chinese (Simplified)'
-  ];
+
+  const handleSocialLinkChange = (platform: string, value: string) => {
+    setEditedUser(prev => ({
+      ...prev,
+      socialLinks: {
+        ...prev.socialLinks,
+        [platform]: value
+      }
+    }));
+  };
+
+  const handleSave = () => {
+    // TODO: Implement save functionality
+    setIsEditing(false);
+  };
+
+  const renderField = (label: string, value: string, field: keyof Person) => {
+    return (
+      <div>
+        <Label className="text-[#3A366E] font-medium">{label}</Label>
+        {isEditing ? (
+          <Input
+            value={editedUser[field]?.toString() || ''}
+            onChange={(e) => handleInputChange(field, e.target.value)}
+            className="mt-1 border-[#A7CEBC] text-[#4C5760] placeholder-[#4C5760]"
+          />
+        ) : (
+          <p className="mt-1 text-[#4C5760]">{value || '-'}</p>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-8">
@@ -55,238 +83,206 @@ export const GeneralSettings = () => {
       </div>
 
       {/* Profile Section */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-medium text-[#3A366E]">Profile Information</h3>
-        
-        <Card className="border-[#A7CEBC]">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* Avatar Upload */}
-              <div className="flex flex-col items-center">
-                <Avatar className="w-24 h-24 mb-4">
-                  <AvatarFallback className="bg-[#3A366E] text-white text-xl">
-                    {user.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                  {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}
-                </Avatar>
-                <Button variant="outline" size="sm" className="border-[#A7CEBC]">
-                  <Camera size={14} className="mr-1" />
-                  Change Photo
-                </Button>
-              </div>
-              
-              {/* Profile Form */}
-              <div className="flex-grow space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-[#3A366E] mb-1 block">
-                      Full Name
-                    </label>
-                    <Input 
-                      defaultValue={user.name} 
-                      className="border-[#A7CEBC] focus-visible:ring-[#D15F36]" 
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-[#3A366E] mb-1 block">
-                      Job Title
-                    </label>
-                    <Input 
-                      defaultValue={user.title} 
-                      className="border-[#A7CEBC] focus-visible:ring-[#D15F36]" 
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-[#3A366E] mb-1 block">
-                      Email
-                    </label>
-                    <Input 
-                      type="email"
-                      defaultValue={user.email} 
-                      className="border-[#A7CEBC] focus-visible:ring-[#D15F36]" 
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-[#3A366E] mb-1 block">
-                      Phone
-                    </label>
-                    <Input 
-                      type="tel"
-                      defaultValue={user.phone} 
-                      className="border-[#A7CEBC] focus-visible:ring-[#D15F36]" 
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-[#3A366E] mb-1 block">
-                      Company
-                    </label>
-                    <Input 
-                      defaultValue={user.company} 
-                      className="border-[#A7CEBC] focus-visible:ring-[#D15F36]" 
-                    />
-                  </div>
-                </div>
-                
-                <div className="pt-2 flex justify-end">
-                  <Button className="bg-[#3A366E]">
-                    <Save size={16} className="mr-1" />
-                    Save Changes
-                  </Button>
-                </div>
-              </div>
+      <section className="bg-white rounded-lg border border-[#A7CEBC] p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-[#3A366E]">Profile Information</h2>
+          {canEditProfile && !isEditing && (
+            <Button
+              variant="outline"
+              onClick={() => setIsEditing(true)}
+              className="border-[#A7CEBC] text-[#4C5760] hover:bg-gray-50"
+            >
+              Edit Profile
+            </Button>
+          )}
+        </div>
+        <div className="flex items-start space-x-6">
+          <div className="flex-shrink-0">
+            <Avatar className="w-24 h-24">
+              {user.avatar ? (
+                <AvatarImage src={user.avatar} alt={user.name} />
+              ) : (
+                <AvatarFallback className="bg-[#3A366E] text-white">
+                  {user.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              )}
+            </Avatar>
+          </div>
+          <div className="flex-grow space-y-6">
+            <div className="grid grid-cols-2 gap-6">
+              {renderField('Full Name', user.name, 'name')}
+              {renderField('Email', user.email, 'email')}
+              {renderField('Phone', user.phone || '', 'phone')}
+              {renderField('Role', user.role, 'role')}
+              {renderField('Department', user.department || '', 'department')}
+              {renderField('Location', user.location || '', 'location')}
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div>
+              <Label className="text-[#3A366E] font-medium">Bio</Label>
+              {isEditing ? (
+                <textarea
+                  value={editedUser.bio || ''}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                  rows={4}
+                  className="mt-1 w-full rounded-md border border-[#A7CEBC] bg-white px-3 py-2 text-[#4C5760] text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D15F36] focus-visible:ring-offset-2"
+                />
+              ) : (
+                <p className="mt-1 text-[#4C5760]">{user.bio || '-'}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
-      {/* Preferences Section */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-medium text-[#3A366E]">Preferences</h3>
-        
-        <Card className="border-[#A7CEBC]">
-          <CardContent className="p-6 space-y-6">
-            {/* Region Settings */}
+      {/* Company Information */}
+      {user.isOrganizationMember && (
+        <section className="bg-white rounded-lg border border-[#A7CEBC] p-6">
+          <h2 className="text-xl font-semibold text-[#3A366E] mb-4">Company Information</h2>
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <h4 className="text-lg font-medium text-[#3A366E] mb-4">Region</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-[#3A366E] mb-1 block">
-                    Timezone
-                  </label>
-                  <select className="w-full p-2 border border-[#A7CEBC] rounded-md">
-                    {timezones.map(tz => (
-                      <option key={tz} selected={tz === user.timezone}>
-                        {tz}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-[#4C5760] mt-1">
-                    Current time: {new Date().toLocaleTimeString()}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-[#3A366E] mb-1 block">
-                    Language
-                  </label>
-                  <select className="w-full p-2 border border-[#A7CEBC] rounded-md">
-                    {languages.map(lang => (
-                      <option key={lang} selected={lang === user.language}>
-                        {lang}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-            
-            {/* Display Settings */}
-            <div>
-              <h4 className="text-lg font-medium text-[#3A366E] mb-4">Display</h4>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="bg-[#3A366E] bg-opacity-10 p-2 rounded-md">
-                    {darkMode ? <Moon size={20} className="text-[#3A366E]" /> : <Sun size={20} className="text-[#3A366E]" />}
-                  </div>
-                  <div>
-                    <p className="font-medium text-[#3A366E]">Dark Mode</p>
-                    <p className="text-sm text-[#4C5760]">Toggle between light and dark themes</p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={darkMode}
-                  onCheckedChange={setDarkMode}
+              <Label className="text-[#3A366E] font-medium">Company Name</Label>
+              {isEditing && canEditCompany ? (
+                <Input
+                  value={editedUser.company}
+                  onChange={(e) => handleInputChange('company', e.target.value)}
+                  className="mt-1 border-[#A7CEBC] text-[#4C5760] placeholder-[#4C5760]"
                 />
+              ) : (
+                <p className="mt-1 text-[#4C5760]">{user.company}</p>
+              )}
+            </div>
+            {'organizationId' in user && (
+              <div>
+                <Label className="text-[#3A366E] font-medium">Organization ID</Label>
+                <p className="mt-1 text-[#4C5760]">{user.organizationId}</p>
               </div>
-            </div>
-            
-            {/* Notification Settings */}
-            <div>
-              <h4 className="text-lg font-medium text-[#3A366E] mb-4">Notifications</h4>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-[#3A366E] bg-opacity-10 p-2 rounded-md">
-                      <Bell size={20} className="text-[#3A366E]" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#3A366E]">Email Notifications</p>
-                      <p className="text-sm text-[#4C5760]">Receive email updates about your projects</p>
-                    </div>
-                  </div>
-                  <Switch 
-                    checked={emailNotifications}
-                    onCheckedChange={setEmailNotifications}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-[#3A366E] bg-opacity-10 p-2 rounded-md">
-                      <Bell size={20} className="text-[#3A366E]" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#3A366E]">Browser Notifications</p>
-                      <p className="text-sm text-[#4C5760]">Get real-time alerts in your browser</p>
-                    </div>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-              </div>
-            </div>
-            
-            <div className="pt-2 flex justify-end">
-              <Button className="bg-[#3A366E]">
-                <Save size={16} className="mr-1" />
-                Save Preferences
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            )}
+          </div>
+        </section>
+      )}
 
-      {/* Change Password */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-medium text-[#3A366E]">Password</h3>
-        
-        <Card className="border-[#A7CEBC]">
-          <CardContent className="p-6">
-            <div className="max-w-md space-y-4">
-              <div>
-                <label className="text-sm font-medium text-[#3A366E] mb-1 block">
-                  Current Password
-                </label>
-                <Input 
-                  type="password"
-                  className="border-[#A7CEBC] focus-visible:ring-[#D15F36]" 
+      {/* Social Links */}
+      {user.isSignedUp && (
+        <section className="bg-white rounded-lg border border-[#A7CEBC] p-6">
+          <h2 className="text-xl font-semibold text-[#3A366E] mb-4">Social Links</h2>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <Label className="text-[#3A366E] font-medium">LinkedIn</Label>
+              {isEditing ? (
+                <Input
+                  value={editedUser.socialLinks?.linkedin || ''}
+                  onChange={(e) => handleSocialLinkChange('linkedin', e.target.value)}
+                  className="mt-1 border-[#A7CEBC] text-[#4C5760] placeholder-[#4C5760]"
                 />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-[#3A366E] mb-1 block">
-                  New Password
-                </label>
-                <Input 
-                  type="password"
-                  className="border-[#A7CEBC] focus-visible:ring-[#D15F36]" 
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-[#3A366E] mb-1 block">
-                  Confirm New Password
-                </label>
-                <Input 
-                  type="password"
-                  className="border-[#A7CEBC] focus-visible:ring-[#D15F36]" 
-                />
-              </div>
-              <div className="pt-2">
-                <Button className="bg-[#3A366E]">
-                  Change Password
-                </Button>
-              </div>
+              ) : (
+                <p className="mt-1 text-[#4C5760]">{user.socialLinks?.linkedin || '-'}</p>
+              )}
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div>
+              <Label className="text-[#3A366E] font-medium">Twitter</Label>
+              {isEditing ? (
+                <Input
+                  value={editedUser.socialLinks?.twitter || ''}
+                  onChange={(e) => handleSocialLinkChange('twitter', e.target.value)}
+                  className="mt-1 border-[#A7CEBC] text-[#4C5760] placeholder-[#4C5760]"
+                />
+              ) : (
+                <p className="mt-1 text-[#4C5760]">{user.socialLinks?.twitter || '-'}</p>
+              )}
+            </div>
+            <div>
+              <Label className="text-[#3A366E] font-medium">Website</Label>
+              {isEditing ? (
+                <Input
+                  value={editedUser.socialLinks?.website || ''}
+                  onChange={(e) => handleSocialLinkChange('website', e.target.value)}
+                  className="mt-1 border-[#A7CEBC] text-[#4C5760] placeholder-[#4C5760]"
+                />
+              ) : (
+                <p className="mt-1 text-[#4C5760]">{user.socialLinks?.website || '-'}</p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Preferences */}
+      {user.isSignedUp && 'profileSettings' in user && user.profileSettings && (
+        <section className="bg-white rounded-lg border border-[#A7CEBC] p-6">
+          <h2 className="text-xl font-semibold text-[#3A366E] mb-4">Preferences</h2>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-[#3A366E] font-medium">Language</Label>
+              {isEditing ? (
+                <Select disabled={!canEditProfile}>
+                  <SelectTrigger className="mt-1 border-[#A7CEBC] text-[#4C5760]">
+                    <SelectValue placeholder={user.profileSettings.language} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Spanish</SelectItem>
+                    <SelectItem value="fr">French</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="mt-1 text-[#4C5760]">
+                  {user.profileSettings.language === 'en' ? 'English' :
+                   user.profileSettings.language === 'es' ? 'Spanish' :
+                   user.profileSettings.language === 'fr' ? 'French' : '-'}
+                </p>
+              )}
+            </div>
+            <div>
+              <Label className="text-[#3A366E] font-medium">Timezone</Label>
+              {isEditing ? (
+                <Select disabled={!canEditProfile}>
+                  <SelectTrigger className="mt-1 border-[#A7CEBC] text-[#4C5760]">
+                    <SelectValue placeholder={user.profileSettings.timezone} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="America/New_York">Eastern Time</SelectItem>
+                    <SelectItem value="America/Chicago">Central Time</SelectItem>
+                    <SelectItem value="America/Denver">Mountain Time</SelectItem>
+                    <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="mt-1 text-[#4C5760]">{user.profileSettings.timezone}</p>
+              )}
+            </div>
+            <div className="flex items-center justify-between">
+              <Label className="text-[#3A366E] font-medium">Dark Mode</Label>
+              <Switch
+                checked={user.profileSettings.theme === 'dark'}
+                disabled={!isEditing || !canEditProfile}
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Action Buttons */}
+      {canEditProfile && isEditing && (
+        <div className="flex justify-end space-x-4">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsEditing(false);
+              setEditedUser(user);
+            }}
+            className="border-[#A7CEBC] text-[#4C5760] hover:bg-gray-50"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="default"
+            onClick={handleSave}
+            className="bg-[#3A366E] text-white hover:bg-[#3A366E]/90"
+          >
+            Save Changes
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

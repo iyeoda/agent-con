@@ -6,6 +6,39 @@ export interface BasePerson {
   company: string;
   avatar?: string;
   phone?: string;
+  department?: string;
+  location?: string;
+  bio?: string;
+  socialLinks?: {
+    linkedin?: string;
+    twitter?: string;
+    website?: string;
+  };
+  profileSettings?: {
+    timezone: string;
+    language: string;
+    theme: 'light' | 'dark';
+    notifications: {
+      email: boolean;
+      push: boolean;
+      desktop: boolean;
+      projectUpdates: boolean;
+      taskAssignments: boolean;
+      drawingUpdates: boolean;
+      mentions: boolean;
+      comments: boolean;
+    };
+    preferences: {
+      dashboardLayout: 'grid' | 'list';
+      emailDigest: 'daily' | 'weekly' | 'never';
+      taskView: 'kanban' | 'list';
+    };
+    security?: {
+      twoFactorEnabled: boolean;
+      lastPasswordChange: string;
+      sessionTimeout: number;
+    };
+  };
 }
 
 // Organization role types

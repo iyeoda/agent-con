@@ -15,15 +15,9 @@ import {
   Folder
 } from 'lucide-react';
 import Switch from './ui/switch';
+import { useUser } from '../contexts/UserContext';
 
 // Sample data - replace with real data from your backend
-const user = {
-  name: 'John Smith',
-  role: 'Project Manager',
-  avatar: null,
-  email: 'john.smith@acmeconstruction.com'
-};
-
 const recentProjects = [
   { id: '1', name: 'Woodside Project', lastAccessed: '2024-03-28T10:30:00Z' },
   { id: '2', name: 'Downtown Tower', lastAccessed: '2024-03-27T15:45:00Z' },
@@ -39,6 +33,15 @@ const notifications = [
 export const AvatarDropdown = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
+  const { currentUser, logout: userLogout } = useUser();
+
+  // Use current user data if available, otherwise use default
+  const user = currentUser || {
+    name: 'John Smith',
+    role: 'Project Manager',
+    avatar: null,
+    email: 'john.smith@acmeconstruction.com'
+  };
 
   const handleNavigation = (path: string) => {
     try {
@@ -50,8 +53,8 @@ export const AvatarDropdown = () => {
   };
 
   const handleSignOut = () => {
-    // Implement sign out logic
-    console.log('Signing out...');
+    // Call the logout function from user context
+    userLogout();
     // After sign out, navigate to login page
     handleNavigation('/login');
   };
@@ -104,41 +107,35 @@ export const AvatarDropdown = () => {
           ))}
         </div>
 
-        {/* Theme Toggle */}
-        <DropdownMenuItem className="flex items-center justify-between">
-          <div className="flex items-center">
-            {darkMode ? (
-              <Moon size={16} className="mr-2 text-[#4C5760]" />
-            ) : (
-              <Sun size={16} className="mr-2 text-[#4C5760]" />
-            )}
-            <span className="text-sm">Dark Mode</span>
-          </div>
-          <Switch
-            checked={darkMode}
-            onCheckedChange={setDarkMode}
-          />
-        </DropdownMenuItem>
-
         {/* Notifications */}
         <div className="px-3 py-2 border-b border-[#A7CEBC]">
-          <div className="text-xs font-medium text-[#3A366E] mb-2">Recent Notifications</div>
+          <div className="text-xs font-medium text-[#3A366E] mb-2">Notifications</div>
           {notifications.map(notification => (
-            <DropdownMenuItem key={notification.id} className="flex flex-col items-start">
-              <div className="flex items-center justify-between w-full">
-                <span className="text-sm font-medium">{notification.title}</span>
-                <span className="text-xs text-[#4C5760]">{notification.time}</span>
-              </div>
-              <span className="text-xs text-[#4C5760]">{notification.message}</span>
+            <DropdownMenuItem 
+              key={notification.id} 
+              className="flex flex-col items-start"
+            >
+              <div className="text-sm font-medium">{notification.title}</div>
+              <div className="text-xs text-[#4C5760]">{notification.message}</div>
+              <div className="text-xs text-[#4C5760] mt-1">{notification.time}</div>
             </DropdownMenuItem>
           ))}
         </div>
 
+        {/* Theme Toggle */}
+        <div className="px-3 py-2 border-b border-[#A7CEBC]">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-medium text-[#3A366E]">Dark Mode</div>
+            <Switch 
+              checked={darkMode} 
+              onCheckedChange={setDarkMode}
+              aria-label="Toggle dark mode"
+            />
+          </div>
+        </div>
+
         {/* Sign Out */}
-        <DropdownMenuItem 
-          onClick={handleSignOut}
-          className="text-red-600 focus:text-red-600"
-        >
+        <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
           <LogOut size={16} className="mr-2" />
           Sign Out
         </DropdownMenuItem>

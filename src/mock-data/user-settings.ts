@@ -1,7 +1,9 @@
 import { UserSettings } from '../types';
 
 export const mockUserSettings: UserSettings = {
-  id: 'SET-001',
+  timezone: 'America/New_York',
+  language: 'en',
+  theme: 'light',
   notifications: {
     email: true,
     push: true,
@@ -12,9 +14,6 @@ export const mockUserSettings: UserSettings = {
     mentions: true,
     comments: true
   },
-  theme: 'light',
-  language: 'en',
-  timezone: 'America/New_York',
   preferences: {
     dashboardLayout: 'grid',
     emailDigest: 'daily',

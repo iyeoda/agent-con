@@ -248,6 +248,7 @@
       - Keyboard accessible (Esc to dismiss)
 
 15. **Mock Data Handling**
+    All mutable data should be obtained from mock data. Where this does not exist it should be created.
     - **Initialization**:
       - Mock data initialized only when arrays are empty
       - Uses spread operator to create independent copies
