@@ -1,34 +1,37 @@
-import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios from 'axios';
+import config from '../config';
 
 // Base API configuration
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api',
+  baseURL: config.apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 // Request interceptor for adding auth token
-api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 // Response interceptor for handling errors
 api.interceptors.response.use(
-  (response: AxiosResponse) => {
-    if (!response.data) {
-      throw new Error('No data received from server');
-    }
-    return response as AxiosResponse<NonNullable<typeof response.data>>;
+  (response) => {
+    // Any status code between 200 and 299 triggers this function
+    return response.data;
   },
-  (error: AxiosError) => {
+  (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem('auth_token');
+      // Redirect to login page or refresh token
       window.location.href = '/login';
     }
     return Promise.reject(error);

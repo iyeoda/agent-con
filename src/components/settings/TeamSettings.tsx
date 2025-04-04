@@ -1,94 +1,142 @@
-import React, { useState, ChangeEvent } from 'react';
-import { Card, CardContent } from '../ui/card';
+import React, { useState, ChangeEvent, useEffect } from 'react';
+import { Card } from '../ui/card';
 import Button from '../ui/button';
 import Input from '../ui/input';
 import { Label } from '../ui/label';
 import Dialog from '../ui/dialog';
+import ConfirmationDialog from '../ui/confirmation-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Plus, MoreHorizontal, UserPlus, Mail, Building } from 'lucide-react';
-
-interface TeamMember {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  joinedAt: string;
-  status: 'active' | 'pending';
-  projects: string[];
-}
+import { UserPlus, Mail, Building, MoreHorizontal } from 'lucide-react';
+import { Person, isOrganizationUser } from '../../types/users';
+import { getOrganizationUsers } from '../../mock-data/people';
+import { userManagementService } from '../../services/user-management';
+import { toast } from 'react-hot-toast';
 
 const TeamSettings: React.FC = () => {
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [isConfirmRemoveOpen, setIsConfirmRemoveOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [organizationMembers, setOrganizationMembers] = useState<Person[]>([]);
 
-  // Mock team members data - replace with actual data from your backend
-  const teamMembers: TeamMember[] = [
-    {
-      id: '1',
-      name: 'Sarah Chen',
-      email: 'sarah.chen@example.com',
-      role: 'Project Manager',
-      joinedAt: '2024-01-15',
-      status: 'active',
-      projects: ['Woodside Tower', 'City Center Mall']
-    },
-    {
-      id: '2',
-      name: 'Mike Johnson',
-      email: 'mike.j@example.com',
-      role: 'Engineer',
-      joinedAt: '2024-02-01',
-      status: 'active',
-      projects: ['Riverfront Apartments']
-    },
-    {
-      id: '3',
-      name: 'Elena Rodriguez',
-      email: 'elena.r@example.com',
-      role: 'Architect',
-      joinedAt: '2024-02-15',
-      status: 'pending',
-      projects: []
-    }
-  ];
+  // Organization ID - in a real app, this would come from context or props
+  const organizationId = 'ACME-001';
 
-  const filteredMembers = teamMembers.filter(member => 
+  // Fetch organization members
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        setIsLoading(true);
+        const members = await userManagementService.getOrganizationMembers(organizationId);
+        setOrganizationMembers(members);
+      } catch (error) {
+        console.error('Error fetching organization members:', error);
+        toast.error('Failed to load organization members');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMembers();
+  }, [organizationId]);
+
+  const filteredMembers = organizationMembers.filter(member => 
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     member.role.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleAddMember = async () => {
+    if (!name || !email || !role) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await userManagementService.addOrganizationMember(organizationId, name, email, role);
+      
+      // Refresh the organization members list
+      const updatedMembers = await userManagementService.getOrganizationMembers(organizationId);
+      setOrganizationMembers(updatedMembers);
+      
+      // Reset form and close modal
+      setName('');
+      setEmail('');
+      setRole('');
+      setIsAddMemberOpen(false);
+      
+      toast.success('Invitation sent successfully');
+    } catch (error) {
+      console.error('Error adding organization member:', error);
+      toast.error('Failed to send invitation');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const openRemoveConfirmation = (memberId: string) => {
+    setMemberToRemove(memberId);
+    setIsConfirmRemoveOpen(true);
+  };
+
+  const handleRemoveMember = async () => {
+    if (!memberToRemove) return;
+
+    try {
+      setIsLoading(true);
+      await userManagementService.removeOrganizationMember(organizationId, memberToRemove);
+      
+      // Refresh the organization members list
+      const updatedMembers = await userManagementService.getOrganizationMembers(organizationId);
+      setOrganizationMembers(updatedMembers);
+      
+      toast.success('Member removed successfully');
+    } catch (error) {
+      console.error('Error removing organization member:', error);
+      toast.error('Failed to remove member');
+    } finally {
+      setIsLoading(false);
+      setMemberToRemove(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Organization Team Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-[#3A366E] mb-2">Organization Team</h2>
-        <p className="text-[#4C5760]">
-          Manage your organization's team members and their roles. Team members can be assigned to specific projects.
-        </p>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <div className="relative flex-grow max-w-md">
-          <Input
-            placeholder="Search members..."
-            value={searchQuery}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-            className="pl-10 border-[#A7CEBC]"
-          />
-          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-[#3A366E] mb-2">Organization Team</h2>
+          <p className="text-[#4C5760]">
+            Manage your organization's team members
+          </p>
         </div>
         <Button 
           onClick={() => setIsAddMemberOpen(true)}
           className="bg-[#D15F36] text-white hover:bg-opacity-90"
+          disabled={isLoading}
         >
           <UserPlus className="h-4 w-4 mr-2" />
           Add Member
         </Button>
       </div>
 
-      {/* Team Members List */}
+      <div className="relative max-w-md">
+        <Input
+          placeholder="Search team members..."
+          value={searchQuery}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+          className="pl-10 border-[#A7CEBC]"
+        />
+        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+      </div>
+
+      {/* Organization Team Members List */}
       <Card className="border-[#A7CEBC]">
         <div className="divide-y divide-[#A7CEBC]">
           {/* Table Header */}
@@ -102,99 +150,145 @@ const TeamSettings: React.FC = () => {
           </div>
           
           {/* Team Member Rows */}
-          {filteredMembers.map(member => (
-            <div key={member.id} className="grid grid-cols-12 p-4 items-center hover:bg-gray-50">
-              <div className="col-span-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#F7F5F2] flex items-center justify-center">
-                    <Building className="h-4 w-4 text-[#4C5760]" />
+          {isLoading && organizationMembers.length === 0 ? (
+            <div className="p-4 text-center text-gray-500">Loading members...</div>
+          ) : filteredMembers.length === 0 ? (
+            <div className="p-4 text-center text-gray-500">No members found</div>
+          ) : (
+            filteredMembers.map(member => (
+              <div key={member.id} className="grid grid-cols-12 p-4 items-center hover:bg-gray-50">
+                <div className="col-span-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#F7F5F2] flex items-center justify-center">
+                      <Building className="h-4 w-4 text-[#4C5760]" />
+                    </div>
+                    <div className="font-medium text-[#3A366E]">{member.name}</div>
                   </div>
-                  <div className="font-medium text-[#3A366E]">{member.name}</div>
+                </div>
+                <div className="col-span-3 text-[#4C5760]">{member.email}</div>
+                <div className="col-span-2 text-[#4C5760]">{member.role}</div>
+                <div className="col-span-2">
+                  {isOrganizationUser(member) && member.projectIds.length > 0 ? (
+                    <span className="text-[#4C5760]">
+                      {member.projectIds.length} project{member.projectIds.length !== 1 ? 's' : ''}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">No projects</span>
+                  )}
+                </div>
+                <div className="col-span-1">
+                  {isOrganizationUser(member) && (
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      member.status === 'active' 
+                        ? 'bg-green-100 text-green-800'
+                        : member.status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {member.status}
+                    </span>
+                  )}
+                </div>
+                <div className="col-span-1">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Change Role</DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className="text-red-600"
+                        onClick={() => openRemoveConfirmation(member.id)}
+                      >
+                        Remove from Organization
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
-              <div className="col-span-3 text-[#4C5760]">{member.email}</div>
-              <div className="col-span-2 text-[#4C5760]">{member.role}</div>
-              <div className="col-span-2 text-[#4C5760]">
-                {member.projects.length > 0 ? `${member.projects.length} projects` : 'No projects'}
-              </div>
-              <div className="col-span-1">
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  member.status === 'active' 
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {member.status}
-                </span>
-              </div>
-              <div className="col-span-1">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      View Projects
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      Edit Role
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600">
-                      Remove Member
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </Card>
 
       {/* Add Member Modal */}
       <Dialog
-        title="Add Team Member"
+        title="Add Organization Member"
         content={
           <div className="space-y-4">
             <div>
-              <Label>Email Address</Label>
-              <Input className="mt-1" type="email" placeholder="Enter team member's email" />
+              <Label>Full Name</Label>
+              <Input
+                type="text"
+                placeholder="Enter full name"
+                value={name}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                className="mt-1"
+              />
             </div>
             <div>
-              <Label>Organization Role</Label>
-              <Select>
+              <Label>Email Address</Label>
+              <Input
+                type="email"
+                placeholder="Enter email address"
+                value={email}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Role</Label>
+              <Select value={role} onValueChange={setRole}>
                 <SelectTrigger className="w-full mt-1">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="project-manager">Project Manager</SelectItem>
+                  <SelectItem value="admin">Administrator</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
                   <SelectItem value="member">Member</SelectItem>
+                  <SelectItem value="viewer">Viewer</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-sm text-[#4C5760] mt-1">
-                Project-specific roles can be assigned when adding members to projects.
-              </p>
             </div>
             <div className="flex justify-end gap-2 mt-6">
-              <Button variant="outline" onClick={() => setIsAddMemberOpen(false)}>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setName('');
+                  setEmail('');
+                  setRole('');
+                  setIsAddMemberOpen(false);
+                }}
+                disabled={isLoading}
+              >
                 Cancel
               </Button>
-              <Button className="bg-[#D15F36] text-white hover:bg-opacity-90">
-                Send Invitation
+              <Button 
+                className="bg-[#D15F36] text-white hover:bg-opacity-90"
+                onClick={handleAddMember}
+                disabled={isLoading || !name || !email || !role}
+              >
+                {isLoading ? 'Sending...' : 'Send Invitation'}
               </Button>
             </div>
           </div>
         }
-      >
-        <Button 
-          onClick={() => setIsAddMemberOpen(true)}
-          className="bg-[#D15F36] text-white hover:bg-opacity-90"
-        >
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add Member
-        </Button>
-      </Dialog>
+        open={isAddMemberOpen}
+        onOpenChange={setIsAddMemberOpen}
+      />
+
+      {/* Confirmation Dialog for Removing Member */}
+      <ConfirmationDialog
+        isOpen={isConfirmRemoveOpen}
+        onClose={() => setIsConfirmRemoveOpen(false)}
+        onConfirm={handleRemoveMember}
+        title="Remove Member"
+        message="Are you sure you want to remove this member from the organization?"
+        confirmText="Remove"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

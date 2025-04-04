@@ -213,3 +213,90 @@
     - Mock data provides consistent test cases
     - Integration tests can swap mock data for API calls
     - E2E tests can use mock data for predictable scenarios
+
+14. **Toast Notifications**
+    - **Usage Guidelines**:
+      - Success toasts: Green background (bg-green-100) with success icon
+        - After successful form submissions
+        - When operations complete successfully (add/remove members, save settings)
+        - When connections are established
+      - Error toasts: Red background (bg-red-100) with error icon
+        - API failures
+        - Validation errors
+        - Connection failures
+        - Permission denied scenarios
+      - Info toasts: Blue background (bg-blue-100) with info icon
+        - Status updates
+        - Background process completions
+        - Non-critical notifications
+      - Warning toasts: Yellow background (bg-yellow-100) with warning icon
+        - Before destructive actions
+        - Resource limitations
+        - Configuration issues
+    
+    - **Positioning and Timing**:
+      - Default position: top-right corner
+      - Stack vertically with newest on top
+      - Auto-dismiss after 5 seconds for success/info
+      - Error/warning toasts require manual dismissal
+      - Maximum 5 toasts visible at once
+    
+    - **Interaction**:
+      - Click to dismiss
+      - Hover to pause auto-dismiss timer
+      - Optional action buttons for complex notifications
+      - Keyboard accessible (Esc to dismiss)
+
+15. **Mock Data Handling**
+    - **Initialization**:
+      - Mock data initialized only when arrays are empty
+      - Uses spread operator to create independent copies
+      - Preserves data structure matching API responses
+      - Maintains referential integrity between related data
+    
+    - **Persistence**:
+      - Changes persist during the session
+      - Separate storage for different entity types
+      - Updates reflect immediately in UI
+      - Reset on page refresh
+    
+    - **Type Safety**:
+      - Mock data follows same interfaces as API responses
+      - Type guards ensure correct data handling
+      - Consistent error handling with API responses
+      - Type-safe CRUD operations
+    
+    - **Development Features**:
+      - Configurable delay simulation
+      - Error scenario testing
+      - Network condition simulation
+      - Relationship maintenance between entities
+
+16. **Environment Variables**
+    - **Configuration**:
+      - NODE_ENV: Determines runtime environment
+        - 'development': Enables debug logging, mock data
+        - 'production': Disables debug features
+        - 'test': Enables test-specific behavior
+      - REACT_APP_API_URL: Base URL for API requests
+      - REACT_APP_USE_MOCK_DATA: Toggle mock data usage
+      - REACT_APP_DEBUG_LEVEL: Control debug output
+    
+    - **Usage Guidelines**:
+      - Access via process.env
+      - Type-safe using TypeScript
+      - Default values for development
+      - Documentation required for all env vars
+      - Validation on application startup
+    
+    - **Security**:
+      - Sensitive values only in .env.local
+      - No secrets in version control
+      - Runtime environment validation
+      - Secure handling of API keys
+    
+    - **Development Workflow**:
+      - .env.example for documentation
+      - Environment-specific configs
+      - Local override support
+      - CI/CD integration
