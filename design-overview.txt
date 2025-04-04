@@ -300,3 +300,49 @@
       - Environment-specific configs
       - Local override support
       - CI/CD integration
+
+17. **Organization Role Management**
+    - **Multiple Role Support**:
+      - Users can have multiple organization roles simultaneously
+      - Roles include: 'billing_admin', 'org_admin', and 'standard'
+      - At least one role must be assigned at all times
+      - Role changes are managed through a dedicated interface
+    
+    - **Role Selection UI**:
+      - Checkbox-based selection for multiple roles
+      - Visual indicators for each role type:
+        - Billing Admin: CreditCard icon with orange accent
+        - Organization Admin: Users icon with indigo accent
+        - Standard User: User icon with slate accent
+      - Role badges display in member list with appropriate icons
+      - Consistent styling with the app's design system
+    
+    - **Role Management Workflows**:
+      - Add Member: Role selection during invitation process
+      - Change Roles: Dedicated dialog for modifying existing roles
+      - Remove Member: Confirmation dialog before removal
+      - Role validation to prevent removing all roles
+    
+    - **Visual Hierarchy**:
+      - Role badges use consistent styling with rounded corners
+      - Icons provide immediate visual recognition
+      - Text labels maintain readability with appropriate contrast
+      - Hover states for interactive elements follow global patterns
+    
+    - **Accessibility Considerations**:
+      - Checkbox inputs are properly labeled
+      - Role changes provide appropriate feedback
+      - Keyboard navigation supported for all role management actions
+      - Screen reader friendly role descriptions
+    
+    - **State Management**:
+      - Role changes trigger immediate UI updates
+      - Optimistic updates for better user experience
+      - Error handling for failed role changes
+      - Loading states during role updates
+    
+    - **Data Structure**:
+      - OrganizationRoles type as array of OrganizationRole
+      - Consistent role identifiers across the application
+      - Type-safe role operations throughout the codebase
+      - Clear separation between organization roles and project roles
