@@ -8,13 +8,18 @@ import {
   Shield, Lock, Key, Smartphone, Eye, EyeOff, UserCheck, 
   AlertTriangle, Clock, RefreshCw, LogOut, Save, Info, Settings, CheckCircle 
 } from 'lucide-react';
+import { useUser } from '@clerk/clerk-react';
+import { toast } from 'react-hot-toast';
 
 export const SecuritySettings = () => {
+  const { user } = useUser();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   
   // Sample session data
   const activeSessions = [
@@ -82,10 +87,44 @@ export const SecuritySettings = () => {
     },
   ];
 
-  const handlePasswordChange = (e: FormEvent<HTMLFormElement>) => {
+  const handlePasswordChange = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Implementation would handle password change
-    alert('Password change functionality would be implemented here');
+    setPasswordError(null);
+    setIsUpdatingPassword(true);
+
+    const formData = new FormData(e.currentTarget);
+    const currentPassword = formData.get('currentPassword') as string;
+    const newPassword = formData.get('newPassword') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match');
+      setIsUpdatingPassword(false);
+      return;
+    }
+
+    try {
+      await user?.updatePassword({
+        currentPassword,
+        newPassword,
+      });
+      
+      // Clear the form
+      e.currentTarget.reset();
+      
+      // Reset states
+      setShowCurrentPassword(false);
+      setShowNewPassword(false);
+      setShowConfirmPassword(false);
+      
+      // Show success toast
+      toast.success('Password updated successfully');
+    } catch (error) {
+      setPasswordError('Failed to update password. Please check your current password and try again.');
+      console.error('Password update error:', error);
+    } finally {
+      setIsUpdatingPassword(false);
+    }
   };
   
   const handleEnableTwoFactor = () => {
@@ -142,8 +181,10 @@ export const SecuritySettings = () => {
                 </label>
                 <div className="relative">
                   <Input 
+                    name="currentPassword"
                     type={showCurrentPassword ? "text" : "password"} 
-                    className="border-[#A7CEBC] focus-visible:ring-[#D15F36] pr-10" 
+                    className="border-[#A7CEBC] focus-visible:ring-[#D15F36] pr-10"
+                    required
                   />
                   <button 
                     type="button" 
@@ -161,8 +202,10 @@ export const SecuritySettings = () => {
                 </label>
                 <div className="relative">
                   <Input 
+                    name="newPassword"
                     type={showNewPassword ? "text" : "password"} 
-                    className="border-[#A7CEBC] focus-visible:ring-[#D15F36] pr-10" 
+                    className="border-[#A7CEBC] focus-visible:ring-[#D15F36] pr-10"
+                    required
                   />
                   <button 
                     type="button" 
@@ -189,8 +232,10 @@ export const SecuritySettings = () => {
                 </label>
                 <div className="relative">
                   <Input 
+                    name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"} 
-                    className="border-[#A7CEBC] focus-visible:ring-[#D15F36] pr-10" 
+                    className="border-[#A7CEBC] focus-visible:ring-[#D15F36] pr-10"
+                    required
                   />
                   <button 
                     type="button" 
@@ -201,10 +246,29 @@ export const SecuritySettings = () => {
                   </button>
                 </div>
               </div>
+
+              {passwordError && (
+                <div className="text-red-600 text-sm mt-2">
+                  {passwordError}
+                </div>
+              )}
               
-              <Button type="submit" className="bg-[#3A366E]">
-                <Save size={16} className="mr-1" />
-                Update Password
+              <Button 
+                type="submit" 
+                className="bg-[#3A366E]"
+                disabled={isUpdatingPassword}
+              >
+                {isUpdatingPassword ? (
+                  <>
+                    <RefreshCw size={16} className="mr-2 animate-spin" />
+                    Updating Password...
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} className="mr-1" />
+                    Update Password
+                  </>
+                )}
               </Button>
             </form>
           </CardContent>

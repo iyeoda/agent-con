@@ -1,13 +1,12 @@
 import React from 'react';
-import { useUser } from '../../contexts/UserContext';
-import { BasePerson } from '../../types/users';
+import { useUser } from '@clerk/clerk-react';
 import { Button } from '../ui';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 
-const InfoRow: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+const InfoRow: React.FC<{ label: string; value: string | null | undefined }> = ({ label, value }) => (
   <div className="flex justify-between items-center py-2">
     <div className="text-sm text-[#4C5760]">{label}</div>
-    <div className="text-sm text-[#3A366E] font-medium">{value}</div>
+    <div className="text-sm text-[#3A366E] font-medium">{value || 'Not set'}</div>
   </div>
 );
 
@@ -16,7 +15,7 @@ const SectionTitle: React.FC<{ title: string }> = ({ title }) => (
 );
 
 export const GeneralSettings: React.FC = () => {
-  const { currentUser } = useUser();
+  const { user } = useUser();
 
   const handleEditProfile = () => {
     // TODO: Implement edit profile functionality
@@ -45,59 +44,69 @@ export const GeneralSettings: React.FC = () => {
 
         <div className="flex items-start gap-6">
           <Avatar className="h-24 w-24">
-            {currentUser?.avatar ? (
-              <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
+            {user?.imageUrl ? (
+              <AvatarImage src={user.imageUrl} alt={user.fullName || ''} />
             ) : (
               <AvatarFallback className="text-xl bg-[#3A366E] text-white">
-                {currentUser?.name?.split(' ').map(n => n[0]).join('') || 'SC'}
+                {user?.fullName?.split(' ').map(n => n[0]).join('') || '?'}
               </AvatarFallback>
             )}
           </Avatar>
 
           <div className="flex-1 space-y-4">
             <div className="grid grid-cols-2 gap-x-8">
-              <InfoRow label="Full Name" value={currentUser?.name || 'Sarah Chen'} />
-              <InfoRow label="Email" value={currentUser?.email || 'sarah.chen@acme.com'} />
-              <InfoRow label="Phone" value={currentUser?.phone || '555-987-6543'} />
-              <InfoRow label="Role" value={currentUser?.role || 'Project Manager'} />
-              <InfoRow label="Department" value={currentUser?.department || 'Project Management'} />
-              <InfoRow label="Location" value={currentUser?.location || 'San Francisco, CA'} />
+              <InfoRow label="Full Name" value={user?.fullName} />
+              <InfoRow label="Email" value={user?.primaryEmailAddress?.emailAddress} />
+              <InfoRow label="Phone" value={user?.primaryPhoneNumber?.phoneNumber} />
+              <InfoRow label="Username" value={user?.username} />
+              <InfoRow label="Created At" value={user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : undefined} />
+              <InfoRow label="Last Updated" value={user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : undefined} />
             </div>
 
             <div>
-              <div className="text-sm text-[#4C5760] mb-1">Bio</div>
+              <div className="text-sm text-[#4C5760] mb-1">Account Status</div>
               <div className="text-sm text-[#3A366E]">
-                {currentUser?.bio || 'Experienced project manager with a focus on sustainable construction practices.'}
+                {(user?.unsafeMetadata as { status?: string })?.status || 'Active'}
               </div>
             </div>
           </div>
         </div>
 
         <div className="pt-6 border-t border-[#A7CEBC]">
-          <SectionTitle title="Company Information" />
+          <SectionTitle title="Organization Information" />
           <div className="grid grid-cols-2 gap-x-8">
-            <InfoRow 
-              label="Company Name" 
-              value={currentUser?.company || 'Acme Construction'} 
-            />
-            <InfoRow 
-              label="Organization ID" 
-              value={currentUser?.organizationId || 'ACME-001'} 
-            />
+            {user?.organizationMemberships?.map((membership) => (
+              <React.Fragment key={membership.organization.id}>
+                <InfoRow 
+                  label="Organization Name" 
+                  value={membership.organization.name} 
+                />
+                <InfoRow 
+                  label="Organization ID" 
+                  value={membership.organization.id} 
+                />
+                <InfoRow 
+                  label="Role" 
+                  value={membership.role} 
+                />
+              </React.Fragment>
+            ))}
           </div>
         </div>
 
         <div className="pt-6 border-t border-[#A7CEBC]">
-          <SectionTitle title="Social Links" />
+          <SectionTitle title="External Accounts" />
           <div className="grid grid-cols-2 gap-x-8">
-            <InfoRow 
-              label="LinkedIn" 
-              value={currentUser?.socialLinks?.linkedin || 'https://linkedin.com/in/sarahchen'} 
-            />
-            <InfoRow 
-              label="Twitter" 
-              value={currentUser?.socialLinks?.twitter || 'https://twitter.com/sarahchen'} 
-            />
+            {user?.externalAccounts?.map((account) => (
+              <InfoRow 
+                key={account.id}
+                label={`${account.provider.charAt(0).toUpperCase() + account.provider.slice(1)} Account`} 
+                value={account.username || account.emailAddress} 
+              />
+            ))}
+            {(!user?.externalAccounts || user.externalAccounts.length === 0) && (
+              <div className="text-sm text-[#4C5760]">No external accounts linked</div>
+            )}
           </div>
         </div>
       </div>

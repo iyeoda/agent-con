@@ -6,7 +6,7 @@ const mockOrganizationUsers: OrganizationUser[] = [
   {
     id: 'ORG-001',
     name: 'Sarah Chen',
-    email: 'sarah.chen@acme.com',
+    email: 'test@example.com',
     role: 'Project Manager',
     company: 'Acme Construction',
     isSignedUp: true,
