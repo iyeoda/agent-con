@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, useParams } from "react-router-dom";
 import Input from "./ui/input";
-import { Settings, Folder, LayoutDashboard, Bot, Sparkles, Calendar, Briefcase, Users, LogOut, Menu, X, History } from "lucide-react";
+import { Settings, Folder, LayoutDashboard, Bot, Sparkles, Calendar, Briefcase, Users, LogOut, Menu, X, History, FileText } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import SearchModal from "./SearchModal";
@@ -18,6 +18,7 @@ import ProjectCalendarView from "./ProjectCalendarView";
 import WorkspaceSection from "./WorkspaceSection";
 import WorkspaceItemDetail from "./workspace/WorkspaceItemDetail";
 import ActivityLogPage from "./ActivityLogPage";
+import Reports from "./reports/Reports";
 
 // Mock project data
 const defaultProject: Project = {
@@ -172,6 +173,18 @@ const AppContent = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div 
+                  className={`flex items-center gap-2 w-full px-4 cursor-pointer ${currentView === 'reports' ? 'text-[#D15F36]' : ''}`}
+                  onClick={() => handleViewChange('reports')}
+                >
+                  <FileText className={`min-w-[24px] w-6 h-6 ${currentView === 'reports' ? 'text-[#D15F36]' : 'text-[#3A366E] hover:text-[#D15F36]'}`} />
+                  <span className="text-[#4C5760] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Reports</span>
+                </div>
+              </TooltipTrigger>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div 
                   className={`flex items-center gap-2 w-full px-4 cursor-pointer ${currentView === 'activity' ? 'text-[#D15F36]' : ''}`}
                   onClick={() => handleViewChange('activity')}
                 >
@@ -238,6 +251,7 @@ const AppContent = () => {
               <Route path="/workspace/item/:itemId" element={<WorkspaceItemDetail />} />
               <Route path="/data" element={<ProjectDataSection />} />
               <Route path="/data/drawings/:drawingId" element={<DrawingDetail />} />
+              <Route path="/reports/*" element={<Reports projectId={currentProject.id} />} />
               <Route path="/agents" element={<AgentsSection agents={currentProject.agents} />} />
               <Route path="/calendar" element={<ProjectCalendarView projectId={currentProject.id} />} />
               <Route path="/activity" element={<ActivityLogPage projectId={currentProject.id} />} />
