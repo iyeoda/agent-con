@@ -347,3 +347,64 @@
       - Consistent role identifiers across the application
       - Type-safe role operations throughout the codebase
       - Clear separation between organization roles and project roles
+
+18. **Comments Feature Implementation**
+    - **Component Architecture**:
+      - `CommentsSection`: A reusable component for displaying and adding comments on any entity
+      - Integrated into both `DrawingDetail` and `WorkspaceItemDetail` components
+      - Follows the project's design system with consistent styling
+      - Supports entity-specific comments with proper type safety
+    
+    - **Data Structure**:
+      - `CommentableEntityType`: Union type defining entities that can have comments
+        - Includes: 'drawing', 'task', 'query', 'file', 'workspace_item'
+      - `Comment` interface with properties:
+        - Core fields: id, content, createdAt, createdBy, updatedAt
+        - Entity reference: entityType, entityId, projectId
+        - Optional fields: parentId (for nested comments), mentions, attachments
+      - Attachments include: id, name, url, type, and size
+    
+    - **Mock Data Handling**:
+      - Centralized mock data in `src/mock-data/comments.ts`
+      - Helper functions for generating realistic comment data
+      - Functions to retrieve comments by entity, project, or user
+      - Random date generation within the last 30 days for realistic timestamps
+      - Proper relationships between comments and their parent entities
+    
+    - **UI Components**:
+      - Card-based layout with consistent styling
+      - Avatar display for comment authors with fallback to initials
+      - Formatted timestamps using date-fns
+      - Support for mentions and attachments display
+      - Responsive design that works across different viewport sizes
+    
+    - **User Experience**:
+      - Real-time comment updates (simulated with state management)
+      - Loading states during data fetching
+      - Error handling for failed operations
+      - Empty state messaging when no comments exist
+      - Form validation to prevent empty comments
+    
+    - **Navigation Integration**:
+      - Comments accessible from entity detail views
+      - Proper routing between list and detail views
+      - Back navigation to return to the previous view
+      - URL parameters for entity identification
+    
+    - **Styling Consistency**:
+      - Follows the app's color scheme:
+        - Indigo (#3A366E) for headings
+        - Orange (#D15F36) for active elements
+        - Mint (#A7CEBC) for borders
+        - Slate (#4C5760) for regular text
+      - Consistent spacing and typography
+      - Proper hover and focus states
+      - Accessible color contrast
+    
+    - **Future Enhancements**:
+      - Rich text editing for comments
+      - File upload integration
+      - Real-time updates with WebSockets
+      - Comment threading and replies
+      - Notification system for mentions
+      - Comment moderation tools
