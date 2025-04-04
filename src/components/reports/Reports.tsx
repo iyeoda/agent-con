@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import { mockReports, reportCategories, reportFormats } from '../../mock-data/reports';
 import { Report, ReportCategory, ReportFormat } from '../../types/reports';
@@ -15,17 +15,35 @@ const Reports: React.FC<ReportsProps> = ({ projectId }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<ReportCategory[]>([]);
   const [selectedFormats, setSelectedFormats] = useState<ReportFormat[]>([]);
-  const [recentReports, setRecentReports] = useState<Report[]>(mockReports.slice(0, 3));
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
-  const filteredReports = mockReports.filter(report => {
-    const matchesSearch = report.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(report.category);
-    const matchesFormat = selectedFormats.length === 0 || selectedFormats.includes(report.format);
-    return matchesSearch && matchesCategory && matchesFormat;
-  });
+  // Filter reports by current project
+  const projectReports = useMemo(() => 
+    mockReports.filter(report => report.projectId === projectId),
+    [projectId]
+  );
+
+  // Get recently accessed reports for the current project
+  const recentReports = useMemo(() => 
+    projectReports.slice(0, 3),
+    [projectReports]
+  );
+
+  const filteredReports = useMemo(() => 
+    projectReports.filter(report => {
+      const matchesSearch = report.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(report.category);
+      const matchesFormat = selectedFormats.length === 0 || selectedFormats.includes(report.format);
+      return matchesSearch && matchesCategory && matchesFormat;
+    }),
+    [projectReports, searchQuery, selectedCategories, selectedFormats]
+  );
 
   const handleReportClick = (reportId: string) => {
-    navigate(`/project/${projectId}/reports/${reportId}`);
+    const report = mockReports.find(r => r.id === reportId);
+    if (report) {
+      setSelectedReport(report);
+    }
   };
 
   const handleNewReport = () => {
@@ -90,7 +108,7 @@ const Reports: React.FC<ReportsProps> = ({ projectId }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 bg-[#F7F5F2] p-6">
+      <div className={`flex-1 bg-[#F7F5F2] p-6 ${selectedReport ? 'mr-[480px]' : ''}`}>
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold text-[#3A366E]">Reports</h1>
           <button 
@@ -108,7 +126,9 @@ const Reports: React.FC<ReportsProps> = ({ projectId }) => {
             {recentReports.map(report => (
               <div 
                 key={report.id} 
-                className="bg-[#F7F5F2] rounded-md p-4 cursor-pointer hover:bg-opacity-80 transition-colors"
+                className={`bg-[#F7F5F2] rounded-md p-4 cursor-pointer hover:bg-opacity-80 transition-colors ${
+                  selectedReport?.id === report.id ? 'ring-2 ring-[#D15F36]' : ''
+                }`}
                 onClick={() => handleReportClick(report.id)}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -137,7 +157,9 @@ const Reports: React.FC<ReportsProps> = ({ projectId }) => {
             {filteredReports.map(report => (
               <div 
                 key={report.id} 
-                className="flex items-center justify-between p-4 hover:bg-[#F7F5F2] rounded-md transition-colors cursor-pointer"
+                className={`flex items-center justify-between p-4 hover:bg-[#F7F5F2] rounded-md transition-colors cursor-pointer ${
+                  selectedReport?.id === report.id ? 'ring-2 ring-[#D15F36] bg-[#F7F5F2]' : ''
+                }`}
                 onClick={() => handleReportClick(report.id)}
               >
                 <div className="flex-1">
@@ -165,25 +187,17 @@ const Reports: React.FC<ReportsProps> = ({ projectId }) => {
           </div>
         </div>
       </div>
+
+      {/* Report Detail Panel */}
+      {selectedReport && (
+        <ReportDetail
+          report={selectedReport}
+          onClose={() => setSelectedReport(null)}
+          onEdit={() => navigate(`/project/${projectId}/reports/${selectedReport.id}/edit`)}
+        />
+      )}
     </div>
   );
-
-  const ReportDetailRoute = () => {
-    const { reportId } = useParams();
-    const report = mockReports.find(r => r.id === reportId);
-    
-    if (!report) {
-      return <div>Report not found</div>;
-    }
-
-    return (
-      <ReportDetail
-        report={report}
-        onClose={() => navigate(`/project/${projectId}/reports`)}
-        onEdit={() => navigate(`/project/${projectId}/reports/${reportId}/edit`)}
-      />
-    );
-  };
 
   const ReportEditorRoute = () => {
     const { reportId } = useParams();
@@ -208,7 +222,6 @@ const Reports: React.FC<ReportsProps> = ({ projectId }) => {
     <Routes>
       <Route path="/" element={<ReportsList />} />
       <Route path="/new" element={<ReportEditorRoute />} />
-      <Route path="/:reportId" element={<ReportDetailRoute />} />
       <Route path="/:reportId/edit" element={<ReportEditorRoute />} />
     </Routes>
   );
