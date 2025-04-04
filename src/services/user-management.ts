@@ -18,7 +18,7 @@ const ensureMockData = (organizationId: string = 'ACME-001') => {
 };
 
 // Helper function to create a ProjectUser from a ContactPerson
-const createProjectUser = (contact: ContactPerson, projectId: string): ProjectUser => {
+export const createProjectUser = (contact: ContactPerson, projectId: string): ProjectUser => {
   return {
     ...contact,
     isSignedUp: true,
