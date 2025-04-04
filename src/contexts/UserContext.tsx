@@ -18,55 +18,45 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user: clerkUser } = useClerkUser();
 
   useEffect(() => {
-    if (config.useMockData) {
-      // In development, use mock data
-      const mockUser: AuthUser = {
-        id: 'mock-user-1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        role: 'Project Manager',
-        avatar: null,
-        organizationId: null,
-        phone: '555-123-4567',
-        department: 'Engineering',
-        location: 'San Francisco, CA',
-        bio: 'Software engineer with a focus on web technologies',
-        company: 'Acme Construction',
-        socialLinks: {
-          linkedin: 'https://linkedin.com/in/johndoe',
-          twitter: 'https://twitter.com/johndoe'
+    const initializeUser = async () => {
+      if (config.useMockData) {
+        // In development/test, use mock data from auth service
+        const mockUser = await authService.getCurrentUser();
+        if (mockUser) {
+          setCurrentUser(mockUser);
+          authService.setMockUser(mockUser);
         }
-      };
-      setCurrentUser(mockUser);
-      authService.setMockUser(mockUser);
-    } else {
-      // In production, use Clerk
-      if (isLoaded && isSignedIn && clerkUser) {
-        const authUser: AuthUser = {
-          id: clerkUser.id,
-          name: clerkUser.fullName || 'Unknown User',
-          email: clerkUser.primaryEmailAddress?.emailAddress || '',
-          role: 'User',
-          avatar: clerkUser.imageUrl || null,
-          organizationId: clerkUser.organizationMemberships?.[0]?.organization?.id || null,
-          phone: clerkUser.phoneNumbers?.[0]?.phoneNumber || '',
-          department: '',
-          location: '',
-          bio: '',
-          company: clerkUser.organizationMemberships?.[0]?.organization?.name || '',
-          socialLinks: {
-            linkedin: '',
-            twitter: ''
-          }
-        };
-        
-        setCurrentUser(authUser);
-        authService.setClerkUser(clerkUser);
-      } else if (isLoaded && !isSignedIn) {
-        setCurrentUser(null);
-        authService.setClerkUser(null);
+      } else {
+        // In production, use Clerk
+        if (isLoaded && isSignedIn && clerkUser) {
+          const authUser: AuthUser = {
+            id: clerkUser.id,
+            name: clerkUser.fullName || 'Unknown User',
+            email: clerkUser.primaryEmailAddress?.emailAddress || '',
+            role: 'User',
+            avatar: clerkUser.imageUrl || null,
+            organizationId: clerkUser.organizationMemberships?.[0]?.organization?.id || null,
+            phone: clerkUser.phoneNumbers?.[0]?.phoneNumber || '',
+            department: '',
+            location: '',
+            bio: '',
+            company: clerkUser.organizationMemberships?.[0]?.organization?.name || '',
+            socialLinks: {
+              linkedin: '',
+              twitter: ''
+            }
+          };
+          
+          setCurrentUser(authUser);
+          authService.setClerkUser(clerkUser);
+        } else if (isLoaded && !isSignedIn) {
+          setCurrentUser(null);
+          authService.setClerkUser(null);
+        }
       }
-    }
+    };
+
+    initializeUser();
   }, [isLoaded, isSignedIn, clerkUser]);
 
   const logout = async () => {

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, useParams } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate, Navigate, useParams } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
+import { useAuth } from "@clerk/clerk-react";
 import Input from "./ui/input";
 import { Settings, Folder, LayoutDashboard, Bot, Sparkles, Calendar, Briefcase, Users, LogOut, Menu, X, History, FileText } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger } from "@radix-ui/react-tooltip";
@@ -54,6 +56,7 @@ const AppContent = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { projectId } = useParams();
+  const { currentUser } = useUser();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentProject, setCurrentProject] = useState<Project>(defaultProject);
 
@@ -264,13 +267,26 @@ const AppContent = () => {
   );
 };
 
-export default function AppFrame() {
+const AppFrame = () => {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  // Handle the loading state
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  // If the user is not signed in, redirect them to the sign-in page
+  if (!isSignedIn) {
+    return <Navigate to="/sign-in" replace />;
+  }
+
+  // User is signed in, show the protected content
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/project/:projectId/*" element={<AppContent />} />
-        <Route path="/" element={<Navigate to="/project/550e8400-e29b-41d4-a716-446655440000/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Navigate to="/project/550e8400-e29b-41d4-a716-446655440000/dashboard" replace />} />
+      <Route path="/project/:projectId/*" element={<AppContent />} />
+    </Routes>
   );
-}
+};
+
+export default AppFrame;

@@ -208,11 +208,132 @@
       - Connection state synchronization
 
 13. **Testing Strategy**
-    - Components include test scenarios for both mock and real data
-    - Error states and loading behaviors are testable
-    - Mock data provides consistent test cases
-    - Integration tests can swap mock data for API calls
-    - E2E tests can use mock data for predictable scenarios
+    - **Mock Organization**:
+      - Centralized mock data in `src/test/mockData.ts`
+      - Single source of truth for test data
+      - Type-safe mock data matching production interfaces
+      - Consistent mock data across all tests
+    
+    - **Mock System**:
+      - Centralized mock setup in `src/test/mocks.ts`
+      - Mocks for external dependencies (Clerk, React Router)
+      - Consistent mock behavior across tests
+      - Type-safe mock implementations
+      ```typescript
+      // Example mock setup
+      const mockClerkUser = {
+        id: 'test-user-1',
+        fullName: 'Test User',
+        primaryEmailAddress: { emailAddress: 'test@example.com' },
+        imageUrl: null,
+        organizationMemberships: [{
+          organization: {
+            id: 'test-org-1',
+            name: 'Test Organization'
+          }
+        }]
+      };
+
+      vi.mock('@clerk/clerk-react', () => ({
+        useUser: () => ({
+          isSignedIn: true,
+          isLoaded: true,
+          user: mockClerkUser
+        })
+      }));
+      ```
+    
+    - **Test Utilities**:
+      - Reusable test wrapper components
+      - Consistent provider setup
+      - Helper functions for common test operations
+      ```typescript
+      export const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+        <BrowserRouter>
+          <UserProvider>
+            {children}
+          </UserProvider>
+        </BrowserRouter>
+      );
+
+      export const renderWithProviders = (ui: React.ReactElement) => {
+        return render(ui, { wrapper: TestWrapper });
+      };
+      ```
+    
+    - **Async Testing**:
+      - Proper handling of async effects
+      - Use of `waitFor` for async assertions
+      - Consistent async patterns across tests
+      ```typescript
+      it('provides current user from mock data', async () => {
+        const { result } = renderHook(() => useUser(), { wrapper: TestWrapper });
+        
+        await waitFor(() => {
+          expect(result.current.currentUser).toEqual(mockAuthUser);
+        });
+      });
+      ```
+    
+    - **Test Categories**:
+      - Unit Tests:
+        - Individual component behavior
+        - Hook functionality
+        - Utility functions
+      - Integration Tests:
+        - Component interactions
+        - Context providers
+        - Service integration
+      - User Interaction Tests:
+        - Click handlers
+        - Form submissions
+        - Navigation flows
+    
+    - **Test Setup**:
+      - Clear test boundaries
+      - Isolated test environments
+      - Proper cleanup between tests
+      ```typescript
+      describe('Component', () => {
+        beforeEach(() => {
+          vi.clearAllMocks();
+        });
+
+        // Test cases...
+      });
+      ```
+    
+    - **Error Handling**:
+      - Test error scenarios
+      - Validate error messages
+      - Check error state management
+      - Test recovery flows
+    
+    - **Mock Data Validation**:
+      - Type checking for mock data
+      - Realistic test scenarios
+      - Edge case coverage
+      - Consistent with production data structure
+    
+    - **Performance Testing**:
+      - Component render performance
+      - State update efficiency
+      - Memory usage monitoring
+      - Network call optimization
+    
+    - **Accessibility Testing**:
+      - ARIA attribute validation
+      - Keyboard navigation
+      - Screen reader compatibility
+      - Color contrast checking
+    
+    - **Best Practices**:
+      - Follow React Testing Library guidelines
+      - Use semantic queries
+      - Test user behavior over implementation
+      - Maintain test readability
+      - Document test patterns
+      - Regular test maintenance
 
 14. **Toast Notifications**
     - **Usage Guidelines**:
@@ -583,3 +704,247 @@
       - Advanced role management
       - Audit logging
       - Enhanced security features
+
+    - **Testing Clerk Authentication**:
+      - **Test Environment Setup**:
+        - Create a separate Clerk application for testing at https://dashboard.clerk.com
+        - Use test-specific publishable key and secret key
+        - Configure test application with same settings as production
+      
+      - **Test User Creation**:
+        ```bash
+        # Using Clerk CLI
+        npm install -g @clerk/clerk-sdk-node
+        export CLERK_API_KEY=test_your_api_key
+        clerk user:create \
+          --email=test@example.com \
+          --password=test-password-123 \
+          --first-name=Test \
+          --last-name=User
+        ```
+      
+      - **E2E Testing Flow**:
+        1. Sign Up:
+           ```typescript
+           // cypress/e2e/auth.cy.ts
+           describe('Authentication', () => {
+             it('allows new user to sign up', () => {
+               cy.visit('/sign-up');
+               cy.get('[data-testid="email-input"]')
+                 .type('new-user@example.com');
+               cy.get('[data-testid="password-input"]')
+                 .type('secure-password-123');
+               cy.get('[data-testid="sign-up-button"]').click();
+               cy.url().should('include', '/dashboard');
+             });
+           });
+           ```
+        
+        2. Sign In:
+           ```typescript
+           it('allows existing user to sign in', () => {
+             cy.visit('/sign-in');
+             cy.get('[data-testid="email-input"]')
+               .type('test@example.com');
+             cy.get('[data-testid="password-input"]')
+               .type('test-password-123');
+             cy.get('[data-testid="sign-in-button"]').click();
+             cy.url().should('include', '/dashboard');
+           });
+           ```
+        
+        3. Password Reset:
+           ```typescript
+           it('handles password reset flow', () => {
+             cy.visit('/reset-password');
+             cy.get('[data-testid="email-input"]')
+               .type('test@example.com');
+             cy.get('[data-testid="reset-button"]').click();
+             // Check email for reset link
+             // Use Clerk test environment email capture
+           });
+           ```
+      
+      - **Test Environment Features**:
+        - Email capture for verification/reset emails
+        - OAuth provider simulation
+        - Rate limit testing
+        - Error scenario testing
+      
+      - **CI/CD Integration**:
+        ```yaml
+        # .github/workflows/test.yml
+        env:
+          CLERK_PUBLISHABLE_KEY: ${{ secrets.TEST_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.TEST_CLERK_SECRET_KEY }}
+        
+        steps:
+          - uses: actions/checkout@v2
+          - name: Install dependencies
+            run: npm install
+          - name: Run E2E tests
+            run: npm run test:e2e
+        ```
+      
+      - **Test User Management**:
+        - Create test users via API
+        - Clean up test users after tests
+        - Manage test user sessions
+        - Handle test organization membership
+      
+      - **OAuth Testing**:
+        - Use Clerk's OAuth test providers
+        - Simulate OAuth flows
+        - Test OAuth error cases
+        - Validate OAuth user data
+      
+      - **Security Testing**:
+        - Test session handling
+        - Validate token management
+        - Check permission enforcement
+        - Test rate limiting
+      
+      - **Test Data Isolation**:
+        - Separate test tenant
+        - Isolated test users
+        - Clean test environment
+        - No production data access
+
+21. **Authentication Testing**
+    - **Test Environment Setup**:
+      - Uses Jest and React Testing Library
+      - Mock Clerk provider for integration tests
+      - Separate test configurations for mock and Clerk auth
+      - Environment variable management for test runs
+    
+    - **Mock Providers**:
+      ```typescript
+      // Mock Clerk Provider wrapper
+      const MockClerkProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+        const mockUser = {
+          id: 'test-user-1',
+          fullName: 'Test User',
+          primaryEmailAddress: { emailAddress: 'test@example.com' },
+          imageUrl: null,
+          organizationMemberships: [{
+            organization: {
+              id: 'test-org-1',
+              name: 'Test Organization'
+            }
+          }]
+        };
+
+        return (
+          <ClerkProvider publishableKey="test-key" initialState={{
+            user: mockUser,
+            organization: null
+          }}>
+            {children}
+          </ClerkProvider>
+        );
+      };
+      ```
+    
+    - **Test Categories**:
+      - Unit Tests:
+        - AuthService methods
+        - UserContext hooks
+        - Component rendering
+        - Error handling
+      - Integration Tests:
+        - Authentication flow
+        - User session management
+        - Organization switching
+        - Profile updates
+      - E2E Tests:
+        - Login/logout flow
+        - Profile management
+        - Settings updates
+        - Role changes
+    
+    - **Test Data**:
+      - Mock user profiles
+      - Organization data
+      - Session states
+      - Error scenarios
+      - Loading states
+    
+    - **Test Utilities**:
+      ```typescript
+      // Auth test helpers
+      const mockAuthState = {
+        renderWithAuth: (ui: React.ReactElement) => {
+          return render(
+            <MockClerkProvider>
+              <UserProvider>{ui}</UserProvider>
+            </MockClerkProvider>
+          );
+        },
+        mockUser: { /* standard test user */ },
+        mockOrganization: { /* standard test org */ }
+      };
+      ```
+    
+    - **Common Test Scenarios**:
+      - Successful authentication
+      - Failed authentication
+      - Session expiry
+      - Organization switching
+      - Profile updates
+      - Permission changes
+    
+    - **Testing Guidelines**:
+      - Mock external API calls
+      - Test both success and error paths
+      - Verify UI feedback
+      - Check loading states
+      - Validate form submissions
+      - Test role-based access
+    
+    - **CI/CD Integration**:
+      - Automated test runs
+      - Environment setup
+      - Test coverage requirements
+      - Performance benchmarks
+    
+    - **Example Tests**:
+      ```typescript
+      describe('Authentication Flow', () => {
+        it('should handle successful login', async () => {
+          const { result } = renderHook(() => useUser(), {
+            wrapper: MockClerkProvider
+          });
+          
+          expect(result.current.currentUser).toBeTruthy();
+          expect(result.current.currentUser?.email).toBe('test@example.com');
+        });
+
+        it('should handle profile updates', async () => {
+          const { getByRole, findByText } = renderWithAuth(<GeneralSettings />);
+          
+          await userEvent.click(getByRole('button', { name: /edit profile/i }));
+          // Test profile update flow
+        });
+      });
+      ```
+    
+    - **Mocking Strategies**:
+      - API responses
+      - User sessions
+      - Organization data
+      - Error conditions
+      - Loading states
+    
+    - **Performance Testing**:
+      - Authentication speed
+      - State updates
+      - Component rendering
+      - Memory usage
+      - Network calls
+    
+    - **Security Testing**:
+      - Token validation
+      - Permission checks
+      - Session handling
+      - Error exposure
+      - Data access control
